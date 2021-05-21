@@ -10,6 +10,8 @@ make setup.local
 
 This will setup your local (one-node) cluster, and print out available default services and their access credentials.
 
+![](docs/print-access-creds.png)
+
 ## Accessing services
 For developer convenience, the cluster will have a http proxy running for you to access any services internal to the cluster.
 
