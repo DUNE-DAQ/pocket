@@ -51,9 +51,9 @@
       - jq
       - tc
       - "{{ ( (ansible_facts.distribution_major_version | int) < 8) | ternary('libselinux-python','python3-libselinux') }}"
-      - kubelet
-      - kubeadm
-      - kubectl
+      - kubelet-1.21.1
+      - kubeadm-1.21.1
+      - kubectl-1.21.1
       state: latest
 
   - name: docker config folder
@@ -111,7 +111,7 @@
 
   - name: bootstrap cluster
     when: kube_conf_present.stat.exists == false
-    script: kubeadm-init.sh pocketdune-{{ lookup('env', 'OS_USERNAME') }}-master.cern.ch
+    script: kubeadm-init.sh {{ lookup('env', 'OS_USERNAME') }}-pocketdune.cern.ch
     register: bootstrap_script
     run_once: true
   - debug: var=bootstrap_script.stdout_lines
@@ -127,36 +127,14 @@
     run_once: true
     changed_when: false
 
+  - name: fetch kubectl config
+    ansible.builtin.fetch:
+      src: /etc/kubernetes/admin.conf
+      dest: admin.conf
+
 - hosts: all:!bootstrapper
   tasks:
-  - name: join cluster as worker
+  - name: join cluster
     when: kube_conf_present.stat.exists == false
     script: kubeadm-join.sh "{{ hostvars[groups['bootstrapper'][0]]['worker_join_command_script']['stdout'] }}" "{{ hostvars[groups['bootstrapper'][0]]['certificate_key_script']['stdout'] }}"
-
-  # - name: nginx repo
-  #   copy:
-  #     content: |
-  #       [nginx]
-  #       name=nginx repo
-  #       baseurl=https://nginx.org/packages/mainline/centos/7/$basearch/
-  #       gpgcheck=0
-  #       enabled=1
-  #     dest: /etc/yum.repos.d/nginx.repo
-  # - name: install nginx
-  #   yum:
-  #     name:
-  #     - nginx
-  #     state: latest
-  # - name: nginx config
-  #   copy:
-  #     src: nginx.conf
-  #     dest: /etc/nginx/nginx.conf
-  #     mode: '0644'
-  # - name: Start nginx
-  #   systemd:
-  #     state: restarted
-  #     name: nginx
-  #     daemon_reload: yes
-  #     enabled: yes
-
 

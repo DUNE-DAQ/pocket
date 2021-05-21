@@ -21,25 +21,24 @@ locals {
     index         = i,
     flavor        = entry.flavor,
     flavor_index  = entry.flavor_index,
-    instance_name = "${var.cluster_name}-master-${entry.id}"
+    instance_name = "${var.cluster_name}-${entry.id}"
   }]
 
   nodes_yaml = {
     all = {
       vars = {
-        k8s_version                  = "1.20.6"
         ansible_ssh_private_key_file = "../terraform/ssh.key"
         ansible_user                 = "root"
       }
       children = {
         nodes = {
           hosts = {
-            for flavor, count in var.node_flavor_counts : "${var.cluster_name}-master-${flavor}-[1:${count}]" => {}
+            for flavor, count in var.node_flavor_counts : "${var.cluster_name}-${replace(flavor, ".", "-")}-[1:${count}]" => {}
           }
         }
         bootstrapper = {
           hosts = {
-            "${var.cluster_name}-master-${keys(var.node_flavor_counts)[0]}-1" = {}
+            "${var.cluster_name}-${replace(keys(var.node_flavor_counts)[0], ".", "-")}-1" = {}
           }
         }
       }
