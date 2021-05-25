@@ -2,6 +2,7 @@ apiVersion: elasticsearch.k8s.elastic.co/v1
 kind: Elasticsearch
 metadata:
   name: dune-eck
+  namespace: monitoring
 spec:
   version: 7.12.1
   nodeSets:
@@ -14,6 +15,7 @@ apiVersion: kibana.k8s.elastic.co/v1
 kind: Kibana
 metadata:
   name: dune-eck
+  namespace: monitoring
 spec:
   version: 7.12.1
   count: 1

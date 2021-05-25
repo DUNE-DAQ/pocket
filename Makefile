@@ -68,15 +68,28 @@ setup.openstack: on-cern-network check_openstack_login terraform ansible depende
 
 .PHONY: kubectl-apply
 kubectl-apply: kubectl manifests/CRDs/eck.yaml manifests/metricbeat.yaml ## apply files in `manifests` using kubectl
-#	bash manifests/operator-lifecycle-manager.sh v0.18.1
+	@-./kubectl create ns monitoring
+	@-./kubectl -n monitoring create secret generic grafana-secrets \
+  --from-literal=GF_SECURITY_SECRET_KEY=$(shell < /dev/urandom tr -dc _A-Z-a-z-0-9-=%. | head -c$${1:-32};echo;) \
+	--from-literal=GF_SECURITY_ADMIN_PASSWORD="$(shell < /dev/urandom tr -dc _A-Z-a-z-0-9-=%. | head -c$${1:-32};echo;)"
+
+	@-kubectl -n monitoring create secret generic influxdb-secrets \
+	--from-literal=INFLUXDB_CONFIG_PATH=/etc/influxdb/influxdb.conf \
+  --from-literal=INFLUXDB_DB=influxdb \
+	--from-literal=INFLUXDB_URL=http://influxdb.monitoring:8086 \
+  --from-literal=INFLUXDB_USER=user \
+  --from-literal=INFLUXDB_USER_PASSWORD=$(shell < /dev/urandom tr -dc _A-Z-a-z-0-9-=%. | head -c$${1:-32};echo;) \
+  --from-literal=INFLUXDB_READ_USER=readonly \
+  --from-literal=INFLUXDB_READ_USER_PASSWORD=readonly \
+  --from-literal=INFLUXDB_ADMIN_USER=dune \
+  --from-literal=INFLUXDB_ADMIN_USER_PASSWORD=$(shell < /dev/urandom tr -dc _A-Z-a-z-0-9-=%. | head -c$${1:-32};echo;) \
+  --from-literal=INFLUXDB_HOST=influxdb.monitoring  \
+  --from-literal=INFLUXDB_HTTP_AUTH_ENABLED=false
+
 	./kubectl apply -f manifests/CRDs
 	./kubectl wait --for condition=established --timeout=60s crd/kibanas.kibana.k8s.elastic.co
+
 	./kubectl apply -f manifests
-	./kubectl apply -f kube-prometheus/manifests/setup
-	./kubectl wait --for condition=established --timeout=60s crd/servicemonitors.monitoring.coreos.com
-	./kubectl apply -f kube-prometheus/manifests
-#	$(go) get github.com/jsonnet-bundler/jsonnet-bundler/cmd/jb
-#	cd kube-prometheus && $(jb)
 
 ##
 ### Destroy any created setups
@@ -111,32 +124,50 @@ endif
 
 print-access-creds: kubectl ## retrieve and print access data for provided services
 	@echo -n "waiting for ECK to start"
-	@while ! ./kubectl get secret dune-eck-es-elastic-user 2>/dev/null >&2 ; do echo -n "."; sleep 1s; done; echo ""
+	@while ! ./kubectl -n monitoring get secret dune-eck-es-elastic-user 2>/dev/null >&2 ; do echo -n "."; sleep 1s; done; echo ""
 	@echo ""
 	@echo -e "\e[34mAvailable services:\e[0m"
 
 	@echo "Elasticsearch"
-	@echo "	URL: https://dune-eck-es-http:9200/"
+	@echo "	URL: https://dune-eck-es-http.monitoring:9200/"
 	@echo "	User: elastic"
 	@echo -n "	Password: "
-	@./kubectl get secret dune-eck-es-elastic-user -o=jsonpath='{.data.elastic}' | base64 --decode; echo
+	@./kubectl get -n monitoring secret dune-eck-es-elastic-user -o=jsonpath='{.data.elastic}' | base64 --decode; echo
 
 	@echo "Kibana"
-	@echo "	URL: https://dune-eck-kb-http:5601/"
+	@echo "	URL: https://dune-eck-kb-http.monitoring:5601/"
 	@echo "	User: elastic"
 	@echo -n "	Password: "
-	@./kubectl get secret dune-eck-es-elastic-user -o=jsonpath='{.data.elastic}' | base64 --decode; echo
+	@./kubectl get -n monitoring secret dune-eck-es-elastic-user -o=jsonpath='{.data.elastic}' | base64 --decode; echo
 
 	@echo "Grafana"
 	@echo "	URL: http://grafana.monitoring:3000/"
-	@echo "	User: admin"
-	@echo "	Password: admin"
+	@echo "	User: dune"
+	@echo -n "	Password: "
+	@./kubectl get -n monitoring secret grafana-secrets -o=jsonpath='{.data.GF_SECURITY_ADMIN_PASSWORD}' | base64 --decode; echo
 
-	@echo "Alertmanager"
-	@echo "	URL: http://alertmanager-main.monitoring:9093"
+	@echo "InfluxDB"
+	@echo "	URL: http://influxdb.monitoring:8086/"
+	@echo "	User: readonly"
+	@echo "	Password: readonly"
+	@echo "	User: user"
+	@echo -n "	Password: "
+	@./kubectl get -n monitoring secret influxdb-secrets -o=jsonpath='{.data.INFLUXDB_USER_PASSWORD}' | base64 --decode; echo
+	@echo "	User: dune"
+	@echo -n "	Password: "
+	@./kubectl get -n monitoring secret influxdb-secrets -o=jsonpath='{.data.INFLUXDB_ADMIN_USER_PASSWORD}' | base64 --decode; echo
 
-	@echo "Prometheus"
-	@echo "	URL: http://prometheus-k8s.monitoring:9090/"
+##
+### Docker images
+##
+
+.PHONY: images
+images: images.grafana ## build all images
+
+.PHONY: images.grafana
+images.grafana: ## build Grafana image
+	docker build -t juravenator/pocket-grafana:latest stuff/grafana
+	docker push juravenator/pocket-grafana:latest
 
 ##
 ### Dependencies
@@ -186,6 +217,6 @@ manifests/metricbeat.yaml: # fetch metricbeats manifest
 	curl -Lo manifests/metricbeat.yaml --fail https://raw.githubusercontent.com/elastic/beats/7.12/deploy/kubernetes/metricbeat-kubernetes.yaml
 
 manifests/CRDs/eck.yaml: # fetch the ECK operator
-	curl -Lo manifests/CRDs/eck.yaml --fail https://download.elastic.co/downloads/eck/1.5.0/all-in-one.yaml
+	curl -Lo manifests/CRDs/eck.yaml --fail https://download.elastic.co/downloads/eck/1.6.0/all-in-one.yaml
 
 include .makefile/help.mk
