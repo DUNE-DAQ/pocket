@@ -41,7 +41,7 @@ terraform := $(shell pwd)/terraform
 ##
 
 .PHONY: setup.local
-setup.local: kind ## start local setup
+setup.local: dependency.docker kind ## start local setup
 	./kind create cluster --config local/kind.config.yml
 	$(MAKE) --no-print-directory kubectl-apply
 	$(MAKE) --no-print-directory print-access-creds
