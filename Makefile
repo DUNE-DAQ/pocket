@@ -67,13 +67,13 @@ setup.openstack: on-cern-network check_openstack_login terraform ansible depende
 	@echo "31000"
 
 .PHONY: kubectl-apply
-kubectl-apply: kubectl manifests/CRDs/eck.yaml manifests/metricbeat.yaml ## apply files in `manifests` using kubectl
-	@-./kubectl create ns monitoring
-	@-./kubectl -n monitoring create secret generic grafana-secrets \
+kubectl-apply: kubectl external-manifests ## apply files in `manifests` using kubectl
+	@-2>/dev/null ./kubectl create ns monitoring
+	@-2>/dev/null ./kubectl -n monitoring create secret generic grafana-secrets \
   --from-literal=GF_SECURITY_SECRET_KEY=$(shell < /dev/urandom tr -dc _A-Z-a-z-0-9-=%. | head -c$${1:-32};echo;) \
 	--from-literal=GF_SECURITY_ADMIN_PASSWORD="$(shell < /dev/urandom tr -dc _A-Z-a-z-0-9-=%. | head -c$${1:-32};echo;)"
 
-	@-kubectl -n monitoring create secret generic influxdb-secrets \
+	@-2>/dev/null kubectl -n monitoring create secret generic influxdb-secrets \
 	--from-literal=INFLUXDB_CONFIG_PATH=/etc/influxdb/influxdb.conf \
   --from-literal=INFLUXDB_DB=influxdb \
 	--from-literal=INFLUXDB_URL=http://influxdb.monitoring:8086 \
@@ -126,27 +126,27 @@ print-access-creds: kubectl ## retrieve and print access data for provided servi
 	@echo -n "waiting for ECK to start"
 	@while ! ./kubectl -n monitoring get secret dune-eck-es-elastic-user 2>/dev/null >&2 ; do echo -n "."; sleep 1s; done; echo ""
 	@echo ""
-	@echo -e "\e[34mAvailable services:\e[0m"
+	@echo -e "Available services:"
 
-	@echo "Elasticsearch"
+	@echo -e "\e[34mElasticsearch\e[0m"
 	@echo "	URL: https://dune-eck-es-http.monitoring:9200/"
 	@echo "	User: elastic"
 	@echo -n "	Password: "
 	@./kubectl get -n monitoring secret dune-eck-es-elastic-user -o=jsonpath='{.data.elastic}' | base64 --decode; echo
 
-	@echo "Kibana"
+	@echo -e "\e[34mKibana\e[0m"
 	@echo "	URL: https://dune-eck-kb-http.monitoring:5601/"
 	@echo "	User: elastic"
 	@echo -n "	Password: "
 	@./kubectl get -n monitoring secret dune-eck-es-elastic-user -o=jsonpath='{.data.elastic}' | base64 --decode; echo
 
-	@echo "Grafana"
+	@echo -e "\e[34mGrafana\e[0m"
 	@echo "	URL: http://grafana.monitoring:3000/"
 	@echo "	User: dune"
 	@echo -n "	Password: "
 	@./kubectl get -n monitoring secret grafana-secrets -o=jsonpath='{.data.GF_SECURITY_ADMIN_PASSWORD}' | base64 --decode; echo
 
-	@echo "InfluxDB"
+	@echo -e "\e[34mInfluxDB\e[0m"
 	@echo "	URL: http://influxdb.monitoring:8086/"
 	@echo "	User: readonly"
 	@echo "	Password: readonly"
@@ -156,6 +156,15 @@ print-access-creds: kubectl ## retrieve and print access data for provided servi
 	@echo "	User: dune"
 	@echo -n "	Password: "
 	@./kubectl get -n monitoring secret influxdb-secrets -o=jsonpath='{.data.INFLUXDB_ADMIN_USER_PASSWORD}' | base64 --decode; echo
+
+	@echo -e "\e[34mKubernetes dashboard\e[0m"
+	@echo "	URL: http://kubernetes-dashboard.kubernetes-dashboard"
+	@echo "	Password: none. click 'skip' in login window"
+
+	@echo ""
+	@echo -n "These services are accessible over a proxy server at http:"
+	@kubectl config view --minify -o=jsonpath='{.clusters[0].cluster.server}' | cut -d ':' -f2 | tr -d '\n'
+	@echo ":31000"
 
 ##
 ### Docker images
@@ -213,10 +222,16 @@ kubectl: ## fetch kubectl binary
 	curl -LO --fail https://dl.k8s.io/release/v1.21.0/bin/${uname_s}/${COMMON_ARCH}/kubectl
 	chmod +x kubectl
 
+.PHONY: external-manifests
+external-manifests: manifests/metricbeat.yaml manifests/CRDs/eck.yaml manifests/kubernetes-dashboard-recommended.yaml
+
 manifests/metricbeat.yaml: # fetch metricbeats manifest
 	curl -Lo manifests/metricbeat.yaml --fail https://raw.githubusercontent.com/elastic/beats/7.12/deploy/kubernetes/metricbeat-kubernetes.yaml
 
 manifests/CRDs/eck.yaml: # fetch the ECK operator
 	curl -Lo manifests/CRDs/eck.yaml --fail https://download.elastic.co/downloads/eck/1.6.0/all-in-one.yaml
+
+manifests/kubernetes-dashboard-recommended.yaml: # fetch kubernetes dashboard manifest
+	curl -Lo manifests/kubernetes-dashboard-recommended.yaml --fail https://raw.githubusercontent.com/kubernetes/dashboard/v2.2.0/aio/deploy/recommended.yaml
 
 include .makefile/help.mk
