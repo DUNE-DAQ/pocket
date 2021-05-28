@@ -5,52 +5,7 @@ SHELL:=/bin/bash
 ## helper variables
 ##
 
-SERVICES ?= ECK,opmon
-
-ifeq ($(findstring opmon,$(SERVICES)),)
-	OPMON_ENABLED=0
-else
-	OPMON_ENABLED=1
-endif
-
-ifeq ($(findstring ECK,$(SERVICES)),)
-	ECK_ENABLED=0
-else
-	ECK_ENABLED=1
-endif
-
-# Linux: 'linux'
-# MacOS: 'darwin'
-uname_s := $(shell uname -s | tr '[:upper:]' '[:lower:]')
-# x86_64: 'x86_64'
-# Apple M1: 'arm64'
-uname_m := $(shell uname -m)
-
-COMMON_ARCH.x86_64 := amd64
-COMMON_ARCH := $(or ${COMMON_ARCH.${uname_m}},${uname_m})
-
-OS=unknown
-OS_VERSION=unknown
-
-ifeq ($(uname_s),linux)
-	PRETTY_NAME := $(shell source /etc/os-release && echo $$PRETTY_NAME)
-	ifneq ($(findstring CentOS,$(PRETTY_NAME)),)
-		OS=centos
-	endif
-
-	ifneq ($(findstring CentOS Linux 7,$(PRETTY_NAME)),)
-		OS_VERSION=7
-	else ifneq ($(findstring CentOS Linux 8,$(PRETTY_NAME)),)
-		OS_VERSION=8
-	endif
-else ifeq ($(uname_s),darwin)
-	OS=macos
-endif
-
-TERRAFORM_VERSION ?= 0.15.3
-terraform := $(shell pwd)/terraform
-
-IP_ADDR := $(shell ip -4 addr show dev "$(shell awk '$$2 == 00000000 { print $$1 }' /proc/net/route)" | awk '$$1 ~ /^inet/ { sub("/.*", "", $$2); print $$2 }' | head -1)
+include .makefile/vars.mk
 
 ##
 ### Setup an installation of Pocket
@@ -155,88 +110,7 @@ ifndef OS_PASSWORD
 endif
 
 print-access-creds: kubectl ## retrieve and print access data for provided services
-	@echo -e "Available services:"
-	
-	@(>/dev/null 2>&1 kubectl get crd/kibanas.kibana.k8s.elastic.co && $(MAKE) --no-print-directory _print-eck-creds) ||:
-	@(>/dev/null 2>&1 kubectl -n monitoring get secret/grafana-secrets secret/influxdb-secrets && $(MAKE) --no-print-directory _print-opmon-creds) ||:
-	@$(MAKE) --no-print-directory _print-dashboard-creds
-
-	@echo ""
-	@echo -n "These services are accessible over a proxy server at http:"
-	@kubectl config view --minify -o=jsonpath='{.clusters[0].cluster.server}' | cut -d ':' -f2 | tr -d '\n'
-	@echo ":31000"
-
-.PHONY: _print-eck-creds
-_print-eck-creds:
-	@echo -n "waiting for ECK to start"
-	@while ! ./kubectl -n monitoring get secret dune-eck-es-elastic-user 2>/dev/null >&2 ; do echo -n "."; sleep 1s; done; echo ""
-	@echo ""
-	@echo -e "\e[34mElasticsearch\e[0m"
-	@echo -n "	URL (in-cluster): https://elasticsearch.monitoring:"
-	@kubectl -n monitoring get service elasticsearch -ojsonpath='{.spec.ports[0].port}'; echo
-
-	@echo -n "	URL (out-cluster): https://${IP_ADDR}:"
-	@kubectl -n monitoring get service elasticsearch -ojsonpath='{.spec.ports[0].nodePort}'; echo
-
-	@echo -n "	User: elastic"
-	@echo -n "	Password: "
-	@./kubectl get -n monitoring secret dune-eck-es-elastic-user -o=jsonpath='{.data.elastic}' | base64 --decode; echo
-
-	@echo -e "\e[34mKibana\e[0m"
-	@echo -n "	URL (in-cluster): https://kibana.monitoring:"
-	@kubectl -n monitoring get service kibana -ojsonpath='{.spec.ports[0].port}'; echo
-
-	@echo -n "	URL (out-cluster): http://${IP_ADDR}:"
-	@kubectl -n monitoring get service kibana -ojsonpath='{.spec.ports[0].nodePort}'; echo
-
-	@echo -n "	User: elastic"
-	@echo -n "	Password: "
-	@./kubectl get -n monitoring secret dune-eck-es-elastic-user -o=jsonpath='{.data.elastic}' | base64 --decode; echo
-
-
-.PHONY: _print-opmon-creds
-_print-opmon-creds:
-	@echo -e "\e[34mGrafana\e[0m"
-	@echo -n "	URL (in-cluster): http://grafana.monitoring:"
-	@kubectl -n monitoring get service grafana -ojsonpath='{.spec.ports[0].port}'; echo
-
-	@echo -n "	URL (out-cluster): http://${IP_ADDR}:"
-	@kubectl -n monitoring get service grafana -ojsonpath='{.spec.ports[0].nodePort}'; echo
-
-	@echo -n "	User: dune"
-	@echo -n "	Password: "
-	@./kubectl get -n monitoring secret grafana-secrets -o=jsonpath='{.data.GF_SECURITY_ADMIN_PASSWORD}' | base64 --decode; echo
-
-	@echo -e "\e[34mInfluxDB\e[0m"
-	@echo -n "	URL (in-cluster): http://influxdb.monitoring:"
-	@kubectl -n monitoring get service influxdb -ojsonpath='{.spec.ports[0].port}'; echo
-
-	@echo -n "	URL (out-cluster): http://${IP_ADDR}:"
-	@kubectl -n monitoring get service influxdb -ojsonpath='{.spec.ports[0].nodePort}'; echo
-
-	@echo -n "	User: "
-	@./kubectl get -n monitoring secret influxdb-secrets -o=jsonpath='{.data.INFLUXDB_READ_USER}' | base64 --decode;
-	@echo -n "	Password: "
-	@./kubectl get -n monitoring secret influxdb-secrets -o=jsonpath='{.data.INFLUXDB_READ_USER_PASSWORD}' | base64 --decode; echo
-
-	@echo -n "	User: "
-	@./kubectl get -n monitoring secret influxdb-secrets -o=jsonpath='{.data.INFLUXDB_USER}' | base64 --decode;
-	@echo -n "	Password: "
-	@./kubectl get -n monitoring secret influxdb-secrets -o=jsonpath='{.data.INFLUXDB_USER_PASSWORD}' | base64 --decode; echo
-
-	@echo -n "	User: "
-	@./kubectl get -n monitoring secret influxdb-secrets -o=jsonpath='{.data.INFLUXDB_ADMIN_USER}' | base64 --decode;
-	@echo -n "	Password: "
-	@./kubectl get -n monitoring secret influxdb-secrets -o=jsonpath='{.data.INFLUXDB_ADMIN_USER_PASSWORD}' | base64 --decode; echo
-
-.PHONY: _print-dashboard-creds
-_print-dashboard-creds:
-	@echo -e "\e[34mKubernetes dashboard\e[0m"
-	@echo "	URL (in-cluster): http://kubernetes-dashboard.kubernetes-dashboard"
-	@echo -n "	URL (out-cluster): http://${IP_ADDR}:"
-	@kubectl -n kubernetes-dashboard get service kubernetes-dashboard -ojsonpath='{.spec.ports[0].nodePort}'; echo
-	@echo "	Password: none. click 'skip' in login window"
-
+	@.makefile/print-creds.sh
 
 ##
 ### Docker images
