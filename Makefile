@@ -36,15 +36,37 @@ endif
 TERRAFORM_VERSION ?= 0.15.3
 terraform := $(shell pwd)/terraform
 
+SERVICES ?= ECK,opmon,dashboard
+
+ifeq ($(findstring opmon,$(SERVICES)),)
+	OPMON_ENABLED=0
+else
+	OPMON_ENABLED=1
+endif
+
+ifeq ($(findstring ECK,$(SERVICES)),)
+	ECK_ENABLED=0
+else
+	ECK_ENABLED=1
+endif
+
+ifeq ($(findstring dashboard,$(SERVICES)),)
+	DASHBOARD_ENABLED=0
+else
+	DASHBOARD_ENABLED=1
+endif
+
+
 ##
-### Setup an installation of pocketDUNE
+### Setup an installation of Pocket
 ##
 
 .PHONY: setup.local
 setup.local: dependency.docker kind ## start local setup
-	./kind create cluster --config local/kind.config.yml
-	$(MAKE) --no-print-directory kubectl-apply
-	$(MAKE) --no-print-directory print-access-creds
+	@./kind create cluster --config local/kind.config.yml
+	@$(MAKE) --no-print-directory kubectl-apply
+	@echo ""
+	@$(MAKE) --no-print-directory print-access-creds
 
 .PHONY: setup.openstack
 setup.openstack: on-cern-network check_openstack_login terraform ansible dependency.ssh ## create a setup in your openstack account
@@ -68,12 +90,16 @@ setup.openstack: on-cern-network check_openstack_login terraform ansible depende
 
 .PHONY: kubectl-apply
 kubectl-apply: kubectl external-manifests ## apply files in `manifests` using kubectl
-	@-2>/dev/null ./kubectl create ns monitoring
-	@-2>/dev/null ./kubectl -n monitoring create secret generic grafana-secrets \
+ifeq ($(OPMON_ENABLED),0)
+	@echo -e "\e[33mskipping installation of opmon\e[0m"
+else
+	@echo "installing opmon"
+	@->/dev/null 2>&1 ./kubectl apply -f manifests/opmon/ns-monitoring.yaml
+	@->/dev/null 2>&1 ./kubectl -n monitoring create secret generic grafana-secrets \
   --from-literal=GF_SECURITY_SECRET_KEY=$(shell < /dev/urandom tr -dc _A-Z-a-z-0-9-=%. | head -c$${1:-32};echo;) \
 	--from-literal=GF_SECURITY_ADMIN_PASSWORD="$(shell < /dev/urandom tr -dc _A-Z-a-z-0-9-=%. | head -c$${1:-32};echo;)"
 
-	@-2>/dev/null kubectl -n monitoring create secret generic influxdb-secrets \
+	@->/dev/null 2>&1 kubectl -n monitoring create secret generic influxdb-secrets \
 	--from-literal=INFLUXDB_CONFIG_PATH=/etc/influxdb/influxdb.conf \
   --from-literal=INFLUXDB_DB=influxdb \
 	--from-literal=INFLUXDB_URL=http://influxdb.monitoring:8086 \
@@ -86,10 +112,25 @@ kubectl-apply: kubectl external-manifests ## apply files in `manifests` using ku
   --from-literal=INFLUXDB_HOST=influxdb.monitoring  \
   --from-literal=INFLUXDB_HTTP_AUTH_ENABLED=false
 
-	./kubectl apply -f manifests/CRDs
-	./kubectl wait --for condition=established --timeout=60s crd/kibanas.kibana.k8s.elastic.co
+	@>/dev/null ./kubectl apply -f manifests/opmon
+endif
 
-	./kubectl apply -f manifests
+ifeq ($(ECK_ENABLED),0)
+	@echo -e "\e[33mskipping installation of Elastic stack\e[0m"
+else
+	@echo "installing Elastic stack"
+	@>/dev/null ./kubectl apply -f manifests/ECK/CRDs
+	@>/dev/null ./kubectl wait --for condition=established --timeout=60s crd/kibanas.kibana.k8s.elastic.co
+
+	@>/dev/null ./kubectl apply -f manifests/ECK
+endif
+
+ifeq ($(DASHBOARD_ENABLED),0)
+	@echo -e "\e[33mskipping installation of kubernetes dashboard\e[0m"
+else
+	@echo "installing kubernetes dashboard"
+	@>/dev/null ./kubectl apply -f manifests/dashboard
+endif
 
 ##
 ### Destroy any created setups
@@ -97,7 +138,7 @@ kubectl-apply: kubectl external-manifests ## apply files in `manifests` using ku
 
 .PHONY: destroy.local
 destroy.local: kind ## undo the setup made by `setup.local`
-	./kind delete cluster --name $(shell cat local/kind.config.yml | grep 'name: ' | cut -d ":" -f2)
+	@./kind delete cluster --name $(shell cat local/kind.config.yml | grep 'name: ' | cut -d ":" -f2)
 
 .PHONY: destroy.openstack
 destroy.openstack: check_openstack_login terraform ## undo the setup made by `setup.openstack`
@@ -123,11 +164,22 @@ ifndef OS_PASSWORD
 endif
 
 print-access-creds: kubectl ## retrieve and print access data for provided services
+	@echo -e "Available services:"
+	
+	@(>/dev/null 2>&1 kubectl get crd/kibanas.kibana.k8s.elastic.co && $(MAKE) --no-print-directory _print-eck-creds) ||:
+	@(>/dev/null 2>&1 kubectl -n monitoring get secret/grafana-secrets secret/influxdb-secrets && $(MAKE) --no-print-directory _print-opmon-creds) ||:
+	@(>/dev/null 2>&1 kubectl -n kubernetes-dashboard get deploy kubernetes-dashboard && $(MAKE) --no-print-directory _print-dashboard-creds) ||:
+
+	@echo ""
+	@echo -n "These services are accessible over a proxy server at http:"
+	@kubectl config view --minify -o=jsonpath='{.clusters[0].cluster.server}' | cut -d ':' -f2 | tr -d '\n'
+	@echo ":31000"
+
+.PHONY: _print-eck-creds
+_print-eck-creds:
 	@echo -n "waiting for ECK to start"
 	@while ! ./kubectl -n monitoring get secret dune-eck-es-elastic-user 2>/dev/null >&2 ; do echo -n "."; sleep 1s; done; echo ""
 	@echo ""
-	@echo -e "Available services:"
-
 	@echo -e "\e[34mElasticsearch\e[0m"
 	@echo "	URL: https://dune-eck-es-http.monitoring:9200/"
 	@echo "	User: elastic"
@@ -140,6 +192,9 @@ print-access-creds: kubectl ## retrieve and print access data for provided servi
 	@echo -n "	Password: "
 	@./kubectl get -n monitoring secret dune-eck-es-elastic-user -o=jsonpath='{.data.elastic}' | base64 --decode; echo
 
+
+.PHONY: _print-opmon-creds
+_print-opmon-creds:
 	@echo -e "\e[34mGrafana\e[0m"
 	@echo "	URL: http://grafana.monitoring:3000/"
 	@echo "	User: dune"
@@ -157,14 +212,12 @@ print-access-creds: kubectl ## retrieve and print access data for provided servi
 	@echo -n "	Password: "
 	@./kubectl get -n monitoring secret influxdb-secrets -o=jsonpath='{.data.INFLUXDB_ADMIN_USER_PASSWORD}' | base64 --decode; echo
 
+.PHONY: _print-dashboard-creds
+_print-dashboard-creds:
 	@echo -e "\e[34mKubernetes dashboard\e[0m"
 	@echo "	URL: http://kubernetes-dashboard.kubernetes-dashboard"
 	@echo "	Password: none. click 'skip' in login window"
 
-	@echo ""
-	@echo -n "These services are accessible over a proxy server at http:"
-	@kubectl config view --minify -o=jsonpath='{.clusters[0].cluster.server}' | cut -d ':' -f2 | tr -d '\n'
-	@echo ":31000"
 
 ##
 ### Docker images
@@ -205,33 +258,36 @@ on-cern-network:
 	@curl --connect-timeout 1 network.cern.ch > /dev/null 2>&1 || (echo -e "\e[31mThe CERN network is not accessible\e[0m" && exit 1)
 
 kind: ## fetch Kubernetes In Docker (KIND) binary
-	curl -Lo ./kind --fail https://github.com/kubernetes-sigs/kind/releases/download/v0.11.0/kind-${uname_s}-${COMMON_ARCH}
-	chmod +x ./kind
+	@echo "downloading KIND"
+	@curl -Lo ./kind --fail --silent https://github.com/kubernetes-sigs/kind/releases/download/v0.11.1/kind-${uname_s}-${COMMON_ARCH}
+	@chmod +x ./kind
 
 terraform: ## fetch Terraform binary
 	@$(MAKE) --no-print-directory dependency.unzip
-	curl -Lo terraform.zip https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_${uname_s}_${COMMON_ARCH}.zip
-	unzip -o terraform.zip
-	rm -rf terraform.zip
+	@echo "downloading terraform binary"
+	@curl -Lo terraform.zip --silent --fail https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_${uname_s}_${COMMON_ARCH}.zip
+	@unzip -o terraform.zip
+	@rm -rf terraform.zip
 
 .PHONY: ansible
 ansible: python3 ## install Ansible
 	@command -v ansible-playbook > /dev/null || (python3 -m pip install --upgrade pip && python3 -m pip install ansible)
 
 kubectl: ## fetch kubectl binary
-	curl -LO --fail https://dl.k8s.io/release/v1.21.0/bin/${uname_s}/${COMMON_ARCH}/kubectl
-	chmod +x kubectl
+	@echo "downloading kubectl binary"
+	@curl -LO --fail --silent https://dl.k8s.io/release/v1.21.0/bin/${uname_s}/${COMMON_ARCH}/kubectl
+	@chmod +x kubectl
 
 .PHONY: external-manifests
-external-manifests: manifests/metricbeat.yaml manifests/CRDs/eck.yaml manifests/kubernetes-dashboard-recommended.yaml
+external-manifests: manifests/ECK/CRDs/eck.yaml manifests/dashboard/kubernetes-dashboard-recommended.yaml
 
-manifests/metricbeat.yaml: # fetch metricbeats manifest
-	curl -Lo manifests/metricbeat.yaml --fail https://raw.githubusercontent.com/elastic/beats/7.12/deploy/kubernetes/metricbeat-kubernetes.yaml
+# manifests/ECK/metricbeat.yaml: # fetch metricbeats manifest
+# 	curl -Lo manifests/ECK/metricbeat.yaml --silent --fail https://raw.githubusercontent.com/elastic/beats/7.12/deploy/kubernetes/metricbeat-kubernetes.yaml
 
-manifests/CRDs/eck.yaml: # fetch the ECK operator
-	curl -Lo manifests/CRDs/eck.yaml --fail https://download.elastic.co/downloads/eck/1.6.0/all-in-one.yaml
+manifests/ECK/CRDs/eck.yaml: # fetch the ECK operator
+	@curl -Lo manifests/ECK/CRDs/eck.yaml --silent --fail https://download.elastic.co/downloads/eck/1.6.0/all-in-one.yaml
 
-manifests/kubernetes-dashboard-recommended.yaml: # fetch kubernetes dashboard manifest
-	curl -Lo manifests/kubernetes-dashboard-recommended.yaml --fail https://raw.githubusercontent.com/kubernetes/dashboard/v2.2.0/aio/deploy/recommended.yaml
+manifests/dashboard/kubernetes-dashboard-recommended.yaml: # fetch kubernetes dashboard manifest
+	@curl -Lo manifests/dashboard/kubernetes-dashboard-recommended.yaml --silent --fail https://raw.githubusercontent.com/kubernetes/dashboard/v2.2.0/aio/deploy/recommended.yaml
 
 include .makefile/help.mk

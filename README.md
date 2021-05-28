@@ -4,11 +4,19 @@ Setup a demo installation of DUNE DAQ in a variety of setups.
 
 ## Quick-start
 
+For a cluster with all built-in services enabled:
 ```bash
 make setup.local
+# equivalent to
+# SERVICES=ECK,opmon,dashboard make setup.local
 ```
 
 This will setup your local (one-node) cluster, and print out available default services and their access credentials.
+
+To start a cluster without ElasticSearch
+```bash
+SERVICES=opmon,dashboard make setup.local
+```
 
 ![](docs/print-access-creds.png)
 
