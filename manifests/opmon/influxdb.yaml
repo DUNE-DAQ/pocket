@@ -190,10 +190,12 @@ kind: Service
 metadata:  
   name: influxdb
   namespace: monitoring
-spec:  
+spec:
+  type: NodePort
   selector:  
     app: influxdb  
   ports:  
   - protocol: TCP  
     port: 8086  
     targetPort: 8086
+    nodePort: 31002

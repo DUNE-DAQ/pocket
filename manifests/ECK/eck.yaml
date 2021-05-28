@@ -21,3 +21,37 @@ spec:
   count: 1
   elasticsearchRef:
     name: dune-eck
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: elasticsearch
+  namespace: monitoring
+spec:
+  type: NodePort
+  selector:
+    common.k8s.elastic.co/type: elasticsearch
+    elasticsearch.k8s.elastic.co/cluster-name: dune-eck
+  ports:
+  - name: https
+    port: 9200
+    protocol: TCP
+    targetPort: 9200
+    nodePort: 31004
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kibana
+  namespace: monitoring
+spec:
+  type: NodePort
+  selector:
+    common.k8s.elastic.co/type: kibana
+    kibana.k8s.elastic.co/name: dune-eck
+  ports:
+  - name: https
+    port: 5601
+    protocol: TCP
+    targetPort: 5601
+    nodePort: 31005

@@ -54,10 +54,12 @@ metadata:
   name: grafana
   namespace: monitoring
 spec:
+  type: NodePort
   ports:
   - port: 3000
     protocol: TCP
     targetPort: http-grafana
+    nodePort: 31003
   selector:
     app: grafana
   sessionAffinity: None

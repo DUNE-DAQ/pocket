@@ -8,14 +8,14 @@ For a cluster with all built-in services enabled:
 ```bash
 make setup.local
 # equivalent to
-# SERVICES=ECK,opmon,dashboard make setup.local
+# SERVICES=ECK,opmon make setup.local
 ```
 
 This will setup your local (one-node) cluster, and print out available default services and their access credentials.
 
 To start a cluster without ElasticSearch
 ```bash
-SERVICES=opmon,dashboard make setup.local
+SERVICES=opmon make setup.local
 ```
 
 ![](docs/print-access-creds.png)

@@ -5,6 +5,20 @@ SHELL:=/bin/bash
 ## helper variables
 ##
 
+SERVICES ?= ECK,opmon
+
+ifeq ($(findstring opmon,$(SERVICES)),)
+	OPMON_ENABLED=0
+else
+	OPMON_ENABLED=1
+endif
+
+ifeq ($(findstring ECK,$(SERVICES)),)
+	ECK_ENABLED=0
+else
+	ECK_ENABLED=1
+endif
+
 # Linux: 'linux'
 # MacOS: 'darwin'
 uname_s := $(shell uname -s | tr '[:upper:]' '[:lower:]')
@@ -36,26 +50,7 @@ endif
 TERRAFORM_VERSION ?= 0.15.3
 terraform := $(shell pwd)/terraform
 
-SERVICES ?= ECK,opmon,dashboard
-
-ifeq ($(findstring opmon,$(SERVICES)),)
-	OPMON_ENABLED=0
-else
-	OPMON_ENABLED=1
-endif
-
-ifeq ($(findstring ECK,$(SERVICES)),)
-	ECK_ENABLED=0
-else
-	ECK_ENABLED=1
-endif
-
-ifeq ($(findstring dashboard,$(SERVICES)),)
-	DASHBOARD_ENABLED=0
-else
-	DASHBOARD_ENABLED=1
-endif
-
+IP_ADDR := $(shell ip -4 addr show dev "$(shell awk '$$2 == 00000000 { print $$1 }' /proc/net/route)" | awk '$$1 ~ /^inet/ { sub("/.*", "", $$2); print $$2 }' | head -1)
 
 ##
 ### Setup an installation of Pocket
@@ -90,16 +85,19 @@ setup.openstack: on-cern-network check_openstack_login terraform ansible depende
 
 .PHONY: kubectl-apply
 kubectl-apply: kubectl external-manifests ## apply files in `manifests` using kubectl
+	@echo "installing basic services"
+	@>/dev/null ./kubectl apply -f manifests
+
 ifeq ($(OPMON_ENABLED),0)
 	@echo -e "\e[33mskipping installation of opmon\e[0m"
 else
 	@echo "installing opmon"
-	@->/dev/null 2>&1 ./kubectl apply -f manifests/opmon/ns-monitoring.yaml
-	@->/dev/null 2>&1 ./kubectl -n monitoring create secret generic grafana-secrets \
+	@>/dev/null 2>&1 ./kubectl apply -f manifests/opmon/ns-monitoring.yaml ||:
+	@>/dev/null 2>&1 ./kubectl -n monitoring create secret generic grafana-secrets \
   --from-literal=GF_SECURITY_SECRET_KEY=$(shell < /dev/urandom tr -dc _A-Z-a-z-0-9-=%. | head -c$${1:-32};echo;) \
-	--from-literal=GF_SECURITY_ADMIN_PASSWORD="$(shell < /dev/urandom tr -dc _A-Z-a-z-0-9-=%. | head -c$${1:-32};echo;)"
+	--from-literal=GF_SECURITY_ADMIN_PASSWORD="$(shell < /dev/urandom tr -dc _A-Z-a-z-0-9-=%. | head -c$${1:-32};echo;)" ||:
 
-	@->/dev/null 2>&1 kubectl -n monitoring create secret generic influxdb-secrets \
+	@>/dev/null 2>&1 kubectl -n monitoring create secret generic influxdb-secrets \
 	--from-literal=INFLUXDB_CONFIG_PATH=/etc/influxdb/influxdb.conf \
   --from-literal=INFLUXDB_DB=influxdb \
 	--from-literal=INFLUXDB_URL=http://influxdb.monitoring:8086 \
@@ -110,7 +108,7 @@ else
   --from-literal=INFLUXDB_ADMIN_USER=dune \
   --from-literal=INFLUXDB_ADMIN_USER_PASSWORD=$(shell < /dev/urandom tr -dc _A-Z-a-z-0-9-=%. | head -c$${1:-32};echo;) \
   --from-literal=INFLUXDB_HOST=influxdb.monitoring  \
-  --from-literal=INFLUXDB_HTTP_AUTH_ENABLED=false
+  --from-literal=INFLUXDB_HTTP_AUTH_ENABLED=false ||:
 
 	@>/dev/null ./kubectl apply -f manifests/opmon
 endif
@@ -123,13 +121,6 @@ else
 	@>/dev/null ./kubectl wait --for condition=established --timeout=60s crd/kibanas.kibana.k8s.elastic.co
 
 	@>/dev/null ./kubectl apply -f manifests/ECK
-endif
-
-ifeq ($(DASHBOARD_ENABLED),0)
-	@echo -e "\e[33mskipping installation of kubernetes dashboard\e[0m"
-else
-	@echo "installing kubernetes dashboard"
-	@>/dev/null ./kubectl apply -f manifests/dashboard
 endif
 
 ##
@@ -168,7 +159,7 @@ print-access-creds: kubectl ## retrieve and print access data for provided servi
 	
 	@(>/dev/null 2>&1 kubectl get crd/kibanas.kibana.k8s.elastic.co && $(MAKE) --no-print-directory _print-eck-creds) ||:
 	@(>/dev/null 2>&1 kubectl -n monitoring get secret/grafana-secrets secret/influxdb-secrets && $(MAKE) --no-print-directory _print-opmon-creds) ||:
-	@(>/dev/null 2>&1 kubectl -n kubernetes-dashboard get deploy kubernetes-dashboard && $(MAKE) --no-print-directory _print-dashboard-creds) ||:
+	@$(MAKE) --no-print-directory _print-dashboard-creds
 
 	@echo ""
 	@echo -n "These services are accessible over a proxy server at http:"
@@ -181,14 +172,24 @@ _print-eck-creds:
 	@while ! ./kubectl -n monitoring get secret dune-eck-es-elastic-user 2>/dev/null >&2 ; do echo -n "."; sleep 1s; done; echo ""
 	@echo ""
 	@echo -e "\e[34mElasticsearch\e[0m"
-	@echo "	URL: https://dune-eck-es-http.monitoring:9200/"
-	@echo "	User: elastic"
+	@echo -n "	URL (in-cluster): https://elasticsearch.monitoring:"
+	@kubectl -n monitoring get service elasticsearch -ojsonpath='{.spec.ports[0].port}'; echo
+
+	@echo -n "	URL (out-cluster): https://${IP_ADDR}:"
+	@kubectl -n monitoring get service elasticsearch -ojsonpath='{.spec.ports[0].nodePort}'; echo
+
+	@echo -n "	User: elastic"
 	@echo -n "	Password: "
 	@./kubectl get -n monitoring secret dune-eck-es-elastic-user -o=jsonpath='{.data.elastic}' | base64 --decode; echo
 
 	@echo -e "\e[34mKibana\e[0m"
-	@echo "	URL: https://dune-eck-kb-http.monitoring:5601/"
-	@echo "	User: elastic"
+	@echo -n "	URL (in-cluster): https://kibana.monitoring:"
+	@kubectl -n monitoring get service kibana -ojsonpath='{.spec.ports[0].port}'; echo
+
+	@echo -n "	URL (out-cluster): http://${IP_ADDR}:"
+	@kubectl -n monitoring get service kibana -ojsonpath='{.spec.ports[0].nodePort}'; echo
+
+	@echo -n "	User: elastic"
 	@echo -n "	Password: "
 	@./kubectl get -n monitoring secret dune-eck-es-elastic-user -o=jsonpath='{.data.elastic}' | base64 --decode; echo
 
@@ -196,26 +197,44 @@ _print-eck-creds:
 .PHONY: _print-opmon-creds
 _print-opmon-creds:
 	@echo -e "\e[34mGrafana\e[0m"
-	@echo "	URL: http://grafana.monitoring:3000/"
-	@echo "	User: dune"
+	@echo -n "	URL (in-cluster): http://grafana.monitoring:"
+	@kubectl -n monitoring get service grafana -ojsonpath='{.spec.ports[0].port}'; echo
+
+	@echo -n "	URL (out-cluster): http://${IP_ADDR}:"
+	@kubectl -n monitoring get service grafana -ojsonpath='{.spec.ports[0].nodePort}'; echo
+
+	@echo -n "	User: dune"
 	@echo -n "	Password: "
 	@./kubectl get -n monitoring secret grafana-secrets -o=jsonpath='{.data.GF_SECURITY_ADMIN_PASSWORD}' | base64 --decode; echo
 
 	@echo -e "\e[34mInfluxDB\e[0m"
-	@echo "	URL: http://influxdb.monitoring:8086/"
-	@echo "	User: readonly"
-	@echo "	Password: readonly"
-	@echo "	User: user"
+	@echo -n "	URL (in-cluster): http://influxdb.monitoring:"
+	@kubectl -n monitoring get service influxdb -ojsonpath='{.spec.ports[0].port}'; echo
+
+	@echo -n "	URL (out-cluster): http://${IP_ADDR}:"
+	@kubectl -n monitoring get service influxdb -ojsonpath='{.spec.ports[0].nodePort}'; echo
+
+	@echo -n "	User: "
+	@./kubectl get -n monitoring secret influxdb-secrets -o=jsonpath='{.data.INFLUXDB_READ_USER}' | base64 --decode;
+	@echo -n "	Password: "
+	@./kubectl get -n monitoring secret influxdb-secrets -o=jsonpath='{.data.INFLUXDB_READ_USER_PASSWORD}' | base64 --decode; echo
+
+	@echo -n "	User: "
+	@./kubectl get -n monitoring secret influxdb-secrets -o=jsonpath='{.data.INFLUXDB_USER}' | base64 --decode;
 	@echo -n "	Password: "
 	@./kubectl get -n monitoring secret influxdb-secrets -o=jsonpath='{.data.INFLUXDB_USER_PASSWORD}' | base64 --decode; echo
-	@echo "	User: dune"
+
+	@echo -n "	User: "
+	@./kubectl get -n monitoring secret influxdb-secrets -o=jsonpath='{.data.INFLUXDB_ADMIN_USER}' | base64 --decode;
 	@echo -n "	Password: "
 	@./kubectl get -n monitoring secret influxdb-secrets -o=jsonpath='{.data.INFLUXDB_ADMIN_USER_PASSWORD}' | base64 --decode; echo
 
 .PHONY: _print-dashboard-creds
 _print-dashboard-creds:
 	@echo -e "\e[34mKubernetes dashboard\e[0m"
-	@echo "	URL: http://kubernetes-dashboard.kubernetes-dashboard"
+	@echo "	URL (in-cluster): http://kubernetes-dashboard.kubernetes-dashboard"
+	@echo -n "	URL (out-cluster): http://${IP_ADDR}:"
+	@kubectl -n kubernetes-dashboard get service kubernetes-dashboard -ojsonpath='{.spec.ports[0].nodePort}'; echo
 	@echo "	Password: none. click 'skip' in login window"
 
 
@@ -279,7 +298,7 @@ kubectl: ## fetch kubectl binary
 	@chmod +x kubectl
 
 .PHONY: external-manifests
-external-manifests: manifests/ECK/CRDs/eck.yaml manifests/dashboard/kubernetes-dashboard-recommended.yaml
+external-manifests: manifests/ECK/CRDs/eck.yaml manifests/kubernetes-dashboard-recommended.yaml
 
 # manifests/ECK/metricbeat.yaml: # fetch metricbeats manifest
 # 	curl -Lo manifests/ECK/metricbeat.yaml --silent --fail https://raw.githubusercontent.com/elastic/beats/7.12/deploy/kubernetes/metricbeat-kubernetes.yaml
@@ -287,7 +306,7 @@ external-manifests: manifests/ECK/CRDs/eck.yaml manifests/dashboard/kubernetes-d
 manifests/ECK/CRDs/eck.yaml: # fetch the ECK operator
 	@curl -Lo manifests/ECK/CRDs/eck.yaml --silent --fail https://download.elastic.co/downloads/eck/1.6.0/all-in-one.yaml
 
-manifests/dashboard/kubernetes-dashboard-recommended.yaml: # fetch kubernetes dashboard manifest
-	@curl -Lo manifests/dashboard/kubernetes-dashboard-recommended.yaml --silent --fail https://raw.githubusercontent.com/kubernetes/dashboard/v2.2.0/aio/deploy/recommended.yaml
+manifests/kubernetes-dashboard-recommended.yaml: # fetch kubernetes dashboard manifest
+	@curl -Lo manifests/kubernetes-dashboard-recommended.yaml --silent --fail https://raw.githubusercontent.com/kubernetes/dashboard/v2.2.0/aio/deploy/recommended.yaml
 
 include .makefile/help.mk
