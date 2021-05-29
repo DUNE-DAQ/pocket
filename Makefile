@@ -12,26 +12,26 @@ include .makefile/vars.mk
 ##
 
 .PHONY: setup.local
-setup.local: dependency.docker kind ## start local setup
-	@./kind create cluster --config local/kind.config.yml
+setup.local: dependency.docker $(KIND) ## start local setup
+	@$(KIND) create cluster --config local/kind.config.yml
 	@$(MAKE) --no-print-directory kubectl-apply
 	@echo ""
 	@$(MAKE) --no-print-directory print-access-creds
 
 .PHONY: setup.openstack
-setup.openstack: on-cern-network check_openstack_login terraform ansible dependency.ssh ## create a setup in your openstack account
+setup.openstack: on-cern-network check_openstack_login $(TERRAFORM) ansible dependency.ssh ## create a setup in your openstack account
 	cd openstack/terraform && \
-	${terraform} init -upgrade && \
-	TF_VAR_cluster_name=${OS_USERNAME}-pocketdune ${terraform} apply
+	$(TERRAFORM) init -upgrade && \
+	TF_VAR_cluster_name=${OS_USERNAME}-pocketdune $(TERRAFORM) apply
 
 	cd openstack/ansible && \
 	ansible-playbook -i hosts.yaml playbook.yaml
 
 	cat $(shell find openstack/ansible/admin.conf -type f -name admin.conf) | sed 's|kubernetes-admin@kubernetes|admin@pocketdune|g' | sed 's|kubernetes-admin|pocketdune-admin|g' | sed 's|kubernetes|pocketdune|g' > /tmp/kubeconfig-pocketdune
-	KUBECONFIG=~/.kube/config:/tmp/kubeconfig-pocketdune kubectl config view --flatten > /tmp/kubeconfig
+	KUBECONFIG=~/.kube/config:/tmp/kubeconfig-pocketdune $(KUBECTL) config view --flatten > /tmp/kubeconfig
 	cp /tmp/kubeconfig ~/.kube/config
-	kubectl config use-context 'admin@pocketdune'
-	-kubectl taint nodes --all node-role.kubernetes.io/master-
+	$(KUBECTL) config use-context 'admin@pocketdune'
+	-$(KUBECTL) taint nodes --all node-role.kubernetes.io/master-
 	$(MAKE) --no-print-directory kubectl-apply
 	$(MAKE) --no-print-directory print-access-creds
 	@echo -n "Proxy server available at: socks5"
@@ -39,43 +39,43 @@ setup.openstack: on-cern-network check_openstack_login terraform ansible depende
 	@echo "31000"
 
 .PHONY: kubectl-apply
-kubectl-apply: kubectl external-manifests ## apply files in `manifests` using kubectl
+kubectl-apply: $(KUBECTL) external-manifests ## apply files in `manifests` using kubectl
 	@echo "installing basic services"
-	@>/dev/null ./kubectl apply -f manifests
+	@>/dev/null $(KUBECTL) apply -f manifests
 
 ifeq ($(OPMON_ENABLED),0)
 	@echo -e "\e[33mskipping installation of opmon\e[0m"
 else
 	@echo "installing opmon"
-	@>/dev/null 2>&1 ./kubectl apply -f manifests/opmon/ns-monitoring.yaml ||:
-	@>/dev/null 2>&1 ./kubectl -n monitoring create secret generic grafana-secrets \
-  --from-literal=GF_SECURITY_SECRET_KEY=$(shell < /dev/urandom tr -dc _A-Z-a-z-0-9-=%. | head -c$${1:-32};echo;) \
+	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/opmon/ns-monitoring.yaml ||:
+	@>/dev/null 2>&1 $(KUBECTL) -n monitoring create secret generic grafana-secrets \
+	--from-literal=GF_SECURITY_SECRET_KEY=$(shell < /dev/urandom tr -dc _A-Z-a-z-0-9-=%. | head -c$${1:-32};echo;) \
 	--from-literal=GF_SECURITY_ADMIN_PASSWORD="$(shell < /dev/urandom tr -dc _A-Z-a-z-0-9-=%. | head -c$${1:-32};echo;)" ||:
 
-	@>/dev/null 2>&1 kubectl -n monitoring create secret generic influxdb-secrets \
+	@>/dev/null 2>&1 $(KUBECTL) -n monitoring create secret generic influxdb-secrets \
 	--from-literal=INFLUXDB_CONFIG_PATH=/etc/influxdb/influxdb.conf \
-  --from-literal=INFLUXDB_DB=influxdb \
+	--from-literal=INFLUXDB_DB=influxdb \
 	--from-literal=INFLUXDB_URL=http://influxdb.monitoring:8086 \
-  --from-literal=INFLUXDB_USER=user \
-  --from-literal=INFLUXDB_USER_PASSWORD=$(shell < /dev/urandom tr -dc _A-Z-a-z-0-9-=%. | head -c$${1:-32};echo;) \
-  --from-literal=INFLUXDB_READ_USER=readonly \
-  --from-literal=INFLUXDB_READ_USER_PASSWORD=readonly \
-  --from-literal=INFLUXDB_ADMIN_USER=dune \
-  --from-literal=INFLUXDB_ADMIN_USER_PASSWORD=$(shell < /dev/urandom tr -dc _A-Z-a-z-0-9-=%. | head -c$${1:-32};echo;) \
-  --from-literal=INFLUXDB_HOST=influxdb.monitoring  \
-  --from-literal=INFLUXDB_HTTP_AUTH_ENABLED=false ||:
+	--from-literal=INFLUXDB_USER=user \
+	--from-literal=INFLUXDB_USER_PASSWORD=$(shell < /dev/urandom tr -dc _A-Z-a-z-0-9-=%. | head -c$${1:-32};echo;) \
+	--from-literal=INFLUXDB_READ_USER=readonly \
+	--from-literal=INFLUXDB_READ_USER_PASSWORD=readonly \
+	--from-literal=INFLUXDB_ADMIN_USER=dune \
+	--from-literal=INFLUXDB_ADMIN_USER_PASSWORD=$(shell < /dev/urandom tr -dc _A-Z-a-z-0-9-=%. | head -c$${1:-32};echo;) \
+	--from-literal=INFLUXDB_HOST=influxdb.monitoring  \
+	--from-literal=INFLUXDB_HTTP_AUTH_ENABLED=false ||:
 
-	@>/dev/null ./kubectl apply -f manifests/opmon
+	@>/dev/null $(KUBECTL) apply -f manifests/opmon
 endif
 
 ifeq ($(ECK_ENABLED),0)
 	@echo -e "\e[33mskipping installation of Elastic stack\e[0m"
 else
 	@echo "installing Elastic stack"
-	@>/dev/null ./kubectl apply -f manifests/ECK/CRDs
-	@>/dev/null ./kubectl wait --for condition=established --timeout=60s crd/kibanas.kibana.k8s.elastic.co
+	@>/dev/null $(KUBECTL) apply -f manifests/ECK/CRDs
+	@>/dev/null $(KUBECTL) wait --for condition=established --timeout=60s crd/kibanas.kibana.k8s.elastic.co
 
-	@>/dev/null ./kubectl apply -f manifests/ECK
+	@>/dev/null $(KUBECTL) apply -f manifests/ECK
 endif
 
 ##
@@ -83,17 +83,17 @@ endif
 ##
 
 .PHONY: destroy.local
-destroy.local: kind ## undo the setup made by `setup.local`
-	@./kind delete cluster --name $(shell cat local/kind.config.yml | grep 'name: ' | cut -d ":" -f2)
+destroy.local: $(KIND) ## undo the setup made by `setup.local`
+	@$(KIND) delete cluster --name $(shell cat local/kind.config.yml | grep 'name: ' | cut -d ":" -f2)
 
 .PHONY: destroy.openstack
-destroy.openstack: check_openstack_login terraform ## undo the setup made by `setup.openstack`
+destroy.openstack: check_openstack_login $(TERRAFORM) ## undo the setup made by `setup.openstack`
 	cd openstack/terraform && \
-	${terraform} init -upgrade && \
-	TF_VAR_cluster_name=${OS_USERNAME}-pocketdune ${terraform} destroy
-	kubectl config delete-context 'admin@pocketdune'
-	kubectl config delete-cluster pocketdune
-	kubectl config delete-user pocketdune-admin
+	$(TERRAFORM) init -upgrade && \
+	TF_VAR_cluster_name=${OS_USERNAME}-pocketdune $(TERRAFORM) destroy
+	$(KUBECTL) config delete-context 'admin@pocketdune'
+	$(KUBECTL) config delete-cluster pocketdune
+	$(KUBECTL) config delete-user pocketdune-admin
 
 ##
 ### Helper commands
@@ -109,7 +109,7 @@ ifndef OS_PASSWORD
 	@exit 1
 endif
 
-print-access-creds: kubectl ## retrieve and print access data for provided services
+print-access-creds: $(KUBECTL) ## retrieve and print access data for provided services
 	@.makefile/print-creds.sh
 
 ##
@@ -150,32 +150,35 @@ python3: dependency.python3 # check if python3 is installed
 on-cern-network:
 	@curl --connect-timeout 1 network.cern.ch > /dev/null 2>&1 || (echo -e "\e[31mThe CERN network is not accessible\e[0m" && exit 1)
 
-kind: ## fetch Kubernetes In Docker (KIND) binary
-	@echo "downloading KIND"
-	@curl -Lo ./kind --fail --silent https://github.com/kubernetes-sigs/kind/releases/download/v0.11.1/kind-${uname_s}-${COMMON_ARCH}
-	@chmod +x ./kind
+.PHONY: $(KIND)
+kind: $(KIND) ## fetch Kubernetes In Docker (KIND) binary
+$(KIND):
+	@echo "downloading KIND $(KIND_VERSION)"
+	@curl -Lo $(KIND) --fail --silent https://github.com/kubernetes-sigs/kind/releases/download/v$(KIND_VERSION)/kind-${uname_s}-${COMMON_ARCH}
+	@chmod +x $(KIND)
 
-terraform: ## fetch Terraform binary
+.PHONY: $(TERRAFORM)
+terraform: $(TERRAFORM) ## fetch Terraform binary
+$(TERRAFORM):
 	@$(MAKE) --no-print-directory dependency.unzip
-	@echo "downloading terraform binary"
-	@curl -Lo terraform.zip --silent --fail https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_${uname_s}_${COMMON_ARCH}.zip
-	@unzip -o terraform.zip
-	@rm -rf terraform.zip
+	@echo "downloading terraform $(TERRAFORM_VERSION)"
+	@curl -Lo $(TERRAFORM).zip --silent --fail https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_${uname_s}_${COMMON_ARCH}.zip
+	@cd $(dir $(TERRAFORM)) && unzip -o $(TERRAFORM).zip
+	@rm -rf $(TERRAFORM).zip
 
 .PHONY: ansible
 ansible: python3 ## install Ansible
 	@command -v ansible-playbook > /dev/null || (python3 -m pip install --upgrade pip && python3 -m pip install ansible)
 
-kubectl: ## fetch kubectl binary
-	@echo "downloading kubectl binary"
-	@curl -LO --fail --silent https://dl.k8s.io/release/v1.21.0/bin/${uname_s}/${COMMON_ARCH}/kubectl
-	@chmod +x kubectl
+.PHONY: kubectl
+kubectl: $(KUBECTL) ## fetch kubectl binary
+$(KUBECTL):
+	@echo "downloading kubectl $(KUBECTL_VERSION)"
+	@curl -Lo $(KUBECTL) --fail --silent https://dl.k8s.io/release/v$(KUBECTL_VERSION)/bin/${uname_s}/${COMMON_ARCH}/kubectl
+	@chmod +x $(KUBECTL)
 
 .PHONY: external-manifests
 external-manifests: manifests/ECK/CRDs/eck.yaml manifests/kubernetes-dashboard-recommended.yaml
-
-# manifests/ECK/metricbeat.yaml: # fetch metricbeats manifest
-# 	curl -Lo manifests/ECK/metricbeat.yaml --silent --fail https://raw.githubusercontent.com/elastic/beats/7.12/deploy/kubernetes/metricbeat-kubernetes.yaml
 
 manifests/ECK/CRDs/eck.yaml: # fetch the ECK operator
 	@curl -Lo manifests/ECK/CRDs/eck.yaml --silent --fail https://download.elastic.co/downloads/eck/1.6.0/all-in-one.yaml

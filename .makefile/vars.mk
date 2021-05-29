@@ -1,4 +1,7 @@
 
+##
+## Services to install
+##
 SERVICES ?= ECK,opmon
 
 ifeq ($(findstring opmon,$(SERVICES)),)
@@ -13,6 +16,9 @@ else
 	ECK_ENABLED=1
 endif
 
+##
+## Helper variables so we download the right binaries for your machine
+##
 # Linux: 'linux'
 # MacOS: 'darwin'
 uname_s := $(shell uname -s | tr '[:upper:]' '[:lower:]')
@@ -41,5 +47,15 @@ else ifeq ($(uname_s),darwin)
 	OS=macos
 endif
 
+##
+## Version information and locations of external binaries
+##
+
 TERRAFORM_VERSION ?= 0.15.3
-terraform := $(shell pwd)/terraform
+TERRAFORM := $(shell pwd)/external/bin/terraform-$(TERRAFORM_VERSION)
+
+KIND_VERSION = 0.11.1
+KIND := $(shell pwd)/external/bin/kind-$(KIND_VERSION)
+
+KUBECTL_VERSION = 1.21.0
+KUBECTL := $(shell pwd)/external/bin/kubectl-$(KUBECTL_VERSION)
