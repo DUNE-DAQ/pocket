@@ -2,7 +2,7 @@
 set -o errexit -o nounset -o pipefail
 IFS=$'\n\t\v'
 
-KUBECTL_SERVER=$(kubectl config view --minify -o=jsonpath='{.clusters[0].cluster.server}' | cut -d ':' -f2 | cut -d '/' -f3 | tr -d '\n')
+KUBECTL_SERVER=$(./kubectl config view --minify -o=jsonpath='{.clusters[0].cluster.server}' | cut -d ':' -f2 | cut -d '/' -f3 | tr -d '\n')
 
 # get the IP where services are accessible over their nodePort bindings
 NODEPORT_IP=${KUBECTL_SERVER}
@@ -23,10 +23,10 @@ function eck_creds() {
 	echo ""
 	echo -e "\e[34mElasticsearch\e[0m"
 	echo -n "	URL (in-cluster): https://elasticsearch.monitoring:"
-	kubectl -n monitoring get service elasticsearch -ojsonpath='{.spec.ports[0].port}'; echo
+	./kubectl -n monitoring get service elasticsearch -ojsonpath='{.spec.ports[0].port}'; echo
 
 	echo -n "	URL (out-cluster): https://${NODEPORT_IP}:"
-	kubectl -n monitoring get service elasticsearch -ojsonpath='{.spec.ports[0].nodePort}'; echo
+	./kubectl -n monitoring get service elasticsearch -ojsonpath='{.spec.ports[0].nodePort}'; echo
 
 	echo -n "	User: elastic"
 	echo -n "	Password: "
@@ -34,10 +34,10 @@ function eck_creds() {
 
 	echo -e "\e[34mKibana\e[0m"
 	echo -n "	URL (in-cluster): https://kibana.monitoring:"
-	kubectl -n monitoring get service kibana -ojsonpath='{.spec.ports[0].port}'; echo
+	./kubectl -n monitoring get service kibana -ojsonpath='{.spec.ports[0].port}'; echo
 
 	echo -n "	URL (out-cluster): https://${NODEPORT_IP}:"
-	kubectl -n monitoring get service kibana -ojsonpath='{.spec.ports[0].nodePort}'; echo
+	./kubectl -n monitoring get service kibana -ojsonpath='{.spec.ports[0].nodePort}'; echo
 
 	echo -n "	User: elastic"
 	echo -n "	Password: "
@@ -47,10 +47,10 @@ function eck_creds() {
 function opmon_creds() {
   echo -e "\e[34mGrafana\e[0m"
 	echo -n "	URL (in-cluster): http://grafana.monitoring:"
-	kubectl -n monitoring get service grafana -ojsonpath='{.spec.ports[0].port}'; echo
+	./kubectl -n monitoring get service grafana -ojsonpath='{.spec.ports[0].port}'; echo
 
 	echo -n "	URL (out-cluster): http://${NODEPORT_IP}:"
-	kubectl -n monitoring get service grafana -ojsonpath='{.spec.ports[0].nodePort}'; echo
+	./kubectl -n monitoring get service grafana -ojsonpath='{.spec.ports[0].nodePort}'; echo
 
 	echo -n "	User: dune"
 	echo -n "	Password: "
@@ -58,10 +58,10 @@ function opmon_creds() {
 
 	echo -e "\e[34mInfluxDB\e[0m"
 	echo -n "	URL (in-cluster): http://influxdb.monitoring:"
-	kubectl -n monitoring get service influxdb -ojsonpath='{.spec.ports[0].port}'; echo
+	./kubectl -n monitoring get service influxdb -ojsonpath='{.spec.ports[0].port}'; echo
 
 	echo -n "	URL (out-cluster): http://${NODEPORT_IP}:"
-	kubectl -n monitoring get service influxdb -ojsonpath='{.spec.ports[0].nodePort}'; echo
+	./kubectl -n monitoring get service influxdb -ojsonpath='{.spec.ports[0].nodePort}'; echo
 
 	echo -n "	User: "
 	./kubectl get -n monitoring secret influxdb-secrets -o=jsonpath='{.data.INFLUXDB_READ_USER}' | base64 --decode;
@@ -83,7 +83,7 @@ function dashboard_creds() {
   echo -e "\e[34mKubernetes dashboard\e[0m"
 	echo "	URL (in-cluster): http://kubernetes-dashboard.kubernetes-dashboard"
 	echo -n "	URL (out-cluster): http://${NODEPORT_IP}:"
-	kubectl -n kubernetes-dashboard get service kubernetes-dashboard -ojsonpath='{.spec.ports[0].nodePort}'; echo
+	./kubectl -n kubernetes-dashboard get service kubernetes-dashboard -ojsonpath='{.spec.ports[0].nodePort}'; echo
 	echo "	Password: none. click 'skip' in login window"
 }
 
