@@ -89,11 +89,11 @@ function dashboard_creds() {
 
 echo "Available services:"
 
-if >/dev/null 2>&1 kubectl get crd/kibanas.kibana.k8s.elastic.co; then
+if >/dev/null 2>&1 ./kubectl get crd/kibanas.kibana.k8s.elastic.co; then
   eck_creds
 fi
 
-if >/dev/null 2>&1 kubectl -n monitoring get secret/grafana-secrets secret/influxdb-secrets; then
+if >/dev/null 2>&1 ./kubectl -n monitoring get secret/grafana-secrets secret/influxdb-secrets; then
   opmon_creds
 fi
 dashboard_creds
