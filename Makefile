@@ -110,7 +110,7 @@ ifndef OS_PASSWORD
 endif
 
 print-access-creds: $(KUBECTL) ## retrieve and print access data for provided services
-	@.makefile/print-creds.sh
+	@KUBECTL=$(KUBECTL) .makefile/print-creds.sh
 
 ##
 ### Docker images
