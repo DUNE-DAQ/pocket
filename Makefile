@@ -150,7 +150,7 @@ python3: dependency.python3 # check if python3 is installed
 on-cern-network:
 	@curl --connect-timeout 1 network.cern.ch > /dev/null 2>&1 || (echo -e "\e[31mThe CERN network is not accessible\e[0m" && exit 1)
 
-.PHONY: $(KIND)
+.PHONY: kind
 kind: $(KIND) ## fetch Kubernetes In Docker (KIND) binary
 $(KIND):
 	@echo "downloading KIND $(KIND_VERSION)"
