@@ -121,7 +121,7 @@ images: images.grafana ## build all images
 
 .PHONY: images.grafana
 images.grafana: ## build Grafana image
-	docker build -t juravenator/pocket-grafana:latest stuff/grafana
+	docker build -t juravenator/pocket-grafana:latest images/grafana
 	docker push juravenator/pocket-grafana:latest
 
 ##
