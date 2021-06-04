@@ -1,0 +1,651 @@
+---
+# Source: cvmfs-csi/templates/plugin.yaml
+# All of the individual sidecar RBAC roles get bound
+# to this account.
+kind: ServiceAccount
+apiVersion: v1
+metadata:
+  name: cvmfs-serviceaccount
+  namespace: csi-cvmfs
+  labels:
+    app.kubernetes.io/instance: cvmfs.csi.cern.ch
+    app.kubernetes.io/part-of: csi-driver-cvmfs
+    app.kubernetes.io/name: pocket-cvmfs
+    app.kubernetes.io/component: serviceaccount
+    app.kubernetes.io/managed-by: Helm
+---
+# Source: cvmfs-csi/templates/rbac-attacher.yaml
+# https://raw.githubusercontent.com/kubernetes-csi/external-attacher/master/deploy/kubernetes/rbac.yaml
+
+# This YAML file contains all RBAC objects that are necessary to run external
+# CSI attacher.
+#
+# In production, each CSI driver deployment has to be customized:
+# - to avoid conflicts, use non-default namespace and different names
+#   for non-namespaced entities like the ClusterRole
+# - decide whether the deployment replicates the external CSI
+#   attacher, in which case leadership election must be enabled;
+#   this influences the RBAC setup, see below
+
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: csi-attacher
+  # replace with non-default namespace name
+  namespace: csi-cvmfs
+---
+# Source: cvmfs-csi/templates/rbac-provisioner.yaml
+# https://raw.githubusercontent.com/kubernetes-csi/external-provisioner/master/deploy/kubernetes/rbac.yaml
+# This YAML file contains all RBAC objects that are necessary to run external
+# CSI provisioner.
+#
+# In production, each CSI driver deployment has to be customized:
+# - to avoid conflicts, use non-default namespace and different names
+#   for non-namespaced entities like the ClusterRole
+# - decide whether the deployment replicates the external CSI
+#   provisioner, in which case leadership election must be enabled;
+#   this influences the RBAC setup, see below
+
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: csi-provisioner
+  # replace with non-default namespace name
+  namespace: csi-cvmfs
+---
+# Source: cvmfs-csi/templates/storageclass.yaml
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: dunedaq.opensciencegrid.org
+provisioner: cvmfs.csi.cern.ch
+reclaimPolicy: Delete
+volumeBindingMode: Immediate
+parameters:
+  repository: dunedaq.opensciencegrid.org
+---
+# Source: cvmfs-csi/templates/storageclass.yaml
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: cms.cern.ch
+provisioner: cvmfs.csi.cern.ch
+reclaimPolicy: Delete
+volumeBindingMode: Immediate
+parameters:
+  repository: cms.cern.ch
+---
+# Source: cvmfs-csi/templates/persistentvolumeclaim.yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: dunedaq.opensciencegrid.org
+spec:
+  accessModes:
+  - ReadOnlyMany
+  resources:
+    requests:
+      storage: 1Gi
+  storageClassName: dunedaq.opensciencegrid.org
+---
+# Source: cvmfs-csi/templates/persistentvolumeclaim.yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: cms.cern.ch
+spec:
+  accessModes:
+  - ReadOnlyMany
+  resources:
+    requests:
+      storage: 1Gi
+  storageClassName: cms.cern.ch
+---
+# Source: cvmfs-csi/templates/rbac-attacher.yaml
+# Attacher must be able to work with PVs, CSINodes and VolumeAttachments
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: external-attacher-runner
+rules:
+  - apiGroups: [""]
+    resources: ["persistentvolumes"]
+    verbs: ["get", "list", "watch", "patch"]
+  - apiGroups: ["storage.k8s.io"]
+    resources: ["csinodes"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: ["storage.k8s.io"]
+    resources: ["volumeattachments"]
+    verbs: ["get", "list", "watch", "patch"]
+  - apiGroups: ["storage.k8s.io"]
+    resources: ["volumeattachments/status"]
+    verbs: ["patch"]
+#Secret permission is optional.
+#Enable it if you need value from secret.
+#For example, you have key `csi.storage.k8s.io/controller-publish-secret-name` in StorageClass.parameters
+#see https://kubernetes-csi.github.io/docs/secrets-and-credentials.html
+#  - apiGroups: [""]
+#    resources: ["secrets"]
+#    verbs: ["get", "list"]
+---
+# Source: cvmfs-csi/templates/rbac-provisioner.yaml
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: external-provisioner-runner
+rules:
+  # The following rule should be uncommented for plugins that require secrets
+  # for provisioning.
+  # - apiGroups: [""]
+  #   resources: ["secrets"]
+  #   verbs: ["get", "list"]
+  - apiGroups: [""]
+    resources: ["persistentvolumes"]
+    verbs: ["get", "list", "watch", "create", "delete"]
+  - apiGroups: [""]
+    resources: ["persistentvolumeclaims"]
+    verbs: ["get", "list", "watch", "update"]
+  - apiGroups: ["storage.k8s.io"]
+    resources: ["storageclasses"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: [""]
+    resources: ["events"]
+    verbs: ["list", "watch", "create", "update", "patch"]
+  - apiGroups: ["snapshot.storage.k8s.io"]
+    resources: ["volumesnapshots"]
+    verbs: ["get", "list"]
+  - apiGroups: ["snapshot.storage.k8s.io"]
+    resources: ["volumesnapshotcontents"]
+    verbs: ["get", "list"]
+  - apiGroups: ["storage.k8s.io"]
+    resources: ["csinodes"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: [""]
+    resources: ["nodes"]
+    verbs: ["get", "list", "watch"]
+  # Access to volumeattachments is only needed when the CSI driver
+  # has the PUBLISH_UNPUBLISH_VOLUME controller capability.
+  # In that case, external-provisioner will watch volumeattachments
+  # to determine when it is safe to delete a volume.
+  - apiGroups: ["storage.k8s.io"]
+    resources: ["volumeattachments"]
+    verbs: ["get", "list", "watch"]
+---
+# Source: cvmfs-csi/templates/plugin.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  labels:
+    app.kubernetes.io/instance: cvmfs.csi.cern.ch
+    app.kubernetes.io/part-of: csi-driver-cvmfs
+    app.kubernetes.io/name: pocket-cvmfs
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/component: attacher-cluster-role
+  name: csi-cvmfsplugin-attacher-cluster-role
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: external-attacher-runner
+subjects:
+- kind: ServiceAccount
+  name: cvmfs-serviceaccount
+  namespace: csi-cvmfs
+---
+# Source: cvmfs-csi/templates/plugin.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  labels:
+    app.kubernetes.io/instance: cvmfs.csi.cern.ch
+    app.kubernetes.io/part-of: csi-driver-cvmfs
+    app.kubernetes.io/name: pocket-cvmfs
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/component: health-monitor-controller-cluster-role
+  name: csi-cvmfsplugin-health-monitor-controller-cluster-role
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: external-health-monitor-controller-runner
+subjects:
+- kind: ServiceAccount
+  name: cvmfs-serviceaccount
+  namespace: csi-cvmfs
+---
+# Source: cvmfs-csi/templates/plugin.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  labels:
+    app.kubernetes.io/instance: cvmfs.csi.cern.ch
+    app.kubernetes.io/part-of: csi-driver-cvmfs
+    app.kubernetes.io/name: pocket-cvmfs
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/component: provisioner-cluster-role
+  name: csi-cvmfsplugin-provisioner-cluster-role
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: external-provisioner-runner
+subjects:
+- kind: ServiceAccount
+  name: cvmfs-serviceaccount
+  namespace: csi-cvmfs
+---
+# Source: cvmfs-csi/templates/rbac-attacher.yaml
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: csi-attacher-role
+subjects:
+  - kind: ServiceAccount
+    name: csi-attacher
+    # replace with non-default namespace name
+    namespace: csi-cvmfs
+roleRef:
+  kind: ClusterRole
+  name: external-attacher-runner
+  apiGroup: rbac.authorization.k8s.io
+---
+# Source: cvmfs-csi/templates/rbac-provisioner.yaml
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: csi-provisioner-role
+subjects:
+  - kind: ServiceAccount
+    name: csi-provisioner
+    # replace with non-default namespace name
+    namespace: csi-cvmfs
+roleRef:
+  kind: ClusterRole
+  name: external-provisioner-runner
+  apiGroup: rbac.authorization.k8s.io
+---
+# Source: cvmfs-csi/templates/rbac-attacher.yaml
+# Attacher must be able to work with configmaps or leases in the current namespace
+# if (and only if) leadership election is enabled
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  # replace with non-default namespace name
+  namespace: csi-cvmfs
+  name: external-attacher-cfg
+rules:
+- apiGroups: ["coordination.k8s.io"]
+  resources: ["leases"]
+  verbs: ["get", "watch", "list", "delete", "update", "create"]
+---
+# Source: cvmfs-csi/templates/rbac-provisioner.yaml
+# Provisioner must be able to work with endpoints in current namespace
+# if (and only if) leadership election is enabled
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  # replace with non-default namespace name
+  namespace: csi-cvmfs
+  name: external-provisioner-cfg
+rules:
+# Only one of the following rules for endpoints or leases is required based on
+# what is set for `--leader-election-type`. Endpoints are deprecated in favor of Leases.
+- apiGroups: [""]
+  resources: ["endpoints"]
+  verbs: ["get", "watch", "list", "delete", "update", "create"]
+- apiGroups: ["coordination.k8s.io"]
+  resources: ["leases"]
+  verbs: ["get", "watch", "list", "delete", "update", "create"]
+# Permissions for CSIStorageCapacity are only needed enabling the publishing
+# of storage capacity information.
+- apiGroups: ["storage.k8s.io"]
+  resources: ["csistoragecapacities"]
+  verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+# The GET permissions below are needed for walking up the ownership chain
+# for CSIStorageCapacity. They are sufficient for deployment via
+# StatefulSet (only needs to get Pod) and Deployment (needs to get
+# Pod and then ReplicaSet to find the Deployment).
+- apiGroups: [""]
+  resources: ["pods"]
+  verbs: ["get"]
+- apiGroups: ["apps"]
+  resources: ["replicasets"]
+  verbs: ["get"]
+---
+# Source: cvmfs-csi/templates/plugin.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  labels:
+    app.kubernetes.io/instance: cvmfs.csi.cern.ch
+    app.kubernetes.io/part-of: csi-driver-cvmfs
+    app.kubernetes.io/name: pocket-cvmfs
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/component: attacher-role
+  name: csi-cvmfsplugin-attacher-role
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: external-attacher-cfg
+subjects:
+- kind: ServiceAccount
+  name: cvmfs-serviceaccount
+---
+# Source: cvmfs-csi/templates/plugin.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  labels:
+    app.kubernetes.io/instance: cvmfs.csi.cern.ch
+    app.kubernetes.io/part-of: csi-driver-cvmfs
+    app.kubernetes.io/name: pocket-cvmfs
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/component: health-monitor-controller-role
+  name: csi-cvmfsplugin-health-monitor-controller-role
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: external-health-monitor-controller-cfg
+subjects:
+- kind: ServiceAccount
+  name: cvmfs-serviceaccount
+---
+# Source: cvmfs-csi/templates/plugin.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  labels:
+    app.kubernetes.io/instance: cvmfs.csi.cern.ch
+    app.kubernetes.io/part-of: csi-driver-cvmfs
+    app.kubernetes.io/name: pocket-cvmfs
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/component: provisioner-role
+  name: csi-cvmfsplugin-provisioner-role
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: external-provisioner-cfg
+subjects:
+- kind: ServiceAccount
+  name: cvmfs-serviceaccount
+---
+# Source: cvmfs-csi/templates/plugin.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  labels:
+    app.kubernetes.io/instance: cvmfs.csi.cern.ch
+    app.kubernetes.io/part-of: csi-driver-cvmfs
+    app.kubernetes.io/name: pocket-cvmfs
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/component: resizer-role
+  name: csi-cvmfsplugin-resizer-role
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: external-resizer-cfg
+subjects:
+- kind: ServiceAccount
+  name: cvmfs-serviceaccount
+---
+# Source: cvmfs-csi/templates/plugin.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  labels:
+    app.kubernetes.io/instance: cvmfs.csi.cern.ch
+    app.kubernetes.io/part-of: csi-driver-cvmfs
+    app.kubernetes.io/name: pocket-cvmfs
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/component: snapshotter-role
+  name: csi-cvmfsplugin-snapshotter-role
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: external-snapshotter-leaderelection
+subjects:
+- kind: ServiceAccount
+  name: cvmfs-serviceaccount
+---
+# Source: cvmfs-csi/templates/rbac-attacher.yaml
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: csi-attacher-role-cfg
+  # replace with non-default namespace name
+  namespace: csi-cvmfs
+subjects:
+  - kind: ServiceAccount
+    name: csi-attacher
+    # replace with non-default namespace name
+    namespace: csi-cvmfs
+roleRef:
+  kind: Role
+  name: external-attacher-cfg
+  apiGroup: rbac.authorization.k8s.io
+---
+# Source: cvmfs-csi/templates/rbac-provisioner.yaml
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: csi-provisioner-role-cfg
+  # replace with non-default namespace name
+  namespace: csi-cvmfs
+subjects:
+  - kind: ServiceAccount
+    name: csi-provisioner
+    # replace with non-default namespace name
+    namespace: csi-cvmfs
+roleRef:
+  kind: Role
+  name: external-provisioner-cfg
+  apiGroup: rbac.authorization.k8s.io
+---
+# Source: cvmfs-csi/templates/plugin.yaml
+kind: StatefulSet
+apiVersion: apps/v1
+metadata:
+  name: csi-cvmfsplugin
+  labels:
+    app.kubernetes.io/instance: cvmfs.csi.cern.ch
+    app.kubernetes.io/part-of: csi-driver-cvmfs
+    app.kubernetes.io/name: pocket-cvmfs
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/component: plugin
+  namespace: csi-cvmfs
+spec:
+  serviceName: "csi-cvmfsplugin"
+  # One replica only:
+  # Host path driver only works when everything runs
+  # on a single node.
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: cvmfs.csi.cern.ch
+      app.kubernetes.io/part-of: csi-driver-cvmfs
+      app.kubernetes.io/name: pocket-cvmfs
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/component: plugin
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/instance: cvmfs.csi.cern.ch
+        app.kubernetes.io/part-of: csi-driver-cvmfs
+        app.kubernetes.io/name: pocket-cvmfs
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/component: plugin
+    spec:
+      serviceAccountName: cvmfs-serviceaccount
+      containers:
+        - name: cvmfsplugin
+          image: juravenator/csi-cvmfsplugin:latest
+          args:
+            - "--nodeid=$(NODE_ID)"
+            - "--csi-address=$(CSI_ADDRESS)"
+            - "--drivername=$(DRIVER_NAME)"
+            - "--log.level=trace"
+          env:
+            - name: CSI_ADDRESS
+              value: unix:///var/lib/kubelet/plugins/cvmfs.csi.cern.ch/csi.sock
+            - name: DRIVER_NAME
+              value: cvmfs.csi.cern.ch
+            - name: KUBE_NODE_NAME
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: spec.nodeName
+          securityContext:
+            privileged: true
+            # capabilities:
+            #   add: ["SYS_ADMIN"]
+            # allowPrivilegeEscalation: true
+          ports:
+          - containerPort: 9898
+            name: healthz
+            protocol: TCP
+          livenessProbe:
+            failureThreshold: 5
+            httpGet:
+              path: /healthz
+              port: healthz
+            initialDelaySeconds: 10
+            timeoutSeconds: 3
+            periodSeconds: 2
+          volumeMounts:
+            - mountPath: /csi
+              name: socket-dir
+            - mountPath: /var/lib/kubelet/pods
+              mountPropagation: Bidirectional
+              name: mountpoint-dir
+            - mountPath: /var/lib/kubelet/plugins
+              mountPropagation: Bidirectional
+              name: plugins-dir
+            - mountPath: /csi-data-dir
+              name: csi-data-dir
+            - mountPath: /dev
+              name: dev-dir
+            - mountPath: /sys
+              name: host-sys
+
+        # The node-driver-registrar is a sidecar container that registers the CSI driver 
+        # with Kubelet using the kubelet plugin registration mechanism.
+        # This is necessary because Kubelet is responsible for issuing CSI NodeGetInfo, 
+        # NodeStageVolume, NodePublishVolume calls.
+        # The node-driver-registrar registers your CSI driver with Kubelet so that it 
+        # knows which Unix domain socket to issue the CSI calls on.
+        - name: node-driver-registrar
+          image: k8s.gcr.io/sig-storage/csi-node-driver-registrar:v2.2.0
+          args:
+            - --v=5
+            - --csi-address=/csi/csi.sock
+            - --kubelet-registration-path=/var/lib/kubelet/plugins/cvmfs.csi.cern.ch/csi.sock
+          securityContext:
+            # This is necessary only for systems with SELinux, where
+            # non-privileged sidecar containers cannot access unix domain socket
+            # created by privileged CSI driver container.
+            privileged: true
+          env:
+            - name: KUBE_NODE_NAME
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: spec.nodeName
+          volumeMounts:
+          - mountPath: /csi
+            name: socket-dir
+          - mountPath: /registration
+            name: registration-dir
+          - mountPath: /csi-data-dir
+            name: csi-data-dir
+
+        # The CSI livenessprobe is a sidecar container that monitors the health of 
+        # the CSI driver and reports it to Kubernetes via the Liveness Probe mechanism.
+        - name: liveness-probe
+          volumeMounts:
+          - mountPath: /csi
+            name: socket-dir
+          image: k8s.gcr.io/sig-storage/livenessprobe:v2.3.0
+          args:
+          - --csi-address=/csi/csi.sock
+          - --health-port=9898
+
+        # The external-attacher is a sidecar container that attaches volumes to nodes 
+        # by calling ControllerPublish and ControllerUnpublish functions of CSI drivers.
+        - name: csi-attacher
+          image: k8s.gcr.io/sig-storage/csi-attacher:v3.2.1
+          args:
+            - --v=5
+            - --csi-address=/csi/csi.sock
+          securityContext:
+            # This is necessary only for systems with SELinux, where
+            # non-privileged sidecar containers cannot access unix domain socket
+            # created by privileged CSI driver container.
+            privileged: true
+          volumeMounts:
+          - mountPath: /csi
+            name: socket-dir
+
+        # The external-provisioner is a sidecar container that dynamically provisions 
+        # volumes by calling CreateVolume and DeleteVolume functions of CSI drivers.
+        - name: csi-provisioner
+          image: k8s.gcr.io/sig-storage/csi-provisioner:v2.2.1
+          args:
+            - -v=5
+            - --csi-address=/csi/csi.sock
+            # - --feature-gates=Topology=true
+          securityContext:
+            # This is necessary only for systems with SELinux, where
+            # non-privileged sidecar containers cannot access unix domain socket
+            # created by privileged CSI driver container.
+            privileged: true
+          volumeMounts:
+            - mountPath: /csi
+              name: socket-dir
+
+      volumes:
+        - hostPath:
+            path: /var/lib/kubelet/plugins/cvmfs.csi.cern.ch
+            type: DirectoryOrCreate
+          name: socket-dir
+        - hostPath:
+            path: /var/lib/kubelet/pods
+            type: DirectoryOrCreate
+          name: mountpoint-dir
+        - hostPath:
+            path: /var/lib/kubelet/plugins_registry
+            type: Directory
+          name: registration-dir
+        - hostPath:
+            path: /var/lib/kubelet/plugins
+            type: Directory
+          name: plugins-dir
+        - hostPath:
+            # 'path' is where PV data is persisted on host.
+            # using /tmp is also possible while the PVs will not available after plugin container recreation or host reboot
+            path: /var/lib/csi-cvmfs-data/
+            type: DirectoryOrCreate
+          name: csi-data-dir
+        - hostPath:
+            path: /dev
+            type: Directory
+          name: dev-dir
+        - name: host-sys
+          hostPath:
+            path: /sys
+---
+# Source: cvmfs-csi/templates/driverinfo.yaml
+apiVersion: storage.k8s.io/v1
+kind: CSIDriver
+metadata:
+  name: cvmfs.csi.cern.ch
+  labels:
+    app.kubernetes.io/instance: cvmfs.csi.cern.ch
+    app.kubernetes.io/part-of: csi-driver-cvmfs
+    app.kubernetes.io/name: pocket-cvmfs
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/component: csi-driver
+spec:
+  # Supports persistent and ephemeral inline volumes.
+  volumeLifecycleModes:
+  - Persistent
+  - Ephemeral
+  # To determine at runtime which mode a volume uses, pod info and its
+  # "csi.storage.k8s.io/ephemeral" entry are needed.
+  podInfoOnMount: true

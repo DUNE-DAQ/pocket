@@ -41,7 +41,8 @@ setup.openstack: on-cern-network check_openstack_login $(TERRAFORM) ansible depe
 .PHONY: kubectl-apply
 kubectl-apply: $(KUBECTL) external-manifests ## apply files in `manifests` using kubectl
 	@echo "installing basic services"
-	@>/dev/null $(KUBECTL) apply -f manifests
+	@>/dev/null $(KUBECTL) create ns csi-cvmfs
+	@>/dev/null $(KUBECTL) apply -f manifests -f manifests/cvmfs
 
 ifeq ($(OPMON_ENABLED),0)
 	@echo -e "\e[33mskipping installation of opmon\e[0m"
@@ -178,12 +179,15 @@ $(KUBECTL):
 	@chmod +x $(KUBECTL)
 
 .PHONY: external-manifests
-external-manifests: manifests/ECK/CRDs/eck.yaml manifests/kubernetes-dashboard-recommended.yaml
+external-manifests: manifests/ECK/CRDs/eck.yaml manifests/kubernetes-dashboard-recommended.yaml manifests/cvmfs/deploy.yaml
 
 manifests/ECK/CRDs/eck.yaml: # fetch the ECK operator
-	@curl -Lo manifests/ECK/CRDs/eck.yaml --silent --fail https://download.elastic.co/downloads/eck/1.6.0/all-in-one.yaml
+	@curl -Lo $@ --silent --fail https://download.elastic.co/downloads/eck/1.6.0/all-in-one.yaml
 
 manifests/kubernetes-dashboard-recommended.yaml: # fetch kubernetes dashboard manifest
-	@curl -Lo manifests/kubernetes-dashboard-recommended.yaml --silent --fail https://raw.githubusercontent.com/kubernetes/dashboard/v2.2.0/aio/deploy/recommended.yaml
+	@curl -Lo $@ --silent --fail https://raw.githubusercontent.com/kubernetes/dashboard/v2.2.0/aio/deploy/recommended.yaml
+
+manifests/cvmfs/deploy.yaml: # fetch the CVMFS CSI Driver
+	@curl -Lo $@ --silent --fail https://raw.githubusercontent.com/Juravenator/cvmfs-csi/master/deployments/kubernetes/deploy.yaml
 
 include .makefile/help.mk
