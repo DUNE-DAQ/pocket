@@ -26,3 +26,5 @@ nodes:
     hostPort: 31004
   - containerPort: 31005
     hostPort: 31005
+  - containerPort: 31006
+    hostPort: 31006

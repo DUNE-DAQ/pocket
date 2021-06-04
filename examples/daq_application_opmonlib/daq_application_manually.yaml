@@ -1,0 +1,24 @@
+# This will create a pod that is fully prepared to setup a DUNE DAQ
+# development environment in and run daq_applications
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: example-daq-app-manually
+spec:
+  containers:
+  - name: sl7
+    image: dunedaq/sl7:latest # yes, this image only has latest tages
+    command: [ "sleep", "Infinity" ]
+    volumeMounts:
+    - mountPath: "/cvmfs/dunedaq.opensciencegrid.org"
+      name: dunedaq
+    # we don't need this just yet
+    # opmonlib-proxy injects db user:pass for us
+    # envFrom:
+    # - secretRef:
+    #     name: influxdb-secrets
+  volumes:
+  - name: dunedaq
+    persistentVolumeClaim:
+      claimName: dunedaq.opensciencegrid.org
