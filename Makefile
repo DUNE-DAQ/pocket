@@ -41,7 +41,7 @@ setup.openstack: on-cern-network check_openstack_login $(TERRAFORM) ansible depe
 .PHONY: kubectl-apply
 kubectl-apply: $(KUBECTL) external-manifests ## apply files in `manifests` using kubectl
 	@echo "installing basic services"
-	@>/dev/null $(KUBECTL) create ns csi-cvmfs
+	@>/dev/null 2>&1 $(KUBECTL) create ns csi-cvmfs ||:
 	@>/dev/null $(KUBECTL) apply -f manifests -f manifests/cvmfs
 
 ifeq ($(OPMON_ENABLED),0)
