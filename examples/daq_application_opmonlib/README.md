@@ -6,7 +6,19 @@ set up a v2.6.0 development environment, and run a `daq_application`.
 Additionally, we will configure the opmonlib reverse proxy
 and direct our `daq_application`s monitoring data to it.
 
+## Where can I run this?
+Any linux machine that has a functional installation of docker. (yes, this could be your laptop).
+
 ## Starting pocket
+
+In case you haven't got a copy of pocket yet:
+```bash
+# get your copy of Pocket
+git clone https://github.com/DUNE-DAQ/pocket.git
+cd pocket
+# (optional) make your shell use binaries (kubectl, ...) that pocket ships with
+eval $(make env)
+```
 
 ```bash
 # in this example, we only need opmon services in Pocket
@@ -15,7 +27,7 @@ SERVICES=opmon make setup.local
 
 This command will fail if you already have a cluster setup.  
 In case opmon services aren't present in the existing cluster,
-or to make sure, run `SERVICES=opmon make kubectl-apply`
+or if you're not sure, run `SERVICES=opmon make kubectl-apply`
 
 ## Starting containers and getting a shell
 
@@ -40,7 +52,6 @@ dbt-create.sh dunedaq-v2.6.0 exampleapp
 cd exampleapp
 
 dbt-workarea-env
-# dbt-build.sh --install
 
 curl -LO https://raw.githubusercontent.com/DUNE-DAQ/listrev/develop/test/list-reversal-app.json
 

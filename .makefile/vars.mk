@@ -51,11 +51,16 @@ endif
 ## Version information and locations of external binaries
 ##
 
+EXTERNALS_BIN_FOLDER ?= $(shell pwd)/external/bin
+
 TERRAFORM_VERSION ?= 0.15.3
-TERRAFORM := $(shell pwd)/external/bin/terraform-$(TERRAFORM_VERSION)
+TERRAFORM_NOVER := $(EXTERNALS_BIN_FOLDER)/terraform
+TERRAFORM := $(TERRAFORM_NOVER)-$(TERRAFORM_VERSION)
 
-KIND_VERSION = 0.11.1
-KIND := $(shell pwd)/external/bin/kind-$(KIND_VERSION)
+KIND_VERSION ?= 0.11.1
+KIND_NOVER := $(EXTERNALS_BIN_FOLDER)/kind
+KIND := $(KIND_NOVER)-$(KIND_VERSION)
 
-KUBECTL_VERSION = 1.21.0
-KUBECTL := $(shell pwd)/external/bin/kubectl-$(KUBECTL_VERSION)
+KUBECTL_VERSION ?= 1.21.1
+KUBECTL_NOVER := $(EXTERNALS_BIN_FOLDER)/kubectl
+KUBECTL := $(KUBECTL_NOVER)-$(KUBECTL_VERSION)

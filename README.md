@@ -13,15 +13,34 @@ make setup.local
 
 This will setup your local (one-node) cluster, and print out available default services and their access credentials.
 
+![](docs/print-access-creds.png)
+
 To start a cluster without ElasticSearch
 ```bash
 SERVICES=opmon make setup.local
 ```
 
-![](docs/print-access-creds.png)
+Optionally, to make your shell use binaries (`kubectl`, ...) that pocket ships with
+```bash
+eval $(make env)
+```
 
 ## Accessing services
-For developer convenience, the cluster will have a http proxy running for you to access any services internal to the cluster.
+
+Built-in services will be exposed via static port bindings to `localhost`.  
+These are printed out after a successful setup or by running `make print-access-creds`.
+
+|Service|Port|
+|-|-|
+|Proxy server|31000|
+|K8S Dashboard|31001|
+|InfluxDB|31002|
+|Grafana|31003|
+|ElasticSearch|31004|
+|Kibana|31005|
+
+For the in-cluster experience, and to access your own (non-built-in) defined services,
+the cluster will have a http proxy running for you to access any services internal to the cluster.
 
 This proxy runs on port `31000` and is usable using curl
 ```bash
@@ -43,6 +62,11 @@ This will create a single node cluster.
 The only requirement is a working installation of `docker`, other binaries required for setup are downloaded automatically and require no sudo privileges.
 ```bash
 $ make setup.local
+```
+
+Optionally, to make your shell use binaries (`kubectl`, ...) that pocket ships with
+```bash
+eval $(make env)
 ```
 
 To destroy after you finished, run

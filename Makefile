@@ -100,6 +100,10 @@ destroy.openstack: check_openstack_login $(TERRAFORM) ## undo the setup made by 
 ### Helper commands
 ##
 
+.PHONY: env
+env: kubectl kind terraform ## use `eval $(make env)` to get access to dependency binaries such as kubectl
+	@echo PATH="$(EXTERNALS_BIN_FOLDER):$(shell echo $$PATH)"
+
 .PHONY: check_openstack_login
 check_openstack_login:
 ifndef OS_PASSWORD
@@ -153,18 +157,26 @@ on-cern-network:
 
 .PHONY: kind
 kind: $(KIND) ## fetch Kubernetes In Docker (KIND) binary
+	@ln -s --force $(KIND) $(KIND_NOVER)
 $(KIND):
+# do not print to stdout when user runs `make env`
+ifneq ($(MAKECMDGOALS),env)
 	@echo "downloading KIND $(KIND_VERSION)"
+endif
 	@curl -Lo $(KIND) --fail --silent https://github.com/kubernetes-sigs/kind/releases/download/v$(KIND_VERSION)/kind-${uname_s}-${COMMON_ARCH}
 	@chmod +x $(KIND)
 
-.PHONY: $(TERRAFORM)
+.PHONY: terraform
 terraform: $(TERRAFORM) ## fetch Terraform binary
+	@ln -s --force $(TERRAFORM) $(TERRAFORM_NOVER)
 $(TERRAFORM):
 	@$(MAKE) --no-print-directory dependency.unzip
+# do not print to stdout when user runs `make env`
+ifneq ($(MAKECMDGOALS),env)
 	@echo "downloading terraform $(TERRAFORM_VERSION)"
+endif
 	@curl -Lo $(TERRAFORM).zip --silent --fail https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_${uname_s}_${COMMON_ARCH}.zip
-	@cd $(dir $(TERRAFORM)) && unzip -o $(TERRAFORM).zip
+	@cd $(dir $(TERRAFORM)) && unzip -o $(TERRAFORM).zip > /dev/null 2>&1 && touch terraform && mv terraform $(TERRAFORM)
 	@rm -rf $(TERRAFORM).zip
 
 .PHONY: ansible
@@ -173,8 +185,12 @@ ansible: python3 ## install Ansible
 
 .PHONY: kubectl
 kubectl: $(KUBECTL) ## fetch kubectl binary
+	@ln -s --force $(KUBECTL) $(KUBECTL_NOVER)
 $(KUBECTL):
+# do not print to stdout when user runs `make env`
+ifneq ($(MAKECMDGOALS),env)
 	@echo "downloading kubectl $(KUBECTL_VERSION)"
+endif
 	@curl -Lo $(KUBECTL) --fail --silent https://dl.k8s.io/release/v$(KUBECTL_VERSION)/bin/${uname_s}/${COMMON_ARCH}/kubectl
 	@chmod +x $(KUBECTL)
 
