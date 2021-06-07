@@ -22,6 +22,7 @@ endif
 # Linux: 'linux'
 # MacOS: 'darwin'
 # Windows: 'msys_nt-10.0-19042'
+# Windows: 'windows_nt', 'mingw64_nt-10.0-17763', 'msys_nt-6.1', 'windowsnt'
 uname_s := $(shell uname -s | tr '[:upper:]' '[:lower:]')
 # x86_64: 'x86_64'
 # Apple M1: 'arm64'
