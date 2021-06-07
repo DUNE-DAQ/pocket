@@ -38,6 +38,7 @@ These are printed out after a successful setup or by running `make print-access-
 |Grafana|31003|
 |ElasticSearch|31004|
 |Kibana|31005|
+|Opmonlib Proxy|31006|
 
 For the in-cluster experience, and to access your own (non-built-in) defined services,
 the cluster will have a http proxy running for you to access any services internal to the cluster.

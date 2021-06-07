@@ -13,18 +13,24 @@ nodes:
   # mkdir -p /cvmfs/cvmfs-config.cern.ch && mount -t cvmfs cvmfs-config.cern.ch /cvmfs/cvmfs-config.cern.ch (takes forever)
   image: kindest/node:v1.18.6
   extraPortMappings:
-    # proxy server
-  - containerPort: 31000
+  - # proxy server
+    containerPort: 31000
     hostPort: 31000
-  - containerPort: 31001
+  - # Kubernetes dashboard
+    containerPort: 31001
     hostPort: 31001
-  - containerPort: 31002
+  - # InfluxDB
+    containerPort: 31002
     hostPort: 31002
-  - containerPort: 31003
+  - # Grafana
+    containerPort: 31003
     hostPort: 31003
-  - containerPort: 31004
+  - # ElasticSearch
+    containerPort: 31004
     hostPort: 31004
-  - containerPort: 31005
+  - # Kibana
+    containerPort: 31005
     hostPort: 31005
-  - containerPort: 31006
+  - # opmonlib proxy
+    containerPort: 31006
     hostPort: 31006
