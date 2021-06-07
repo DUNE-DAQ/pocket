@@ -102,7 +102,11 @@ destroy.openstack: check_openstack_login $(TERRAFORM) ## undo the setup made by 
 
 .PHONY: env
 env: kubectl ## use `eval $(make env)` to get access to dependency binaries such as kubectl
+ifeq ($(COMMON_SYSTEM),windows)
+	@echo "\$\$$env:Path = \"$(EXTERNALS_BIN_FOLDER);\" + \$\$$env:Path"
+else
 	@echo "PATH=\"$(EXTERNALS_BIN_FOLDER):$(shell echo $$PATH)\""
+endif
 
 .PHONY: check_openstack_login
 check_openstack_login:
@@ -153,7 +157,7 @@ python3: dependency.python3 # check if python3 is installed
 
 .PHONY: on-cern-network
 on-cern-network:
-	@curl --connect-timeout 1 network.cern.ch > /dev/null 2>&1 || (echo -e "\e[31mThe CERN network is not accessible\e[0m" && exit 1)
+	@$(CURL) --connect-timeout 1 network.cern.ch > /dev/null 2>&1 || (echo -e "\e[31mThe CERN network is not accessible\e[0m" && exit 1)
 
 .PHONY: kind
 kind: $(KIND) ## fetch Kubernetes In Docker (KIND) binary
@@ -163,7 +167,7 @@ $(KIND):
 ifneq ($(MAKECMDGOALS),env)
 	@echo "downloading KIND $(KIND_VERSION)"
 endif
-	@curl -Lo $(KIND) --fail --silent https://github.com/kubernetes-sigs/kind/releases/download/v$(KIND_VERSION)/kind-${uname_s}-${COMMON_ARCH}
+	@$(CURL) -Lo $(KIND) --fail --silent https://github.com/kubernetes-sigs/kind/releases/download/v$(KIND_VERSION)/kind-${COMMON_SYSTEM}-${COMMON_ARCH}
 	@chmod +x $(KIND)
 
 .PHONY: terraform
@@ -175,7 +179,7 @@ $(TERRAFORM):
 ifneq ($(MAKECMDGOALS),env)
 	@echo "downloading terraform $(TERRAFORM_VERSION)"
 endif
-	@curl -Lo $(TERRAFORM).zip --silent --fail https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_${uname_s}_${COMMON_ARCH}.zip
+	@$(CURL) -Lo $(TERRAFORM).zip --silent --fail https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_${COMMON_SYSTEM}_${COMMON_ARCH}.zip
 	@cd $(dir $(TERRAFORM)) && unzip -o $(TERRAFORM).zip > /dev/null 2>&1 && touch terraform && mv terraform $(TERRAFORM)
 	@rm -rf $(TERRAFORM).zip
 
@@ -183,6 +187,10 @@ endif
 ansible: python3 ## install Ansible
 	@command -v ansible-playbook > /dev/null || (python3 -m pip install --upgrade pip && python3 -m pip install ansible)
 
+KUBECTL_DL_BIN:=kubectl
+ifeq ($(COMMON_SYSTEM),windows)
+KUBECTL_DL_BIN:=$(KUBECTL_DL_BIN).exe
+endif
 .PHONY: kubectl
 kubectl: $(KUBECTL) ## fetch kubectl binary
 	@ln -s --force $(KUBECTL) $(KUBECTL_NOVER)
@@ -191,19 +199,19 @@ $(KUBECTL):
 ifneq ($(MAKECMDGOALS),env)
 	@echo "downloading kubectl $(KUBECTL_VERSION)"
 endif
-	@curl -Lo $(KUBECTL) --fail --silent https://dl.k8s.io/release/v$(KUBECTL_VERSION)/bin/${uname_s}/${COMMON_ARCH}/kubectl
+	@$(CURL) -Lo $(KUBECTL) --fail --silent https://dl.k8s.io/release/v$(KUBECTL_VERSION)/bin/${COMMON_SYSTEM}/${COMMON_ARCH}/$(KUBECTL_DL_BIN)
 	@chmod +x $(KUBECTL)
 
 .PHONY: external-manifests
 external-manifests: manifests/ECK/CRDs/eck.yaml manifests/kubernetes-dashboard-recommended.yaml manifests/cvmfs/deploy.yaml
 
 manifests/ECK/CRDs/eck.yaml: # fetch the ECK operator
-	@curl -Lo $@ --silent --fail https://download.elastic.co/downloads/eck/1.6.0/all-in-one.yaml
+	@$(CURL) -Lo $@ --silent --fail https://download.elastic.co/downloads/eck/1.6.0/all-in-one.yaml
 
 manifests/kubernetes-dashboard-recommended.yaml: # fetch kubernetes dashboard manifest
-	@curl -Lo $@ --silent --fail https://raw.githubusercontent.com/kubernetes/dashboard/v2.2.0/aio/deploy/recommended.yaml
+	@$(CURL) -Lo $@ --silent --fail https://raw.githubusercontent.com/kubernetes/dashboard/v2.2.0/aio/deploy/recommended.yaml
 
 manifests/cvmfs/deploy.yaml: # fetch the CVMFS CSI Driver
-	@curl -Lo $@ --silent --fail https://raw.githubusercontent.com/Juravenator/cvmfs-csi/master/deployments/kubernetes/deploy.yaml
+	@$(CURL) -Lo $@ --silent --fail https://raw.githubusercontent.com/Juravenator/cvmfs-csi/master/deployments/kubernetes/deploy.yaml
 
 include .makefile/help.mk

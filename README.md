@@ -23,6 +23,8 @@ SERVICES=opmon make setup.local
 Optionally, to make your shell use binaries (`kubectl`, ...) that pocket ships with
 ```bash
 eval $(make env)
+# or, on windows
+# make env | Invoke-Expression
 ```
 
 ## Accessing services
