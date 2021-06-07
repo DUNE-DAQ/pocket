@@ -1,0 +1,16 @@
+name: Test setup.local
+
+on: push
+
+jobs:
+  test-local-setup:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+        - os: ubuntu-latest
+          TARGET: x86_64-unknown-linux-musl
+    steps:
+    - uses: actions/checkout@v1
+    - run: docker ps
+    - run: make setup.local
