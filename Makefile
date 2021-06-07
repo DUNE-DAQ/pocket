@@ -12,14 +12,14 @@ include .makefile/vars.mk
 ##
 
 .PHONY: setup.local
-setup.local: dependency.docker $(KIND) ## start local setup
+setup.local: dependency.docker kind kubectl ## start local setup
 	@$(KIND) create cluster --config local/kind.config.yml
 	@$(MAKE) --no-print-directory kubectl-apply
 	@echo ""
 	@$(MAKE) --no-print-directory print-access-creds
 
 .PHONY: setup.openstack
-setup.openstack: on-cern-network check_openstack_login $(TERRAFORM) ansible dependency.ssh ## create a setup in your openstack account
+setup.openstack: on-cern-network check_openstack_login terraform ansible dependency.ssh ## create a setup in your openstack account
 	cd openstack/terraform && \
 	$(TERRAFORM) init -upgrade && \
 	TF_VAR_cluster_name=${OS_USERNAME}-pocketdune $(TERRAFORM) apply
@@ -39,7 +39,7 @@ setup.openstack: on-cern-network check_openstack_login $(TERRAFORM) ansible depe
 	@echo "31000"
 
 .PHONY: kubectl-apply
-kubectl-apply: $(KUBECTL) external-manifests ## apply files in `manifests` using kubectl
+kubectl-apply: kubectl external-manifests ## apply files in `manifests` using kubectl
 	@echo "installing basic services"
 	@>/dev/null 2>&1 $(KUBECTL) create ns csi-cvmfs ||:
 	@>/dev/null $(KUBECTL) apply -f manifests -f manifests/cvmfs
@@ -84,11 +84,11 @@ endif
 ##
 
 .PHONY: destroy.local
-destroy.local: $(KIND) ## undo the setup made by `setup.local`
+destroy.local: kind ## undo the setup made by `setup.local`
 	@$(KIND) delete cluster --name $(shell cat local/kind.config.yml | grep 'name: ' | cut -d ":" -f2)
 
 .PHONY: destroy.openstack
-destroy.openstack: check_openstack_login $(TERRAFORM) ## undo the setup made by `setup.openstack`
+destroy.openstack: check_openstack_login terraform ## undo the setup made by `setup.openstack`
 	cd openstack/terraform && \
 	$(TERRAFORM) init -upgrade && \
 	TF_VAR_cluster_name=${OS_USERNAME}-pocketdune $(TERRAFORM) destroy
@@ -114,7 +114,7 @@ ifndef OS_PASSWORD
 	@exit 1
 endif
 
-print-access-creds: $(KUBECTL) ## retrieve and print access data for provided services
+print-access-creds: kubectl ## retrieve and print access data for provided services
 	@KUBECTL=$(KUBECTL) .makefile/print-creds.sh
 
 ##
@@ -157,7 +157,7 @@ on-cern-network:
 
 .PHONY: kind
 kind: $(KIND) ## fetch Kubernetes In Docker (KIND) binary
-	@ln -s --force $(KIND) $(KIND_NOVER)
+	@$(call symlink,$(KIND),$(KIND_NOVER))
 $(KIND):
 # do not print to stdout when user runs `make env`
 ifneq ($(MAKECMDGOALS),env)
@@ -168,7 +168,7 @@ endif
 
 .PHONY: terraform
 terraform: $(TERRAFORM) ## fetch Terraform binary
-	@ln -s --force $(TERRAFORM) $(TERRAFORM_NOVER)
+	@$(call symlink,$(TERRAFORM),$(TERRAFORM_NOVER))
 $(TERRAFORM):
 	@$(MAKE) --no-print-directory dependency.unzip
 # do not print to stdout when user runs `make env`
@@ -185,7 +185,7 @@ ansible: python3 ## install Ansible
 
 .PHONY: kubectl
 kubectl: $(KUBECTL) ## fetch kubectl binary
-	@ln -s --force $(KUBECTL) $(KUBECTL_NOVER)
+	@$(call symlink,$(KUBECTL),$(KUBECTL_NOVER))
 $(KUBECTL):
 # do not print to stdout when user runs `make env`
 ifneq ($(MAKECMDGOALS),env)

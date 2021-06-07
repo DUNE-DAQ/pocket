@@ -9,13 +9,24 @@ jobs:
       matrix:
         include:
         - os: ubuntu-latest
-        - os: macos-latest
-        - os: windows-latest
+
+        # MacOS works, but CI is very tempramental...
+        # - os: macos-latest
+        # check windows-powershell-compatibility branch
+        # everything works except password generation
+        # - os: windows-latest
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v2
+
+    # - uses: docker-practice/actions-setup-docker@master
+    #   if: ${{ matrix.os == 'macos-latest' }}
+    
     - name: verify docker is functional
       run: docker ps
-    - run: make setup.local
+    - name: setup.local
+      run: |
+        make setup.local
+        make env >> $GITHUB_ENV
     - name: InfluxDB works
       run: |
         kubectl -n monitoring wait --for condition=available deployment influxdb

@@ -72,3 +72,7 @@ endif
 define random_password
 $(shell head -c32 <(tr -dc _A-Z-a-z-0-9-=%. < /dev/urandom 2> /dev/null))
 endef
+
+define symlink
+$(shell rm -f $(2) && ln -s $(1) $(2))
+endef
