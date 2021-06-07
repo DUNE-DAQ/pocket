@@ -12,5 +12,10 @@ jobs:
           TARGET: x86_64-unknown-linux-musl
     steps:
     - uses: actions/checkout@v1
-    - run: docker ps
+    - name: verify docker is functional
+      run: docker ps
     - run: make setup.local
+    - name: InfluxDB works
+      run: |
+        kubectl -n monitoring wait --for condition=available deployment influxdb
+        curl --fail http://localhost:31002/health | grep "ready for queries and writes"
