@@ -137,13 +137,13 @@ YUM_HINT.ssh := openssh-clients
 YUM_HINT.python3 := rh-python38-python-pip && scl enable rh-python38 "make ..."
 YUM_HINT.8.python3 := python38-pip
 dependency.%: # check if a dependency is installed
-	@command -v $(subst dependency.,,$@) > /dev/null || $(MAKE) --no-print-directory dependencyhint.$(subst dependency.,,$@)
+	@command -v $* > /dev/null || $(MAKE) --no-print-directory dependencyhint.$*
 
 .PHONY: dependencyhint.%
 dependencyhint.%:
-	@echo -e "\e[31m$(subst dependencyhint.,,$@) is required to run\e[0m"
+	@echo -e "\e[31m$* is required to run\e[0m"
 ifeq ($(OS),centos)
-	@echo "Hint: yum install $(or ${YUM_HINT.$(OS_VERSION).$(subst dependencyhint.,,$@)},${YUM_HINT.$(subst dependencyhint.,,$@)},$(subst dependencyhint.,,$@) ?)"
+	@echo "Hint: yum install $(or ${YUM_HINT.$(OS_VERSION).$*},${YUM_HINT.$*},$* ?)"
 endif
 	@exit 1
 
