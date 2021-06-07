@@ -101,7 +101,7 @@ destroy.openstack: check_openstack_login $(TERRAFORM) ## undo the setup made by 
 ##
 
 .PHONY: env
-env: kubectl kind terraform ## use `eval $(make env)` to get access to dependency binaries such as kubectl
+env: kubectl ## use `eval $(make env)` to get access to dependency binaries such as kubectl
 	@echo PATH="$(EXTERNALS_BIN_FOLDER):$(shell echo $$PATH)"
 
 .PHONY: check_openstack_login
