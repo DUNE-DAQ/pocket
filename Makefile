@@ -50,19 +50,19 @@ else
 	@echo "installing opmon"
 	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/opmon/ns-monitoring.yaml ||:
 	@>/dev/null 2>&1 $(KUBECTL) -n monitoring create secret generic grafana-secrets \
-	--from-literal=GF_SECURITY_SECRET_KEY=$(shell < /dev/urandom tr -dc _A-Z-a-z-0-9-=%. | head -c$${1:-32};echo;) \
-	--from-literal=GF_SECURITY_ADMIN_PASSWORD="$(shell < /dev/urandom tr -dc _A-Z-a-z-0-9-=%. | head -c$${1:-32};echo;)" ||:
+	--from-literal=GF_SECURITY_SECRET_KEY="$(call random_password)" \
+	--from-literal=GF_SECURITY_ADMIN_PASSWORD="$(call random_password)" ||:
 
 	@>/dev/null 2>&1 $(KUBECTL) -n monitoring create secret generic influxdb-secrets \
 	--from-literal=INFLUXDB_CONFIG_PATH=/etc/influxdb/influxdb.conf \
 	--from-literal=INFLUXDB_DB=influxdb \
 	--from-literal=INFLUXDB_URL=http://influxdb.monitoring:8086 \
 	--from-literal=INFLUXDB_USER=user \
-	--from-literal=INFLUXDB_USER_PASSWORD=$(shell < /dev/urandom tr -dc _A-Z-a-z-0-9-=%. | head -c$${1:-32};echo;) \
+	--from-literal=INFLUXDB_USER_PASSWORD="$(call random_password)" \
 	--from-literal=INFLUXDB_READ_USER=readonly \
 	--from-literal=INFLUXDB_READ_USER_PASSWORD=readonly \
 	--from-literal=INFLUXDB_ADMIN_USER=dune \
-	--from-literal=INFLUXDB_ADMIN_USER_PASSWORD=$(shell < /dev/urandom tr -dc _A-Z-a-z-0-9-=%. | head -c$${1:-32};echo;) \
+	--from-literal=INFLUXDB_ADMIN_USER_PASSWORD="$(call random_password)" \
 	--from-literal=INFLUXDB_HOST=influxdb.monitoring  \
 	--from-literal=INFLUXDB_HTTP_AUTH_ENABLED=false ||:
 

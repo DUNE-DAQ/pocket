@@ -1,3 +1,20 @@
+##
+## Version information and locations of external binaries
+##
+
+EXTERNALS_BIN_FOLDER ?= $(shell pwd)/external/bin
+
+TERRAFORM_VERSION ?= 0.15.3
+TERRAFORM_NOVER := $(EXTERNALS_BIN_FOLDER)/terraform
+TERRAFORM := $(TERRAFORM_NOVER)-$(TERRAFORM_VERSION)
+
+KIND_VERSION ?= 0.11.1
+KIND_NOVER := $(EXTERNALS_BIN_FOLDER)/kind
+KIND := $(KIND_NOVER)-$(KIND_VERSION)
+
+KUBECTL_VERSION ?= 1.21.1
+KUBECTL_NOVER := $(EXTERNALS_BIN_FOLDER)/kubectl
+KUBECTL := $(KUBECTL_NOVER)-$(KUBECTL_VERSION)
 
 ##
 ## Services to install
@@ -19,6 +36,7 @@ endif
 ##
 ## Helper variables so we download the right binaries for your machine
 ##
+
 # Linux: 'linux'
 # MacOS: 'darwin'
 uname_s := $(shell uname -s | tr '[:upper:]' '[:lower:]')
@@ -48,19 +66,9 @@ else ifeq ($(uname_s),darwin)
 endif
 
 ##
-## Version information and locations of external binaries
+## Helper functions
 ##
 
-EXTERNALS_BIN_FOLDER ?= $(shell pwd)/external/bin
-
-TERRAFORM_VERSION ?= 0.15.3
-TERRAFORM_NOVER := $(EXTERNALS_BIN_FOLDER)/terraform
-TERRAFORM := $(TERRAFORM_NOVER)-$(TERRAFORM_VERSION)
-
-KIND_VERSION ?= 0.11.1
-KIND_NOVER := $(EXTERNALS_BIN_FOLDER)/kind
-KIND := $(KIND_NOVER)-$(KIND_VERSION)
-
-KUBECTL_VERSION ?= 1.21.1
-KUBECTL_NOVER := $(EXTERNALS_BIN_FOLDER)/kubectl
-KUBECTL := $(KUBECTL_NOVER)-$(KUBECTL_VERSION)
+define random_password
+$(shell head -c32 <(tr -dc _A-Z-a-z-0-9-=%. < /dev/urandom))
+endef
