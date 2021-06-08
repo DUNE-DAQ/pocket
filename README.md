@@ -1,6 +1,8 @@
-# PocketDUNE
+# Pocket
 
 Setup a demo installation of DUNE DAQ in a variety of setups.
+
+Pocket is compatible with Linux, MacOS (intel based), and Windows (through WSL2).
 
 ## Quick-start
 
