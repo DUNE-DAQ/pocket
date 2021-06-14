@@ -71,7 +71,7 @@ $ kubectl -n monitoring exec -it influxdb-5f875748d6-xx9x6 -- bash
 $ influx
 Connected to http://localhost:8086 version 1.8.6
 InfluxDB shell version: 1.8.6
-$ use database influxdb
+$ use influxdb
 $ show measurements
 name: measurements
 name
