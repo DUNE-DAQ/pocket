@@ -1,0 +1,24 @@
+apiVersion: kind.x-k8s.io/v1alpha4
+kind: Cluster
+name: pocketdune
+nodes:
+- role: control-plane
+  # very strange sporadic slowdowns on certain hosts on kind images > 1.18.6
+  # not related to K8S, minikube and openstack have no such issues,
+  # nor related to seccomp, apparmor, selinux.
+  # to reproduce:
+  # kubectl run -it --image cern/c8-base --privileged -- bash
+  # yum install -y http://ecsft.cern.ch/dist/cvmfs/cvmfs-release/cvmfs-release-latest.noarch.rpm
+  # yum install -y cvmfs (this will take forever)
+  # mkdir -p /cvmfs/cvmfs-config.cern.ch && mount -t cvmfs cvmfs-config.cern.ch /cvmfs/cvmfs-config.cern.ch (takes forever)
+  image: kindest/node:v1.18.6
+  extraPortMappings:
+  - # proxy server
+    containerPort: 31000
+    hostPort: 31000
+  - # Kubernetes dashboard
+    containerPort: 31001
+    hostPort: 31001
+  - # web
+    containerPort: 80
+    hostPort: 80

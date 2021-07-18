@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dunedaqers
+  namespace: dunedaqers
+spec:
+  selector:
+    matchLabels:
+      app: dunedaqers
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: dunedaqers
+    spec:
+      containers:
+      - name: dunedaqersdotnet
+        image: bonniek/dunedaqersdotnet:0.2
+        ports:
+        - containerPort: 80
+        env:
+        - name: ApplicationDbConnectionParameters__User
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secrets
+              key: POSTGRES_USER
+        - name: ApplicationDbConnectionParameters__Password
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secrets
+              key: POSTGRES_PASSWORD
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: aspcore-svc
+  labels:
+    app: dunedaqers
+  namespace: dunedaqers
+spec:
+  clusterIP: None
+  ports:
+    - name: '80'
+      port: 80
+      protocol: TCP
+      targetPort: 80
+  selector:
+    app: dunedaqers
+
