@@ -7,6 +7,7 @@ wdir=$(dirname "`realpath $0`")
 
 cd ../../
 eval $(make env)
+make kind
 
 cd $wdir
 
@@ -25,7 +26,7 @@ kubectl apply -f ns-kafka-kraft.yaml
 kubectl -n dunedaqers create secret generic postgres-secrets \
         --from-literal=POSTGRES_USER="admin" \
         --from-literal=POSTGRES_PASSWORD="$(pwqgen)"\
-        --from-literal=DOTNETPOSTGRES_PASSWORD="Password= $POSTGRES_PASSWORD"
+        --from-literal=DOTNETPOSTGRES_PASSWORD="Password= $POSTGRES_PASSWORD;"
 
 kubectl apply -f kafka.yaml
 
