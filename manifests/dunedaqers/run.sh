@@ -15,6 +15,7 @@ echo $wdir
 kind create cluster --config ./ers-kind.config.yaml
 
 kubectl apply -f ../proxy-server.yaml
+sleep 4
 
 #namespaces
 kubectl apply -f ns-dunedaqers.yaml
@@ -24,7 +25,7 @@ kubectl apply -f ns-kafka-kraft.yaml
 kubectl -n dunedaqers create secret generic postgres-secrets \
         --from-literal=POSTGRES_USER="admin" \
         --from-literal=POSTGRES_PASSWORD="$(pwqgen)"\
-        --from-literal=DOTNETPOSTGRES_PASSWORD="Password= $POSTGRES_PASSWORD)
+        --from-literal=DOTNETPOSTGRES_PASSWORD="Password= $POSTGRES_PASSWORD"
 
 kubectl apply -f kafka.yaml
 
