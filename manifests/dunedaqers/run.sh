@@ -1,16 +1,20 @@
 #! /bin/bash
 # run this to initialize a local ERS
 
-wdir=$PWD
 
-cd ..
+echo $0
+wdir=$(dirname "`realpath $0`")
+
+cd ../../
 eval $(make env)
 
-cd ${wdir}
+cd $wdir
+
+echo $wdir
 
 kind create cluster --config ./ers-kind.config.yaml
 
-kubectl apply -f ../ers-proxy-server.yaml
+kubectl apply -f ../proxy-server.yaml
 
 #namespaces
 kubectl apply -f ns-dunedaqers.yaml
