@@ -43,7 +43,7 @@ spec:
       storageClassName: 
       containers:
       - name: postgresql-pv-volume
-        image: postgres:9.6
+        image: postgres:11.12
         ports:
         - containerPort: 5432
           name: postgres

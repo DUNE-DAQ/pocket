@@ -22,8 +22,9 @@ kubectl apply -f ns-kafka-kraft.yaml
 
 #secrets
 kubectl -n dunedaqers create secret generic postgres-secrets \
-        --from-literal=POSTGRES_USER="$(pwqgen)" \
+        --from-literal=POSTGRES_USER="admin" \
         --from-literal=POSTGRES_PASSWORD="$(pwqgen)"\
+        --from-literal=DOTNETPOSTGRES_PASSWORD="Password= $POSTGRES_PASSWORD)
 
 kubectl apply -f kafka.yaml
 
