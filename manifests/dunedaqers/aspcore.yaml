@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: dunedaqersdotnet
-        image: bonniek/dunedaqersdotnet:0.4
+        image: bonniek/dunedaqersdotnet:0.6
         ports:
         - containerPort: 80
         env:
@@ -24,10 +24,9 @@ spec:
         - name: ApplicationDbConnectionParameters__User
           value: "User ID =admin;"
         - name: ApplicationDbConnectionParameters__Password
-          value: "Password=foo;"
           valueFrom:
             secretKeyRef:
-              name: postgres-secrets
+              name: aspcore-secrets
               key: DOTNETPOSTGRES_PASSWORD 
         - name: ASPNETCORE_ENVIRONMENT
           value : Development

@@ -1,12 +1,12 @@
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: postgresql-config
-  namespace: dunedaqers
-data:
-  POSTGRES_DB: postgres
-  POSTGRES_USER: postgres
-  POSTGRES_PASSWORD: example
+#apiVersion: v1
+#kind: ConfigMap
+#metadata:
+#  name: postgresql-config
+#  namespace: dunedaqers
+#data:
+#  POSTGRES_DB: postgres
+#  POSTGRES_USER: postgres
+#  POSTGRES_PASSWORD: example
 
 ---
 apiVersion: v1
