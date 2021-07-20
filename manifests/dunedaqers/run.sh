@@ -42,7 +42,7 @@ kubectl -n dunedaqers create secret generic aspcore-secrets \
 
 kubectl apply -f kafka.yaml
 
-#kubectl apply -f kafka-svc.yaml
+kubectl apply -f kafka-svc.yaml
 kubectl apply -f postgres.yaml
 kubectl apply -f postgres-svc.yaml
 
