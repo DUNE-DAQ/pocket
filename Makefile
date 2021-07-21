@@ -38,6 +38,39 @@ setup.openstack: on-cern-network check_openstack_login terraform ansible depende
 	@cat ~/.kube/config | grep -Eo '://[a-zA-Z0-9-]*-pocketdune.cern.ch:' | tr -d '\012\015'
 	@echo "31000"
 
+.PHONY: kafka.local
+kafka.local: dependency.docker kind kubectl external-manifests
+	#@$(KIND) create cluster --config local/kind.config.yml
+
+	@$(KUBECTL) apply -f manifests/kubernetes-dashboard-recommended.yaml ||:
+	
+	@echo "installing kafka"
+
+	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/dunedaqers/ns-kafka-kraft.yaml ||:
+
+	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/dunedaqers/kafka.yaml ||:
+	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/dunedaqers/kafka-svc.yaml ||:
+	#@$(MAKE) --no-print-directory print-access-creds
+
+.PHONY: ers-kafka.local
+ers-kafka.local: kafka.local
+	@echo "installing ers-kafka"
+
+	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/dunedaqers/ns-dunedaqers.yaml ||:
+
+	@>/dev/null 2>&1 $(KUBECTL) -n dunedaqers create secret generic postgres-secrets \
+        --from-literal=POSTGRES_USER="admin" \
+        --from-literal=POSTGRES_PASSWORD="$(PGPASS)" ||:
+
+	# aspcore needs a different password string
+	$(KUBECTL) -n dunedaqers create secret generic aspcore-secrets \
+	--from-literal=DOTNETPOSTGRES_PASSWORD="Password=$(PGPASS);" ||:
+
+	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/dunedaqers/postgres.yaml
+	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/dunedaqers/postgres-svc.yaml
+	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/dunedaqers/aspcore.yaml
+	@$(MAKE) --no-print-directory print-access-creds
+
 .PHONY: kubectl-apply
 kubectl-apply: kubectl external-manifests ## apply files in `manifests` using kubectl
 	@echo "installing basic services"

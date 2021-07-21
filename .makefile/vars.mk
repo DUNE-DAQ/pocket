@@ -16,6 +16,7 @@ KUBECTL_VERSION ?= 1.21.1
 KUBECTL_NOVER := $(EXTERNALS_BIN_FOLDER)/kubectl
 KUBECTL := $(KUBECTL_NOVER)-$(KUBECTL_VERSION)
 
+
 ##
 ## Services to install
 ##
@@ -76,3 +77,6 @@ endef
 define symlink
 $(shell rm -f $(2) && ln -s $(1) $(2))
 endef
+
+PGPASS := $(call random_password)
+
