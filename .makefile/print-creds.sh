@@ -90,14 +90,16 @@ function opmon_creds() {
 
 function kafka_creds() {
   echo -e "\e[34mKafka\e[0m"
-	echo "	address (in-cluster): kafka-svc-erskafka:9092"
+	echo -n "	address (in-cluster): kafka-svc.kafka-kraft:"
+	${KUBECTL} -n kafka-kraft get service kafka-svc -ojsonpath='{.spec.ports[0].targetPort}'; echo
 	echo -n "	address (out-cluster): ${NODEPORT_IP}:"
 	${KUBECTL} -n kafka-kraft get service kafka-svc -ojsonpath='{.spec.ports[0].nodePort}'; echo
 }
 
 function postgres_creds() {
   echo -e "\e[34mPostgres\e[0m"
-	echo "	address (in-cluster): postgres-svc.dunedaqers:5432"
+	echo -n "	address (in-cluster): postgres-svc.dunedaqers:"
+        ${KUBECTL} -n dunedaqers get service postgres-svc -ojsonpath='{.spec.ports[0].targetPort}'; echo
 	echo -n "	address (out-cluster): ${NODEPORT_IP}:"
 	${KUBECTL} -n dunedaqers get service postgres-svc -ojsonpath='{.spec.ports[0].nodePort}'; echo
 	echo -n "	User: "
@@ -110,7 +112,8 @@ function postgres_creds() {
 
 function aspcore_creds() {
   echo -e "\e[34mError Reporting System\e[0m"
-	echo "	address (in-cluster): aspcore-svc.dunedaqers:80"
+	echo -n "	address (in-cluster): aspcore-svc.dunedaqers:"
+	${KUBECTL} -n dunedaqers get service aspcore-svc -ojsonpath='{.spec.ports[0].targetPort}'; echo
 	echo -n "	address (out-cluster): ${NODEPORT_IP}:"
 	${KUBECTL} -n dunedaqers get service aspcore-svc -ojsonpath='{.spec.ports[0].nodePort}'; echo
 	echo -n "	ASP Password: "

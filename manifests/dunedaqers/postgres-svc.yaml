@@ -7,11 +7,10 @@ metadata:
     app: postgresql
   namespace: dunedaqers
 spec:
-  type: NodePort
+  type: ClusterIP
   ports:
-  - port: 9092
+  - port: 5432
     protocol: TCP
-    targetPort: postgres-svc
-    nodePort: 30432
+    targetPort: 5432
   selector:
     app: postgresql
