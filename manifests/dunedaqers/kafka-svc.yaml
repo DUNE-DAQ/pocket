@@ -12,7 +12,7 @@ spec:
   - port: 9092
     protocol: TCP
     targetPort: kafka-svc
-    nodePort: 32666
+    nodePort: 30092
   selector:
     app: kafka-app
   sessionAffinity: None
