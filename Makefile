@@ -138,6 +138,11 @@ destroy.openstack: check_openstack_login terraform ## undo the setup made by `se
 env: kubectl ## use `eval $(make env)` to get access to dependency binaries such as kubectl
 	@echo "PATH=\"$(EXTERNALS_BIN_FOLDER):$(shell echo $$PATH)\""
 
+.PHONY: topic
+topic: env
+	@echo "Configuring Kafka Topic erskafka-reporting"
+	$(KUBECTL) -n kafka-kraft exec --stdin --tty kafka-0 -- kafka-topics.sh --create --bootstrap-server kafka-svc.kafka-kraft:9092 --partitions 1 --topic erskafka-reporting
+
 .PHONY: check_openstack_login
 check_openstack_login:
 ifndef OS_PASSWORD
