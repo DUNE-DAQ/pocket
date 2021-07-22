@@ -109,7 +109,7 @@ function postgres_creds() {
 }
 
 function aspcore_creds() {
-  echo -e "\e[34mPostgres\e[0m"
+  echo -e "\e[34mError Reporting System\e[0m"
 	echo "	address (in-cluster): aspcore-svc.dunedaqers:80"
 	echo -n "	address (out-cluster): ${NODEPORT_IP}:"
 	${KUBECTL} -n dunedaqers get service aspcore-svc -ojsonpath='{.spec.ports[0].nodePort}'; echo
