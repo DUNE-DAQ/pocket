@@ -36,7 +36,10 @@ nodes:
     hostPort: 31006
   - # Kafka
     containerPort: 9092
-    hostPort: 9092
+    hostPort: 30666
   - # web
     containerPort: 80
-    hostPort: 80
+    hostPort: 30080
+  - # postgres
+    containerPort: 5432
+    hostPort: 30432

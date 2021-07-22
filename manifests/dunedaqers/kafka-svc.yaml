@@ -7,11 +7,12 @@ metadata:
     app: kafka-app
   namespace: kafka-kraft
 spec:
-  clusterIP: None
+  type: NodePort
   ports:
-    - name: '9092'
-      port: 9092
-      protocol: TCP
-      targetPort: 9092
+  - port: 9092
+    protocol: TCP
+    targetPort: kafka-svc
+    nodePort: 32666
   selector:
     app: kafka-app
+  sessionAffinity: None

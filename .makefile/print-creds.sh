@@ -97,6 +97,9 @@ function kafka-creds() {
 
 function postgres-creds() {
   echo -e "\e[34mPostgres\e[0m"
+	echo "	address (in-cluster): postgres-svs.dunedaqers:5432"
+	echo -n "	address (out-cluster): ${NODEPORT_IP}:"
+	${KUBECTL} -n dunedaqers get service postgres-svc -ojsonpath='{.spec.ports[0].nodePort}'; echo
 	echo -n "	User: "
 	${KUBECTL} get -n dunedaqers secret postgres-secrets -o=jsonpath='{.data.POSTGRES_USER}' | base64 --decode;
 	echo -n "	Password: "
