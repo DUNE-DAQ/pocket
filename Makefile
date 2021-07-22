@@ -41,9 +41,10 @@ setup.openstack: on-cern-network check_openstack_login terraform ansible depende
 .PHONY: kafka.local
 kafka.local: dependency.docker kind kubectl external-manifests
 	@$(KIND) create cluster --config local/kind.config.yml
-
-	@$(KUBECTL) apply -f manifests/kubernetes-dashboard-recommended.yaml ||:
 	
+	@$(KUBECTL) apply -f manifests/proxy-server.yaml ||:
+	@$(KUBECTL) apply -f manifests/kubernetes-dashboard-recommended.yaml ||:
+
 	@echo "installing kafka"
 
 	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/dunedaqers/ns-kafka-kraft.yaml ||:

@@ -20,7 +20,7 @@ spec:
         - containerPort: 80
         env:
         - name: KafkaConfig__Logging__BootstrapServers
-          value: 'kafka-svc.kafka-kraft:30092'
+          value: 'kafka-svc.kafka-kraft:9092'
         - name: ApplicationDbConnectionparameters__Server
           value: 'Server =postgres-svc.dunedaqers;'
         - name: ApplicationDbConnectionParameters__User
