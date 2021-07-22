@@ -88,22 +88,31 @@ function opmon_creds() {
 	${KUBECTL} get -n monitoring secret influxdb-secrets -o=jsonpath='{.data.INFLUXDB_ADMIN_USER_PASSWORD}' | base64 --decode; echo
 }
 
-function kafka-creds() {
+function kafka_creds() {
   echo -e "\e[34mKafka\e[0m"
 	echo "	address (in-cluster): kafka-svc-erskafka:9092"
 	echo -n "	address (out-cluster): ${NODEPORT_IP}:"
 	${KUBECTL} -n kafka-kraft get service kafka-svc -ojsonpath='{.spec.ports[0].nodePort}'; echo
 }
 
-function postgres-creds() {
+function postgres_creds() {
   echo -e "\e[34mPostgres\e[0m"
-	echo "	address (in-cluster): postgres-svs.dunedaqers:5432"
+	echo "	address (in-cluster): postgres-svc.dunedaqers:5432"
 	echo -n "	address (out-cluster): ${NODEPORT_IP}:"
 	${KUBECTL} -n dunedaqers get service postgres-svc -ojsonpath='{.spec.ports[0].nodePort}'; echo
 	echo -n "	User: "
 	${KUBECTL} get -n dunedaqers secret postgres-secrets -o=jsonpath='{.data.POSTGRES_USER}' | base64 --decode;
 	echo -n "	Password: "
 	${KUBECTL} get -n dunedaqers secret postgres-secrets -o=jsonpath='{.data.POSTGRES_PASSWORD}' | base64 --decode; echo
+	echo -n "	ASP Password: "
+	${KUBECTL} get -n dunedaqers secret aspcore-secrets -o=jsonpath='{.data.DOTNETPOSTGRES_PASSWORD}' | base64 --decode; echo
+}
+
+function aspcore_creds() {
+  echo -e "\e[34mPostgres\e[0m"
+	echo "	address (in-cluster): aspcore-svc.dunedaqers:80"
+	echo -n "	address (out-cluster): ${NODEPORT_IP}:"
+	${KUBECTL} -n dunedaqers get service aspcore-svc -ojsonpath='{.spec.ports[0].nodePort}'; echo
 	echo -n "	ASP Password: "
 	${KUBECTL} get -n dunedaqers secret aspcore-secrets -o=jsonpath='{.data.DOTNETPOSTGRES_PASSWORD}' | base64 --decode; echo
 }
@@ -126,12 +135,14 @@ if >/dev/null 2>&1 ${KUBECTL} -n monitoring get secret/grafana-secrets secret/in
   opmon_creds
 fi
 if > /dev/null 2>&1 ${KUBECTL} -n kafka-kraft get service kafka-svc; then
-  kafka-creds
+	kafka_creds
 fi
 if > /dev/null 2>&1 ${KUBECTL} -n dunedaqers get service postgres-svc; then
-  postgres-creds
+  postgres_creds
 fi
-
+if > /dev/null 2>&1 ${KUBECTL} -n dunedaqers get service aspcore-svc; then
+  aspcore_creds
+fi
 dashboard_creds
 
 echo ""

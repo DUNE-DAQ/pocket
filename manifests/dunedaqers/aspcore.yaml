@@ -39,12 +39,12 @@ metadata:
     app: dunedaqers
   namespace: dunedaqers
 spec:
-  clusterIP: None
+  type: NodePort
   ports:
-    - name: '80'
-      port: 80
-      protocol: TCP
-      targetPort: 80
+  - port: 80
+    protocol: TCP
+    targetPort: aspcore-svc
+    nodePort: 30080
   selector:
     app: dunedaqers
 
