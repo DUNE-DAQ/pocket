@@ -54,6 +54,7 @@ spec:
           image: bonniek/kafka-kraft:1.2
           ports:
             - containerPort: 30092
+            - containerPort: 9092
           env:
             - name: REPLICAS
               value: '1'
