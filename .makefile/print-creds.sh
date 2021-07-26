@@ -93,15 +93,15 @@ function kafka_creds() {
 	echo -n "	address (in-cluster): kafka-svc.kafka-kraft:"
 	${KUBECTL} -n kafka-kraft get service kafka-svc -ojsonpath='{.spec.ports[0].targetPort}'; echo
 	echo -n "	address (out-cluster): ${NODEPORT_IP}:"
-	${KUBECTL} -n kafka-kraft get service kafka-svc -ojsonpath='{.spec.ports[0].nodePort}'; echo
+	${KUBECTL} -n kafka-kraft get service kafka-svc-ext -ojsonpath='{.spec.ports[0].nodePort}'; echo
 }
 
 function postgres_creds() {
   echo -e "\e[34mPostgres\e[0m"
 	echo -n "	address (in-cluster): postgres-svc.dunedaqers:"
         ${KUBECTL} -n dunedaqers get service postgres-svc -ojsonpath='{.spec.ports[0].targetPort}'; echo
-	echo -n "	address (out-cluster): ${NODEPORT_IP}:"
-	${KUBECTL} -n dunedaqers get service postgres-svc -ojsonpath='{.spec.ports[0].nodePort}'; echo
+	#echo -n "	address (out-cluster): ${NODEPORT_IP}:"
+	#${KUBECTL} -n dunedaqers get service postgres-svc -ojsonpath='{.spec.ports[0].nodePort}' || echo None;  echo
 	echo -n "	User: "
 	${KUBECTL} get -n dunedaqers secret postgres-secrets -o=jsonpath='{.data.POSTGRES_USER}' | base64 --decode;
 	echo -n "	Password: "
@@ -114,8 +114,9 @@ function aspcore_creds() {
   echo -e "\e[34mError Reporting System\e[0m"
 	echo -n "	address (in-cluster): aspcore-svc.dunedaqers:"
 	${KUBECTL} -n dunedaqers get service aspcore-svc -ojsonpath='{.spec.ports[0].targetPort}'; echo
-	echo -n "	address (out-cluster): ${NODEPORT_IP}:"
-	${KUBECTL} -n dunedaqers get service aspcore-svc -ojsonpath='{.spec.ports[0].nodePort}'; echo
+	#echo -n "	address (out-cluster): ${NODEPORT_IP}:"
+	#${KUBECTL} -n dunedaqers get service aspcore-svc -ojsonpath='{.spec.ports[0].nodePort}'; echo
+        echo "	Use the proxy for the web app"
 	echo -n "	ASP Password: "
 	${KUBECTL} get -n dunedaqers secret aspcore-secrets -o=jsonpath='{.data.DOTNETPOSTGRES_PASSWORD}' | base64 --decode; echo
 }
