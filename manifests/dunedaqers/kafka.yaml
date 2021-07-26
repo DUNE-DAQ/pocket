@@ -51,9 +51,9 @@ spec:
             claimName: kafka-pv-claim
       containers:
         - name: kafka-container
-          image: bonniek/kafka-kraft
+          image: bonniek/kafka-kraft:1.2
           ports:
-            - containerPort: 9092
+            - containerPort: 30092
           env:
             - name: REPLICAS
               value: '1'
@@ -63,6 +63,7 @@ spec:
               value: kafka-kraft
             - name: SHARE_DIR
               value: /mnt/kafka
+
           volumeMounts:
             - name: kafka-storage
               mountPath: /mnt/kafka
