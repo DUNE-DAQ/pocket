@@ -40,10 +40,6 @@ setup.openstack: on-cern-network check_openstack_login terraform ansible depende
 
 .PHONY: kafka.local
 kafka.local: dependency.docker kind kubectl external-manifests
-	@$(KIND) create cluster --config local/kind.config.yml
-	
-	@$(KUBECTL) apply -f manifests/proxy-server.yaml ||:
-	@$(KUBECTL) apply -f manifests/kubernetes-dashboard-recommended.yaml ||:
 
 	@echo "installing kafka"
 
@@ -51,7 +47,6 @@ kafka.local: dependency.docker kind kubectl external-manifests
 
 	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/dunedaqers/kafka.yaml ||:
 	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/dunedaqers/kafka-svc.yaml ||:
-	#@$(MAKE) --no-print-directory print-access-creds
 
 .PHONY: ers-kafka.local
 ers-kafka.local: kafka.local
@@ -64,13 +59,12 @@ ers-kafka.local: kafka.local
         --from-literal=POSTGRES_PASSWORD="$(PGPASS)" ||:
 
 	# aspcore needs a different password string
-	$(KUBECTL) -n dunedaqers create secret generic aspcore-secrets \
+	@>/dev/null 2>&1 $(KUBECTL) -n dunedaqers create secret generic aspcore-secrets \
 	--from-literal=DOTNETPOSTGRES_PASSWORD="Password=$(PGPASS);" ||:
 
 	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/dunedaqers/postgres.yaml
 	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/dunedaqers/postgres-svc.yaml
 	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/dunedaqers/aspcore.yaml
-	@$(MAKE) --no-print-directory print-access-creds
 
 .PHONY: kubectl-apply
 kubectl-apply: kubectl external-manifests ## apply files in `manifests` using kubectl
@@ -112,6 +106,15 @@ else
 
 	@>/dev/null $(KUBECTL) apply -f manifests/ECK
 endif
+
+ifeq ($(KAFKA_ENABLED),0)
+	@echo -e "\e[33mskipping installation of Kafka-ERS\e[0m"
+else
+	@$(MAKE) --no-print-directory ers-kafka.local
+endif
+
+
+
 
 ##
 ### Destroy any created setups
