@@ -45,16 +45,7 @@ spec:
   ports:
   - port: 80
     protocol: TCP
-    targetPort: aspcore-svc
+    targetPort: 80
     nodePort: 30080
   selector:
     app: dunedaqers
-spec:
-  type: ClusterIP
-  ports:
-  - port: 80
-    protocol: TCP
-    targetPort: 80
-  selector:
-    app: dunedaqers
-

@@ -114,9 +114,8 @@ function aspcore_creds() {
   echo -e "\e[34mError Reporting System\e[0m"
 	echo -n "	address (in-cluster): aspcore-svc.dunedaqers:"
 	${KUBECTL} -n dunedaqers get service aspcore-svc -ojsonpath='{.spec.ports[0].targetPort}'; echo
-	#echo -n "	address (out-cluster): ${NODEPORT_IP}:"
-	#${KUBECTL} -n dunedaqers get service aspcore-svc -ojsonpath='{.spec.ports[0].nodePort}'; echo
-        echo "	Use the proxy for the web app"
+	echo -n "	address (out-cluster): ${NODEPORT_IP}:"
+	${KUBECTL} -n dunedaqers get service aspcore-svc -ojsonpath='{.spec.ports[0].nodePort}'; echo
 	echo -n "	ASP Password: "
 	${KUBECTL} get -n dunedaqers secret aspcore-secrets -o=jsonpath='{.data.DOTNETPOSTGRES_PASSWORD}' | base64 --decode; echo
 }

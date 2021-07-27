@@ -38,8 +38,11 @@ nodes:
     containerPort: 30092
     hostPort: 30092
   - # web
-    containerPort: 80
+    containerPort: 30080
     hostPort: 30080
+  - # dqmweb
+    containerPort: 38080
+    hostPort: 38080
   - # postgres
     containerPort: 5432
     hostPort: 30432
