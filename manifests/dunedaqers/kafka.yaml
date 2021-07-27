@@ -51,7 +51,7 @@ spec:
             claimName: kafka-pv-claim
       containers:
         - name: kafka-container
-          image: bonniek/kafka-kraft:1.2
+          image: bonniek/kafka-kraft:1.3
           ports:
             - containerPort: 30092
             - containerPort: 9092
