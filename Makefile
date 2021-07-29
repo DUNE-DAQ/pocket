@@ -161,9 +161,8 @@ env: kubectl ## use `eval $(make env)` to get access to dependency binaries such
 
 .PHONY: ers-topic
 ers-topic: env
-
 	@echo "Configuring Kafka Topic erskafka-reporting"
-	@>/dev/null 2>&1 $(KUBECTL) -n kafka-kraft exec --stdin --tty kafka-0 -- kafka-topics.sh --create --bootstrap-server kafka-svc.kafka-kraft:9092 --partitions 1 --topic erskafka-reporting
+	@>/dev/null 2>&1 $(KUBECTL) -n kafka-kraft exec --stdin --tty kafka-0 -- kafka-topics.sh --create --bootstrap-server kafka-svc.kafka-kraft:9092 --partitions 1 --topic erskafka-reporting ||:
 
 .PHONY: dqm-topc
 dqm-topic: env
