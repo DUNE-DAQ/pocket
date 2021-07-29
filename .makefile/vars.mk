@@ -34,10 +34,16 @@ else
 	ECK_ENABLED=1
 endif
 
-ifeq ($(findstring kafka,$(SERVICES)),)
-	KAFKA_ENABLED=0
+ifeq ($(findstring ers,$(SERVICES)),)
+	ERS_ENABLED=0
 else
-	KAFKA_ENABLED=1
+	ERS_ENABLED=1
+endif
+
+ifeq ($(findstring dqm,$(SERVICES)),)
+	DQM_ENABLED=0
+else
+	DQM_ENABLED=1
 endif
 
 ##

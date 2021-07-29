@@ -62,16 +62,7 @@ spec:
   ports:
   - port: 80
     protocol: TCP
-    targetPort: dqm-svc
-    nodePort: 80
-  selector:
-    app: dqmplatform
-spec:
-  type: ClusterIP
-  ports:
-  - port: 80
-    protocol: TCP
     targetPort: 80
+    nodePort: 30081
   selector:
     app: dqmplatform
-

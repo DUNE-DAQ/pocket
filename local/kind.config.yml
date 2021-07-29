@@ -37,12 +37,12 @@ nodes:
   - # Kafka
     containerPort: 30092
     hostPort: 30092
-  - # web
+  - # ersweb
     containerPort: 30080
     hostPort: 30080
   - # dqmweb
-    containerPort: 38080
-    hostPort: 38080
+    containerPort: 30081
+    hostPort: 30081
   - # postgres
     containerPort: 5432
     hostPort: 30432
