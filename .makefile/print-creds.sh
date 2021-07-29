@@ -110,7 +110,7 @@ function postgres_creds() {
 	${KUBECTL} get -n dunedaqers secret aspcore-secrets -o=jsonpath='{.data.DOTNETPOSTGRES_PASSWORD}' | base64 --decode; echo
 }
 
-function aspcore_creds() {
+function ers_creds() {
   echo -e "\e[34mError Reporting System\e[0m"
 	echo -n "	address (in-cluster): aspcore-svc.dunedaqers:"
 	${KUBECTL} -n dunedaqers get service aspcore-svc -ojsonpath='{.spec.ports[0].targetPort}'; echo
@@ -128,6 +128,16 @@ function dashboard_creds() {
 	echo "	Password: none. click 'skip' in login window"
 }
 
+function dqm_creds() {
+  echo -e "\e[34mData Quality Monitoring Platform\e[0m"
+	echo -n "	address (in-cluster): dqm-svc.dunedaqers:"
+	${KUBECTL} -n dunedaqers get service dqm-svc -ojsonpath='{.spec.ports[0].targetPort}'; echo
+	echo -n "	address (out-cluster): ${NODEPORT_IP}:"
+	${KUBECTL} -n dunedaqers get service dqm-svc -ojsonpath='{.spec.ports[0].nodePort}'; echo
+	echo -n "	ASP Password: "
+	${KUBECTL} get -n dunedaqers secret aspcore-secrets -o=jsonpath='{.data.DOTNETPOSTGRES_PASSWORD}' | base64 --decode; echo
+}
+
 echo "Available services:"
 
 if >/dev/null 2>&1 ${KUBECTL} get crd/kibanas.kibana.k8s.elastic.co; then
@@ -140,11 +150,14 @@ fi
 if > /dev/null 2>&1 ${KUBECTL} -n kafka-kraft get service kafka-svc; then
 	kafka_creds
 fi
-if > /dev/null 2>&1 ${KUBECTL} -n dunedaqers get service postgres-svc; then
+if > /dev/null 2>&1 ${KUBECTL} -n dunedaqers get service postgresql-svc; then
   postgres_creds
 fi
 if > /dev/null 2>&1 ${KUBECTL} -n dunedaqers get service aspcore-svc; then
-  aspcore_creds
+  ers_creds
+fi
+if > /dev/null 2>&1 ${KUBECTL} -n dunedaqers get service dqm-svc; then
+  dqm_creds
 fi
 dashboard_creds
 
