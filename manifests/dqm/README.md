@@ -1,6 +1,6 @@
 # Pocket Data Quality Monitoring
 
-Setup a demo installation of DUNE DAQ SQM in KIND
+Setup a demo installation of DUNE DAQ DQM in KIND
 
 ## Quick-start
 
