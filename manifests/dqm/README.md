@@ -1,6 +1,6 @@
-# Pocket Error Reporting System
+# Pocket Data Quality Monitoring
 
-Setup a demo installation of DUNE DAQ ERS in KIND
+Setup a demo installation of DUNE DAQ SQM in KIND
 
 ## Quick-start
 
@@ -11,7 +11,7 @@ From the main Makefile:
 
 Toggle installation of ERS by adding 'ers' to the $SERVICES variable:
 
-SERVICES=opmon,ers make setup.local
+SERVICES=opmon,dqm make setup.local
 
 ```
 
@@ -20,10 +20,10 @@ Creates (in Pocket cluster):
 1. namespaces
 2. postgres service (one node)
 4. Kafka service (one node) and topics
-5. asp.net core application from https://github.com/DUNE-DAQ/daqerrordisplay
+5. asp.net core application from https://github.com/DUNE-DAQ/dqmplatform
 
 
-Check out the ERS service in a browser once everything is running, and apply migrations to initiate the database.
+Check out the DQM service in a browser once everything is running, and apply migrations to initiate the database.
 
 ## Quick tools
 

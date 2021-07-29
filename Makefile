@@ -122,6 +122,7 @@ ifeq ($(ERS_ENABLED),0)
 	@echo -e "\e[33mskipping installation of Kafka-ERS\e[0m"
 else
 	@$(MAKE) --no-print-directory ers-kafka.local
+	@$(MAKE) --no-print-directory ers-topic
 endif
 
 
@@ -129,6 +130,7 @@ ifeq ($(DQM_ENABLED),0)
 	@echo -e "\e[33mskipping installation of DQM\e[0m"
 else
 	@$(MAKE) --no-print-directory dqm-kafka.local
+	@$(MAKE) --no-print-directory dqm-topic
 endif
 
 
