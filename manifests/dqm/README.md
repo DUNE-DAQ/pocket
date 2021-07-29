@@ -9,7 +9,7 @@ Make sure Docker is running and you have the needed permissions.
 ```
 From the main Makefile:
 
-Toggle installation of ERS by adding 'ers' to the $SERVICES variable:
+Toggle installation of DQM by adding 'dqm' to the $SERVICES variable:
 
 SERVICES=opmon,dqm make setup.local
 
