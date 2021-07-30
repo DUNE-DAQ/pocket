@@ -1,0 +1,21 @@
+{
+    "Kafka":{
+        "Servers" : [
+            ""
+        ],
+        "ClientId" : "AnalysisMiniServices",
+        "Channels" : {
+            "DQMInputs" : "testdunedqm",
+            "HandlerInputs" : "dunedqm-incommingchannel1",
+            "PlatformInputs" : "dunedqm-platforminputs"
+        }
+    },
+    "Database": {
+        "Server":"",
+        "Port":"",
+        "Name":"",
+        "UserName":"",
+        "Password":""
+    },
+    "FileStorage": ""
+}
