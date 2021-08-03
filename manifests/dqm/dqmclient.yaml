@@ -1,0 +1,43 @@
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: dqm-pv-volume
+  namespace: dunedaqers
+  labels:
+    type: local
+spec:
+  storageClassName: manual
+  accessModes: ["ReadWriteOnce"]
+  capacity:
+    storage: 1Gi
+  hostPath:
+    path: '/mnt/data'
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dqmclient
+  namespace: dunedaqers
+spec:
+  selector:
+    matchLabels:
+      app: dqmclient
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: dqmclient
+    spec:
+      containers:
+      - name: dqmclient
+        image: bonniek/dqm:0.3
+        ports:
+        - containerPort: 80
+        env:
+        - name: PGPASS
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secrets
+              key: POSTGRES_PASSWORD 
