@@ -6,9 +6,9 @@ Pocket is compatible with Linux, MacOS (intel based), and Windows (through WSL2)
 
 ## Quick-start
 Clone the pocket repository:
-> git clone https://github.com/DUNE-DAQ/pocket.git
-> cd pocket
-
+```bash
+git clone https://github.com/DUNE-DAQ/pocket.git ; cd pocket
+```
 You need to execute all the following commands as a superuser, or with sudo.
 For a cluster with all built-in services enabled:
 ```bash
