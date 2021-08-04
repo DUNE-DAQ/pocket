@@ -18,7 +18,7 @@ spec:
           emptyDir: {}
       containers:
       - name: dqmanalysis
-        image: bonniek/dqm:0.4
+        image: bonniek/dqm:0.5
         ports:
         - containerPort: 80
         env:
