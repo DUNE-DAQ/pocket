@@ -13,9 +13,26 @@ spec:
       labels:
         app: dqmplatform
     spec:
+      volumes:
+        - name: dqm-shared
+          emptyDir: {}
       containers:
+      - name: dqmanalysis
+        image: bonniek/dqm:0.4
+        ports:
+        - containerPort: 80
+        env:
+        - name: PGPASS
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secrets
+              key: POSTGRES_PASSWORD 
+        volumeMounts:
+        - mountPath: "/mnt/data/"
+          name: dqm-shared
+
       - name: dunedaqersdotnet
-        image: bonniek/dunedqmdotnet:0.6
+        image: bonniek/dunedqmdotnet:0.7
         ports:
         - containerPort: 80
         env:
@@ -49,6 +66,10 @@ spec:
               key: DOTNETPOSTGRES_PASSWORD 
         - name: ASPNETCORE_ENVIRONMENT
           value : Development
+        volumeMounts:
+        - mountPath: "/mnt/data/"
+          name: dqm-shared
+
 ---
 apiVersion: v1
 kind: Service
