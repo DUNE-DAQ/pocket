@@ -21,6 +21,7 @@ Creates (in Pocket cluster):
 2. postgres service (one node)
 4. Kafka service (one node) and topics
 5. asp.net core application from https://github.com/DUNE-DAQ/dqmplatform
+6. python Analysis module container in the same pod as aspcore DQM
 
 
 Check out the DQM service in a browser once everything is running, and apply migrations to initiate the database.
