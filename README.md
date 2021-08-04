@@ -59,7 +59,7 @@ or a webbrowser using foxyproxy
 
 ### locally on your own machine
 This will create a single node cluster.  
-The only requirement is a working installation of `docker`, other binaries required for setup are downloaded automatically and require no sudo privileges.
+The only requirement is a working installation of `docker`, other binaries required for setup are downloaded automatically.
 ```bash
 $ make setup.local
 ```
