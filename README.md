@@ -1,26 +1,23 @@
 # Pocket
 
-Setup a demo installation of DUNE DAQ in a variety of setups.
+Setup a demo installation of DUNE DAQ services in a variety of setups.
 
 Pocket is compatible with Linux, MacOS (intel based), and Windows (through WSL2).
 
 ## Quick-start
+Clone the pocket repository:
+> git clone https://github.com/DUNE-DAQ/pocket.git
+> cd pocket
 
+You need to execute all the following commands as a superuser, or with sudo.
 For a cluster with all built-in services enabled:
 ```bash
-make setup.local
-# equivalent to
-# SERVICES=ECK,opmon make setup.local
+SERVICES=opmon,ers,dqm make setup.local
 ```
 
 This will setup your local (one-node) cluster, and print out available default services and their access credentials.
 
 ![](docs/print-access-creds.png)
-
-To start a cluster without ElasticSearch
-```bash
-SERVICES=opmon make setup.local
-```
 
 Optionally, to make your shell use binaries (`kubectl`, ...) that pocket ships with
 ```bash
