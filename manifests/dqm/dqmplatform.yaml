@@ -31,7 +31,7 @@ spec:
         - mountPath: "/mnt/data/"
           name: dqm-shared
 
-      - name: dunedaqersdotnet
+      - name: dqmplatform
         image: bonniek/dunedqmdotnet:0.7
         ports:
         - containerPort: 80
