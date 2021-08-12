@@ -108,6 +108,10 @@ else
 	--from-literal=INFLUXDB_HOST=influxdb.monitoring  \
 	--from-literal=INFLUXDB_HTTP_AUTH_ENABLED=false ||:
 
+	@>/dev/null 2>&1 $(KUBECTL) -n monitoring create secret generic postgres-secrets \
+	--from-literal=POSTGRES_USER="admin" \
+	--from-literal=POSTGRES_PASSWORD="$(PGPASS)" ||:
+
 	@>/dev/null $(KUBECTL) apply -f manifests/opmon
 endif
 
