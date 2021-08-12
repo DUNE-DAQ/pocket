@@ -42,8 +42,11 @@ setup.openstack: on-cern-network check_openstack_login terraform ansible depende
 kafka.local: dependency.docker kind kubectl external-manifests
 
 	@echo "installing kafka"
-
 	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/dunedaqers/ns-kafka-kraft.yaml ||:
+	@echo -n "setting advertised listener to "
+	@echo "$(call node_ip)"
+	@>/dev/null 2>&1 $(KUBECTL) -n kafka-kraft create secret generic kafka-secrets \
+	--from-literal=EXTERNAL_LISTENER="$(call node_ip)" ||:
 
 	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/dunedaqers/kafka.yaml ||:
 	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/dunedaqers/kafka-svc.yaml ||:

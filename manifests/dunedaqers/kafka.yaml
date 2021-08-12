@@ -51,7 +51,7 @@ spec:
             claimName: kafka-pv-claim
       containers:
         - name: kafka-container
-          image: bonniek/kafka-kraft:1.4
+          image: bonniek/kafka-kraft:1.7
           ports:
             - containerPort: 30092
             - containerPort: 9092
@@ -64,6 +64,11 @@ spec:
               value: kafka-kraft
             - name: SHARE_DIR
               value: /mnt/kafka
+            - name: EXTERNAL_LISTENER
+              valueFrom: 
+                  secretKeyRef:
+                    name: kafka-secrets
+                    key: EXTERNAL_LISTENER
 
           volumeMounts:
             - name: kafka-storage

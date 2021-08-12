@@ -2,10 +2,8 @@
 
 NODE_ID=${HOSTNAME:6}
 
-#LISTENERS="PLAINTEXT_POCKET://:9092,PLAINTEXT://30092,CONTROLLER://:9093,"
-#ADVERTISED_LISTENERS="PLAINTEXT://kafka-$NODE_ID.$SERVICE.$NAMESPACE.svc.cluster.local:9092"
-#ADVERTISED_LISTENERS="PLAINTEXT://127.0.0.1:30092, PLAINTEXT_POCKET:kafka-svc.kafka-kraft:9092"
-#KAFKA_LISTENER_SECURITY_PROTOCOL_MAP="PLAINTEXT:PLAINTEXT,PLAINTEXT_POCKET:PLAINTEXT"
+LISTENERS="PLAINTEXT_POCKET://:9092,PLAINTEXT://:30092,CONTROLLER://:9093,"
+ADVERTISED_LISTENERS="PLAINTEXT_POCKET://$SERVICE.$NAMESPACE:9092,PLAINTEXT://$EXTERNAL_LISTENER:30092"
 
 CONTROLLER_QUORUM_VOTERS=""
 for i in $( seq 0 $REPLICAS); do
@@ -28,6 +26,8 @@ fi
 sed -e "s+^node.id=.*+node.id=$NODE_ID+" \
 -e "s+^controller.quorum.voters=.*+controller.quorum.voters=$CONTROLLER_QUORUM_VOTERS+" \
 -e "s+^log.dirs=.*+log.dirs=$SHARE_DIR/$NODE_ID+" \
+-e "s+^advertised.listeners=.*+advertised.listeners=$ADVERTISED_LISTENERS+" \
+-e "s+^listeners=.*+listeners=$LISTENERS+" \
 /opt/kafka/config/kraft/server.properties > server.properties.updated \
 && mv server.properties.updated /opt/kafka/config/kraft/server.properties
 

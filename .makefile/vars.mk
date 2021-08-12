@@ -90,5 +90,13 @@ define symlink
 $(shell rm -f $(2) && ln -s $(1) $(2))
 endef
 
+define node_ip
+$(shell bash .makefile/print-nodeip.sh)
+endef
+
+define node_hostname
+$(shell hostname)
+endef
+
 PGPASS := $(call random_password)
 
