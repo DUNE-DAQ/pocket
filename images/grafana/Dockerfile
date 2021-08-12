@@ -1,4 +1,4 @@
-from grafana/grafana:7.5.7
+from grafana/grafana:8.1.1
 
 USER root
 
@@ -20,4 +20,7 @@ RUN curl -Lo aceiot.zip https://grafana.com/api/plugins/aceiot-svg-panel/version
 # copying confs
 COPY conf /etc/grafana
 
-USER grafana
+
+COPY ./entrypoint.sh /
+RUN ["chmod", "+x", "/entrypoint.sh"]
+ENTRYPOINT ["/entrypoint.sh"]

@@ -1,10 +1,19 @@
 # Pocket
 
-Setup a demo installation of DUNE DAQ in a variety of setups.
+A set of scripts designed to help create a 'production-like' DUNE DAQ environment in a variety of setups.
+
+## Requirements
+- A git clone of this repository
+- a functional docker installation
 
 Pocket is compatible with Linux, MacOS (intel based), and Windows (through WSL2).
 
+Note that while this covers a very large variety of setups, currently lxplus is _not_ compatible for its lack of a docker installation.
+This for security reasons (even though [rootless docker](https://docs.docker.com/engine/security/rootless/) is a thing.
+
 ## Quick-start
+
+Clone this git repository to a location of your choice.
 
 For a cluster with all built-in services enabled:
 ```bash
