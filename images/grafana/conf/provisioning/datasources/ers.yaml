@@ -1,0 +1,15 @@
+apiVersion: 1
+
+datasources:
+- name: ERS
+  orgId: 1
+  type: postgres
+  access: proxy
+  url: http://postgres-svc.dunedaqers:5432
+  database: postgres
+  isDefault: false
+  version: 1
+  editable: false
+  basicAuth: true
+  basicAuthUser: admin
+  basicAuthPassword: readonly
