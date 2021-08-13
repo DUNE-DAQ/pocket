@@ -91,6 +91,7 @@ ifeq ($(OPMON_ENABLED),0)
 else
 	@echo "installing opmon"
 	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/opmon/ns-monitoring.yaml ||:
+
 	@>/dev/null 2>&1 $(KUBECTL) -n monitoring create secret generic grafana-secrets \
 	--from-literal=GF_SECURITY_SECRET_KEY="$(call random_password)" \
 	--from-literal=GF_SECURITY_ADMIN_PASSWORD="$(call random_password)" ||:
