@@ -61,7 +61,7 @@ function opmon_creds() {
 	echo -n "	URL (out-cluster): http://${NODEPORT_IP}:"
 	${KUBECTL} -n monitoring get service grafana -ojsonpath='{.spec.ports[0].nodePort}'; echo
 
-	echo -n "	User: dune"
+	echo -n "	User: admin"
 	echo -n "	Password: "
 	${KUBECTL} get -n monitoring secret grafana-secrets -o=jsonpath='{.data.GF_SECURITY_ADMIN_PASSWORD}' | base64 --decode; echo
 
