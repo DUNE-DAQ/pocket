@@ -5,11 +5,26 @@ A set of scripts designed to help create a 'production-like' DUNE DAQ environmen
 ## Requirements
 - A git clone of this repository
 - a functional docker installation
+- access to external network/Internet for git and dockerhub downloads
 
 Pocket is compatible with Linux, MacOS (intel based), and Windows (through WSL2).
 
 Note that while this covers a very large variety of setups, currently lxplus is _not_ compatible for its lack of a docker installation.
 This for security reasons (even though [rootless docker](https://docs.docker.com/engine/security/rootless/) is a thing.
+
+## Dependencies
+
+If your environment does not already provide a working Docker configuration, install Docker and run the daemon. 
+
+On CentOS/SL, as root:
+```
+ $ [yum|dnf] -y install docker
+ $ systemctl enable docker
+ $ systemctl start docker
+```
+
+On Fedora you may need to set the kernel commandline parameter:
+```systemd.unified_cgroup_hierarchy=0```
 
 ## Quick-start
 
@@ -19,7 +34,7 @@ For a cluster with all built-in services enabled:
 ```bash
 make setup.local
 # equivalent to
-# SERVICES=ECK,opmon make setup.local
+# SERVICES=opmon make setup.local
 ```
 
 This will setup your local (one-node) cluster, and print out available default services and their access credentials.
