@@ -150,7 +150,7 @@ fi
 if > /dev/null 2>&1 ${KUBECTL} -n kafka-kraft get service kafka-svc; then
 	kafka_creds
 fi
-if > /dev/null 2>&1 ${KUBECTL} -n dunedaqers get service postgresql-svc; then
+if > /dev/null 2>&1 ${KUBECTL} -n dunedaqers get service postgres-svc; then
   postgres_creds
 fi
 if > /dev/null 2>&1 ${KUBECTL} -n dunedaqers get service aspcore-svc; then
