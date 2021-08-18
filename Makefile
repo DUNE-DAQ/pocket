@@ -9,7 +9,7 @@ include .makefile/vars.mk
 
 ##
 ### Setup an installation of Pocket
-##
+#
 
 .PHONY: setup.local
 setup.local: dependency.docker kind kubectl ## start local setup
@@ -38,11 +38,19 @@ setup.openstack: on-cern-network check_openstack_login terraform ansible depende
 	@cat ~/.kube/config | grep -Eo '://[a-zA-Z0-9-]*-pocketdune.cern.ch:' | tr -d '\012\015'
 	@echo "31000"
 
+.PHONY: namespaces.local
+namespaces.local: kind kubectl external-manifests
+
+	@echo "setting up namespaces"
+	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/dunedaqers/ns-kafka-kraft.yaml ||:
+	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/opmon/ns-monitoring.yaml ||:
+	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/dunedaqers/ns-dunedaqers.yaml ||:
+
+
 .PHONY: kafka.local
-kafka.local: dependency.docker kind kubectl external-manifests
+kafka.local: dependency.docker kind kubectl external-manifests namespaces.local
 
 	@echo "installing kafka"
-	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/dunedaqers/ns-kafka-kraft.yaml ||:
 	@echo -n "setting advertised listener to "
 	@echo "$(call node_ip)"
 	@>/dev/null 2>&1 $(KUBECTL) -n kafka-kraft create secret generic kafka-secrets \
@@ -52,13 +60,18 @@ kafka.local: dependency.docker kind kubectl external-manifests
 	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/dunedaqers/kafka-svc.yaml ||:
 
 .PHONY: postgres.local
-postgres.local:
+postgres.local: kind kubectl external-manifests namespaces.local
 	@echo "installing postgres"
 
-	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/dunedaqers/ns-dunedaqers.yaml ||:
 	@>/dev/null 2>&1 $(KUBECTL) -n dunedaqers create secret generic postgres-secrets \
-        --from-literal=POSTGRES_USER="admin" \
-        --from-literal=POSTGRES_PASSWORD="$(PGPASS)" ||:
+	--from-literal=POSTGRES_USER="admin" \
+	--from-literal=POSTGRES_PASSWORD="$(PGPASS)" ||:
+
+	#@>/dev/null 2>&1 $(KUBECTL) get secret postgres-secrets --namespace=dunedaqers -o yaml | sed 's/dunedaqers/monitoring/' | kubectl apply -f - ||:
+
+	@>/dev/null 2>&1 $(KUBECTL) -n monitoring create secret generic postgres-secrets \
+	--from-literal=POSTGRES_USER="admin" \
+	--from-literal=POSTGRES_PASSWORD="$(PGPASS)" ||:
 
 	@>/dev/null 2>&1 $(KUBECTL) -n dunedaqers create secret generic aspcore-secrets \
 	--from-literal=DOTNETPOSTGRES_PASSWORD="Password=$(PGPASS);" ||:
@@ -81,7 +94,7 @@ dqm-kafka.local: kafka.local postgres.local
 
 
 .PHONY: kubectl-apply
-kubectl-apply: kubectl external-manifests ## apply files in `manifests` using kubectl
+kubectl-apply: kubectl external-manifests namespaces.local ## apply files in `manifests` using kubectl
 	@echo "installing basic services"
 	@>/dev/null 2>&1 $(KUBECTL) create ns csi-cvmfs ||:
 	@>/dev/null $(KUBECTL) apply -f manifests -f manifests/cvmfs
@@ -90,7 +103,6 @@ ifeq ($(OPMON_ENABLED),0)
 	@echo -e "\e[33mskipping installation of opmon\e[0m"
 else
 	@echo "installing opmon"
-	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/opmon/ns-monitoring.yaml ||:
 
 	@>/dev/null 2>&1 $(KUBECTL) -n monitoring create secret generic grafana-secrets \
 	--from-literal=GF_SECURITY_SECRET_KEY="$(call random_password)" \
@@ -108,10 +120,6 @@ else
 	--from-literal=INFLUXDB_ADMIN_USER_PASSWORD="$(call random_password)" \
 	--from-literal=INFLUXDB_HOST=influxdb.monitoring  \
 	--from-literal=INFLUXDB_HTTP_AUTH_ENABLED=false ||:
-
-	@>/dev/null 2>&1 $(KUBECTL) -n monitoring create secret generic postgres-secrets \
-	--from-literal=POSTGRES_USER="admin" \
-	--from-literal=POSTGRES_PASSWORD="$(PGPASS)" ||:
 
 	@>/dev/null $(KUBECTL) apply -f manifests/opmon
 endif

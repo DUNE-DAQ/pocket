@@ -147,15 +147,19 @@ fi
 if >/dev/null 2>&1 ${KUBECTL} -n monitoring get secret/grafana-secrets secret/influxdb-secrets; then
   opmon_creds
 fi
+
 if > /dev/null 2>&1 ${KUBECTL} -n kafka-kraft get service kafka-svc; then
 	kafka_creds
 fi
+
 if > /dev/null 2>&1 ${KUBECTL} -n dunedaqers get service postgres-svc; then
   postgres_creds
 fi
+
 if > /dev/null 2>&1 ${KUBECTL} -n dunedaqers get service aspcore-svc; then
   ers_creds
 fi
+
 if > /dev/null 2>&1 ${KUBECTL} -n dunedaqers get service dqm-svc; then
   dqm_creds
 fi
