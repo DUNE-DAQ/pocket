@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: grafana
-        image: juravenator/pocket-grafana:latest
+        image: bonniek/pocket-grafana:2.0
         imagePullPolicy: Always
         ports:
         - containerPort: 3000
@@ -47,6 +47,10 @@ spec:
         envFrom:
         - secretRef:
             name: grafana-secrets
+        - secretRef:
+            name: influxdb-secrets
+        - secretRef:
+            name: postgres-secrets
 ---
 apiVersion: v1
 kind: Service

@@ -16,10 +16,11 @@ KUBECTL_VERSION ?= 1.21.1
 KUBECTL_NOVER := $(EXTERNALS_BIN_FOLDER)/kubectl
 KUBECTL := $(KUBECTL_NOVER)-$(KUBECTL_VERSION)
 
+
 ##
 ## Services to install
 ##
-SERVICES ?= ECK,opmon
+SERVICES ?= opmon
 
 ifeq ($(findstring opmon,$(SERVICES)),)
 	OPMON_ENABLED=0
@@ -31,6 +32,18 @@ ifeq ($(findstring ECK,$(SERVICES)),)
 	ECK_ENABLED=0
 else
 	ECK_ENABLED=1
+endif
+
+ifeq ($(findstring ers,$(SERVICES)),)
+	ERS_ENABLED=0
+else
+	ERS_ENABLED=1
+endif
+
+ifeq ($(findstring dqm,$(SERVICES)),)
+	DQM_ENABLED=0
+else
+	DQM_ENABLED=1
 endif
 
 ##
@@ -76,3 +89,14 @@ endef
 define symlink
 $(shell rm -f $(2) && ln -s $(1) $(2))
 endef
+
+define node_ip
+$(shell bash .makefile/print-nodeip.sh)
+endef
+
+define node_hostname
+$(shell hostname)
+endef
+
+PGPASS := $(call random_password)
+

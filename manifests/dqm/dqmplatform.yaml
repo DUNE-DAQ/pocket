@@ -1,0 +1,89 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dqmplatform
+  namespace: dunedaqers
+spec:
+  selector:
+    matchLabels:
+      app: dqmplatform
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: dqmplatform
+    spec:
+      volumes:
+        - name: dqm-shared
+          emptyDir: {}
+      containers:
+      - name: dqmanalysis
+        image: bonniek/dqm:0.5
+        ports:
+        - containerPort: 80
+        env:
+        - name: PGPASS
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secrets
+              key: POSTGRES_PASSWORD 
+        volumeMounts:
+        - mountPath: "/mnt/data/"
+          name: dqm-shared
+
+      - name: dqmplatform
+        image: bonniek/dunedqmdotnet:0.7
+        ports:
+        - containerPort: 80
+        env:
+        - name: KafkaConfig__Logging__BootstrapServers
+          value: 'kafka-svc.kafka-kraft:9092'
+        - name: MonitoringDbConnectionParameters__Server
+          value: 'Server =postgres-svc.dunedaqers;'
+        - name: MonitoringDbConnectionParameters__Port
+          value: 'Port=5432;'
+        - name: MonitoringDbConnectionParameters__Database
+          value: 'Database=DbDQMMonitoring;'
+        - name: MonitoringDbConnectionParameters__User
+          value: "User ID =admin;"
+        - name: MonitoringDbConnectionParameters__Password
+          valueFrom:
+            secretKeyRef:
+              name: aspcore-secrets
+              key: DOTNETPOSTGRES_PASSWORD 
+        - name: UserDbConnectionParameters__Server
+          value: 'Server =postgres-svc.dunedaqers;'
+        - name: UserDbConnectionParameters__Port
+          value: 'Port=5432;'
+        - name: UserDbConnectionParameters__Database
+          value: 'Database=DbDQMUser;'
+        - name: UserDbConnectionParameters__User
+          value: "User ID =admin;"
+        - name: UserDbConnectionParameters__Password
+          valueFrom:
+            secretKeyRef:
+              name: aspcore-secrets
+              key: DOTNETPOSTGRES_PASSWORD 
+        - name: ASPNETCORE_ENVIRONMENT
+          value : Development
+        volumeMounts:
+        - mountPath: "/mnt/data/"
+          name: dqm-shared
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: dqm-svc
+  labels:
+    app: dqmplatform
+  namespace: dunedaqers
+spec:
+  type: NodePort
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 80
+    nodePort: 30081
+  selector:
+    app: dqmplatform

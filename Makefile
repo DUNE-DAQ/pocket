@@ -9,7 +9,7 @@ include .makefile/vars.mk
 
 ##
 ### Setup an installation of Pocket
-##
+#
 
 .PHONY: setup.local
 setup.local: dependency.docker kind kubectl ## start local setup
@@ -38,8 +38,63 @@ setup.openstack: on-cern-network check_openstack_login terraform ansible depende
 	@cat ~/.kube/config | grep -Eo '://[a-zA-Z0-9-]*-pocketdune.cern.ch:' | tr -d '\012\015'
 	@echo "31000"
 
+.PHONY: namespaces.local
+namespaces.local: kind kubectl external-manifests
+
+	@echo "setting up namespaces"
+	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/dunedaqers/ns-kafka-kraft.yaml ||:
+	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/opmon/ns-monitoring.yaml ||:
+	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/dunedaqers/ns-dunedaqers.yaml ||:
+
+
+.PHONY: kafka.local
+kafka.local: dependency.docker kind kubectl external-manifests namespaces.local
+
+	@echo "installing kafka"
+	@echo -n "setting advertised listener to "
+	@echo "$(call node_ip)"
+	@>/dev/null 2>&1 $(KUBECTL) -n kafka-kraft create secret generic kafka-secrets \
+	--from-literal=EXTERNAL_LISTENER="$(call node_ip)" ||:
+
+	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/dunedaqers/kafka.yaml ||:
+	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/dunedaqers/kafka-svc.yaml ||:
+
+.PHONY: postgres.local
+postgres.local: kind kubectl external-manifests namespaces.local
+	@echo "installing postgres"
+
+	@>/dev/null 2>&1 $(KUBECTL) -n dunedaqers create secret generic postgres-secrets \
+	--from-literal=POSTGRES_USER="admin" \
+	--from-literal=POSTGRES_PASSWORD="$(PGPASS)" ||:
+
+	#@>/dev/null 2>&1 $(KUBECTL) get secret postgres-secrets --namespace=dunedaqers -o yaml | sed 's/dunedaqers/monitoring/' | kubectl apply -f - ||:
+
+	@>/dev/null 2>&1 $(KUBECTL) -n monitoring create secret generic postgres-secrets \
+	--from-literal=POSTGRES_USER="admin" \
+	--from-literal=POSTGRES_PASSWORD="$(PGPASS)" ||:
+
+	@>/dev/null 2>&1 $(KUBECTL) -n dunedaqers create secret generic aspcore-secrets \
+	--from-literal=DOTNETPOSTGRES_PASSWORD="Password=$(PGPASS);" ||:
+
+	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/dunedaqers/postgres.yaml ||: 
+	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/dunedaqers/postgres-svc.yaml ||:
+
+.PHONY: ers-kafka.local
+ers-kafka.local: kafka.local postgres.local
+	@echo "installing ers-kafka"
+
+	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/dunedaqers/aspcore.yaml ||:
+
+
+.PHONY: dqm-kafka.local
+dqm-kafka.local: kafka.local postgres.local
+	@echo "installing dqm-kafka"
+
+	$(KUBECTL) apply -f manifests/dqm/dqmplatform.yaml ||:
+
+
 .PHONY: kubectl-apply
-kubectl-apply: kubectl external-manifests ## apply files in `manifests` using kubectl
+kubectl-apply: kubectl external-manifests namespaces.local ## apply files in `manifests` using kubectl
 	@echo "installing basic services"
 	@>/dev/null 2>&1 $(KUBECTL) create ns csi-cvmfs ||:
 	@>/dev/null $(KUBECTL) apply -f manifests -f manifests/cvmfs
@@ -48,7 +103,7 @@ ifeq ($(OPMON_ENABLED),0)
 	@echo -e "\e[33mskipping installation of opmon\e[0m"
 else
 	@echo "installing opmon"
-	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/opmon/ns-monitoring.yaml ||:
+
 	@>/dev/null 2>&1 $(KUBECTL) -n monitoring create secret generic grafana-secrets \
 	--from-literal=GF_SECURITY_SECRET_KEY="$(call random_password)" \
 	--from-literal=GF_SECURITY_ADMIN_PASSWORD="$(call random_password)" ||:
@@ -79,6 +134,22 @@ else
 	@>/dev/null $(KUBECTL) apply -f manifests/ECK
 endif
 
+ifeq ($(ERS_ENABLED),0)
+	@echo -e "\e[33mskipping installation of Kafka-ERS\e[0m"
+else
+	@$(MAKE) --no-print-directory ers-kafka.local
+	@$(MAKE) --no-print-directory ers-topic
+endif
+
+
+ifeq ($(DQM_ENABLED),0)
+	@echo -e "\e[33mskipping installation of DQM\e[0m"
+else
+	@$(MAKE) --no-print-directory dqm-kafka.local
+	@$(MAKE) --no-print-directory dqm-topic
+endif
+
+
 ##
 ### Destroy any created setups
 ##
@@ -103,6 +174,23 @@ destroy.openstack: check_openstack_login terraform ## undo the setup made by `se
 .PHONY: env
 env: kubectl ## use `eval $(make env)` to get access to dependency binaries such as kubectl
 	@echo "PATH=\"$(EXTERNALS_BIN_FOLDER):$(shell echo $$PATH)\""
+
+.PHONY: ers-topic
+ers-topic: env
+	@echo "Configuring Kafka Topic erskafka-reporting"
+	@>/dev/null 2>&1 $(KUBECTL) -n kafka-kraft exec --stdin --tty kafka-0 -- kafka-topics.sh --create --bootstrap-server kafka-svc.kafka-kraft:9092 --partitions 1 --topic erskafka-reporting ||:
+
+.PHONY: dqm-topc
+dqm-topic: env
+	@echo "Configuring topics for DQM"
+	@>/dev/null 2>&1 $(KUBECTL) -n kafka-kraft exec --stdin --tty kafka-0 -- kafka-topics.sh --create --bootstrap-server kafka-svc.kafka-kraft:9092 --partitions 1 --topic testdunedqm ||:
+	@>/dev/null 2>&1 $(KUBECTL) -n kafka-kraft exec --stdin --tty kafka-0 -- kafka-topics.sh --create --bootstrap-server kafka-svc.kafka-kraft:9092 --partitions 1 --topic kafkaopmon-reporting ||:
+	@>/dev/null 2>&1 $(KUBECTL) -n kafka-kraft exec --stdin --tty kafka-0 -- kafka-topics.sh --create --bootstrap-server kafka-svc.kafka-kraft:9092 --partitions 1 --topic dune-dqm-messenger ||:
+	@>/dev/null 2>&1 $(KUBECTL) -n kafka-kraft exec --stdin --tty kafka-0 -- kafka-topics.sh --create --bootstrap-server kafka-svc.kafka-kraft:9092 --partitions 1 --topic dune-dqm-messages ||:
+	@>/dev/null 2>&1 $(KUBECTL) -n kafka-kraft exec --stdin --tty kafka-0 -- kafka-topics.sh --create --bootstrap-server kafka-svc.kafka-kraft:9092 --partitions 1 --topic dunedqm-incommingchannel1 ||:
+	@>/dev/null 2>&1 $(KUBECTL) -n kafka-kraft exec --stdin --tty kafka-0 -- kafka-topics.sh --create --bootstrap-server kafka-svc.kafka-kraft:9092 --partitions 1 --topic dunedqm-incommingchannel2 ||:
+	@>/dev/null 2>&1 $(KUBECTL) -n kafka-kraft exec --stdin --tty kafka-0 -- kafka-topics.sh --create --bootstrap-server kafka-svc.kafka-kraft:9092 --partitions 1 --topic dunedqm-platforminputs ||:
+	@>/dev/null 2>&1 $(KUBECTL) -n kafka-kraft exec --stdin --tty kafka-0 -- kafka-topics.sh --create --bootstrap-server kafka-svc.kafka-kraft:9092 --partitions 1 --topic dunedqm-processedchannel1 ||:
 
 .PHONY: check_openstack_login
 check_openstack_login:

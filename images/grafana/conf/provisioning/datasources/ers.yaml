@@ -1,0 +1,14 @@
+apiVersion: 1
+
+datasources:
+- name: ERS
+  type: postgres
+  url: postgres-svc.dunedaqers
+  database: postgres
+  isDefault: true
+  editable: false
+  user: admin
+  secureJsonData:
+    basicAuthPassword: "${POSTGRES_PASSWORD}"
+  jsonData:
+    sslmode: 'disable'
