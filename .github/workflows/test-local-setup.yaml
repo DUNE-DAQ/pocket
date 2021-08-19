@@ -29,7 +29,7 @@ jobs:
         make env >> $GITHUB_ENV
     - name: InfluxDB works
       run: |
-        kubectl -n monitoring wait --for condition=available deployment influxdb --timeouot=60s
+        kubectl -n monitoring wait --for condition=available deployment influxdb --timeout=60s
         curl --fail http://localhost:31002/health | grep "ready for queries and writes"
     - name: Grafana works
       run: |
