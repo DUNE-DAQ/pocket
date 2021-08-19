@@ -196,7 +196,7 @@ ers-topic: env
 	@echo "Configuring Kafka Topic erskafka-reporting"
 	@>/dev/null 2>&1 $(KUBECTL) -n kafka-kraft exec --stdin --tty kafka-0 -- kafka-topics.sh --create --bootstrap-server kafka-svc.kafka-kraft:9092 --partitions 1 --topic erskafka-reporting ||:
 
-.PHONY: dqm-topc
+.PHONY: dqm-topic
 dqm-topic: env
 	@echo "Configuring topics for DQM"
 	@>/dev/null 2>&1 $(KUBECTL) -n kafka-kraft exec --stdin --tty kafka-0 -- kafka-topics.sh --create --bootstrap-server kafka-svc.kafka-kraft:9092 --partitions 1 --topic testdunedqm ||:
