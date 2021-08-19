@@ -48,7 +48,7 @@ make setup.local
 
 This will setup your local (one-node) cluster, and print out available default services and their access credentials.
 
-![](docs/print-access-creds.png)
+![](print-access-creds.png)
 
 To start a cluster without ElasticSearch
 ```bash
