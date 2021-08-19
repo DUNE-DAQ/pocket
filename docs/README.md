@@ -1,6 +1,16 @@
 # Pocket
 
-A set of scripts designed to help create a 'production-like' DUNE DAQ environment in a variety of setups.
+A set of scripts designed to help create a portable, 'production-like' DUNE DAQ environment in a variety of setups.
+
+Pocket is based on [(Linux) containers](docker.io) and [Kubernetes](kubernetes.io).
+
+In the local setup, Pocket is configured to run in a one-node [KIND](https://kind.sigs.k8s.io) cluster.
+
+Some services can also be run in CERN OpenStack.
+
+## Security
+
+Pocket exposes most of its services on the host to the outside network. It should only be run in a protected environment!
 
 ## Requirements
 - A git clone of this repository
@@ -9,8 +19,7 @@ A set of scripts designed to help create a 'production-like' DUNE DAQ environmen
 
 Pocket is compatible with Linux, MacOS (intel based), and Windows (through WSL2).
 
-Note that while this covers a very large variety of setups, currently lxplus is _not_ compatible for its lack of a docker installation.
-This for security reasons (even though [rootless docker](https://docs.docker.com/engine/security/rootless/) is a thing.
+Note that while this covers a very large variety of setups, currently shared interactive nodes like lxplus are _not_ compatible for its lack of a docker installation.
 
 ## Dependencies
 
@@ -65,8 +74,11 @@ These are printed out after a successful setup or by running `make print-access-
 |ElasticSearch|31004|
 |Kibana|31005|
 |Opmonlib Proxy|31006|
+|Kafka External|30092|
+|Error Reporting System|30080|
+|DQM Platform|30081|
 
-For the in-cluster experience, and to access your own (non-built-in) defined services,
+For the in-cluster experience with DNS, and to access your own (non-built-in) defined services,
 the cluster will have a http proxy running for you to access any services internal to the cluster.
 
 This proxy runs on port `31000` and is usable using curl
