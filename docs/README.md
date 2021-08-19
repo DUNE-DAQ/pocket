@@ -90,9 +90,9 @@ $ curl --socks5 https://mycernusername-pocketdune.cern.ch:31000 --socks5-hostnam
 ```
 
 or a webbrowser using foxyproxy  
-![](docs/foxyproxy.png)
+![](foxyproxy.png)
 
-![](docs/grafana.png)
+![](grafana.png)
 
 ## supported setups
 
