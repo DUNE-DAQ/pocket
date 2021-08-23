@@ -1,0 +1,1 @@
+docker build -v /cvmfs/dunedaq.opensciencegrid.org:/cvmfs/dunedaq.opensciencegrid.org  -v /cvmfs/dunedaq-development.opensciencegrid.org:/cvmfs/dunedaq-development.opensciencegrid.org --tag pocket-daq:0.1.1 daq_application_cvmfs/ 
