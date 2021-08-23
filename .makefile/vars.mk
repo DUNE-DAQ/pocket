@@ -20,7 +20,7 @@ KUBECTL := $(KUBECTL_NOVER)-$(KUBECTL_VERSION)
 ##
 ## Services to install
 ##
-SERVICES ?= opmon
+SERVICES ?= ""
 
 ifeq ($(findstring opmon,$(SERVICES)),)
 	OPMON_ENABLED=0
