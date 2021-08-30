@@ -108,16 +108,11 @@ dqm-kafka.local: kafka.local dqmpostgres.local
 
 	$(KUBECTL) apply -f manifests/dqm/dqmplatform.yaml ||:
 
+	@echo "installing opmon"
 
-.PHONY: kubectl-apply
-kubectl-apply: kubectl external-manifests namespaces.local ## apply files in `manifests` using kubectl
-	@echo "installing basic services"
-	@>/dev/null 2>&1 $(KUBECTL) create ns csi-cvmfs ||:
-	@>/dev/null $(KUBECTL) apply -f manifests -f manifests/cvmfs
 
-ifeq ($(OPMON_ENABLED),0)
-	@echo -e "\e[33mskipping installation of opmon\e[0m"
-else
+.PHONY: opmon.local
+opmon.local: postgres.local
 	@echo "installing opmon"
 
 	@>/dev/null 2>&1 $(KUBECTL) -n monitoring create secret generic grafana-secrets \
@@ -138,6 +133,38 @@ else
 	--from-literal=INFLUXDB_HTTP_AUTH_ENABLED=false ||:
 
 	@>/dev/null $(KUBECTL) apply -f manifests/opmon
+
+.PHONY: kubectl-apply
+kubectl-apply: kubectl external-manifests namespaces.local ## apply files in `manifests` using kubectl
+	@echo "installing basic services"
+	@>/dev/null 2>&1 $(KUBECTL) create ns csi-cvmfs ||:
+	@>/dev/null $(KUBECTL) apply -f manifests -f manifests/cvmfs
+
+ifeq ($(OPMON_ENABLED),0)
+	@echo -e "\e[33mskipping installation of opmon\e[0m"
+else
+	@$(MAKE) --no-print-directory opmon.local
+
+# 	@echo "installing opmon"
+
+# 	@>/dev/null 2>&1 $(KUBECTL) -n monitoring create secret generic grafana-secrets \
+# 	--from-literal=GF_SECURITY_SECRET_KEY="$(call random_password)" \
+# 	--from-literal=GF_SECURITY_ADMIN_PASSWORD="$(call random_password)" ||:
+
+# 	@>/dev/null 2>&1 $(KUBECTL) -n monitoring create secret generic influxdb-secrets \
+# 	--from-literal=INFLUXDB_CONFIG_PATH=/etc/influxdb/influxdb.conf \
+# 	--from-literal=INFLUXDB_DB=influxdb \
+# 	--from-literal=INFLUXDB_URL=http://influxdb.monitoring:8086 \
+# 	--from-literal=INFLUXDB_USER=user \
+# 	--from-literal=INFLUXDB_USER_PASSWORD="$(call random_password)" \
+# 	--from-literal=INFLUXDB_READ_USER=readonly \
+# 	--from-literal=INFLUXDB_READ_USER_PASSWORD=readonly \
+# 	--from-literal=INFLUXDB_ADMIN_USER=dune \
+# 	--from-literal=INFLUXDB_ADMIN_USER_PASSWORD="$(call random_password)" \
+# 	--from-literal=INFLUXDB_HOST=influxdb.monitoring  \
+# 	--from-literal=INFLUXDB_HTTP_AUTH_ENABLED=false ||:
+
+# 	@>/dev/null $(KUBECTL) apply -f manifests/opmon
 endif
 
 ifeq ($(ECK_ENABLED),0)
