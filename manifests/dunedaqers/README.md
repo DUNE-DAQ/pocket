@@ -34,7 +34,7 @@ Use the kubectl and kind binaries from this environment:
 `eval $(make env)`
 
 Show pods in the application namespace:
-`kubectl -n dunedaqers get pods`
+`kubectl -n ers get pods`
 
 Show pods in the Kafka namespace:
 `kubectl -n kafka-kraft get pods`

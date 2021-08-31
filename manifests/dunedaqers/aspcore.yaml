@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: dunedaqers
-  namespace: dunedaqers
+  namespace: ers
 spec:
   selector:
     matchLabels:
@@ -39,7 +39,7 @@ metadata:
   name: aspcore-svc
   labels:
     app: dunedaqers
-  namespace: dunedaqers
+  namespace: ers
 spec:
   type: NodePort
   ports:
