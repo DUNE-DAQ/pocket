@@ -73,6 +73,43 @@ Set the SERVICES variables and run `make`:
 ```bash
 SERVICES=opmon,ers make setup.local
 ```
+### Access the Error Reporting System
+
+The setup scripts will print the internal (to the cluster) and external addresses for the web application:
+
+To use the interal DNS names, you need to configure the SOCKS5 proxy in your browser:
+
+```
+Error Reporting System
+	address (in-cluster): aspcore-svc.ers:80
+	address (out-cluster): <server's external IP>:30080
+	ASP Password: Password=passsssword;
+```
+
+### Access Grafana
+
+### Configure the DAQ application
+
+To use the ERS in pocket, the DAQ must send error messages to the Kafka instance running in Pocket. External and internal addresses are printed after setup:
+
+```
+Kafka
+	address (in-cluster): kafka-svc.kafka-kraft:9092
+	address (out-cluster): <server's external IP>:30092
+```
+
+To configure the DAQ application to report to the Pocket ERS, set the environment variables below to the Kafka address, for example: 
+
+```bash
+export KAFKA=<your Kafka address>
+
+export DUNEDAQ_ERS_STREAM_LIBS=erskafka
+export DUNEDAQ_PARTITION=ChooseYourPartitionName
+export DUNEDAQ_ERS_INFO="erstrace,throttle(30,100),lstdout,erskafka($KAFKA:30092)"
+export DUNEDAQ_ERS_WARNING="erstrace,throttle(30,100),lstderr,erskafka($KAFKA:30092)"
+export DUNEDAQ_ERS_ERROR="erstrace,throttle(30,100),lstderr,erskafka($KAFKA:30092)"
+export DUNEDAQ_ERS_FATAL="erstrace,lstderr,erskafka($KAFKA:30092)"
+```
 
 ## Accessing services
 
