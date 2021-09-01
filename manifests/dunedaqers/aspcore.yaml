@@ -22,7 +22,7 @@ spec:
         - name: KafkaConfig__Logging__BootstrapServers
           value: 'kafka-svc.kafka-kraft:9092'
         - name: ApplicationDbConnectionparameters__Server
-          value: 'Server =postgres-svc.dunedaqers;'
+          value: 'Server =postgres-svc.ers;'
         - name: ApplicationDbConnectionParameters__User
           value: "User ID =admin;"
         - name: ApplicationDbConnectionParameters__Password
@@ -36,7 +36,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: aspcore-svc
+  name: ers-svc
   labels:
     app: dunedaqers
   namespace: ers

@@ -122,10 +122,10 @@ function dqmpostgres_creds() {
 
 function ers_creds() {
   echo -e "\e[34mError Reporting System\e[0m"
-	echo -n "	address (in-cluster): aspcore-svc.ers:"
-	${KUBECTL} -n ers get service aspcore-svc -ojsonpath='{.spec.ports[0].targetPort}'; echo
+	echo -n "	address (in-cluster): ers-svc.ers:"
+	${KUBECTL} -n ers get service ers-svc -ojsonpath='{.spec.ports[0].targetPort}'; echo
 	echo -n "	address (out-cluster): ${NODEPORT_IP}:"
-	${KUBECTL} -n ers get service aspcore-svc -ojsonpath='{.spec.ports[0].nodePort}'; echo
+	${KUBECTL} -n ers get service ers-svc -ojsonpath='{.spec.ports[0].nodePort}'; echo
 	echo -n "	ASP Password: "
 	${KUBECTL} get -n ers secret aspcore-secrets -o=jsonpath='{.data.DOTNETPOSTGRES_PASSWORD}' | base64 --decode; echo
 }
@@ -166,7 +166,7 @@ if > /dev/null 2>&1 ${KUBECTL} -n ers get service postgres-svc; then
   erspostgres_creds
 fi
 
-if > /dev/null 2>&1 ${KUBECTL} -n ers get service aspcore-svc; then
+if > /dev/null 2>&1 ${KUBECTL} -n ers get service ers-svc; then
   ers_creds
 fi
 
