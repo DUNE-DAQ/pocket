@@ -25,6 +25,8 @@ Note that while this covers a very large variety of setups, currently shared int
 
 If your environment does not already provide a working Docker configuration, install Docker and run the daemon. 
 
+More information about installing Docker is [here](https://docs.docker.com/engine/install/).
+
 On CentOS/SL, as root:
 ```
  $ [yum|dnf] -y install docker
@@ -35,7 +37,7 @@ On CentOS/SL, as root:
 On Fedora you may need to set the kernel commandline parameter:
 ```systemd.unified_cgroup_hierarchy=0```
 
-## Quick-start
+## Cluster Set up
 
 Clone this git repository to a location of your choice.
 
@@ -58,6 +60,18 @@ SERVICES=opmon make setup.local
 Optionally, to make your shell use binaries (`kubectl`, ...) that pocket ships with
 ```bash
 eval $(make env)
+```
+
+## Quick Start: Error Reporting System
+
+This section covers how to install the Error Reporting System, and the 2.8 Grafana dashboard.
+
+Clone this repository to your location. Keep in mind that access to the Internet is required.
+
+Set the SERVICES variables and run `make`:
+
+```bash
+SERVICES=opmon,ers make setup.local
 ```
 
 ## Accessing services
