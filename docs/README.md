@@ -88,6 +88,15 @@ Error Reporting System
 
 ### Access Grafana
 
+```bash
+Grafana
+	URL (in-cluster): http://grafana.monitoring:3000
+	URL (out-cluster): http://<your IP>:31003
+	User: admin	Password: passssssssworddddd
+```
+
+Navigate to Grafana and log in with the provided credentials.
+
 ### Configure the DAQ application
 
 To use the ERS in pocket, the DAQ must send error messages to the Kafka instance running in Pocket. External and internal addresses are printed after setup:
