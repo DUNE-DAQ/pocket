@@ -52,11 +52,6 @@ This will setup your local (one-node) cluster, and print out available default s
 
 ![](print-access-creds.png)
 
-To start a cluster without ElasticSearch
-```bash
-SERVICES=opmon make setup.local
-```
-
 Optionally, to make your shell use binaries (`kubectl`, ...) that pocket ships with
 ```bash
 eval $(make env)
