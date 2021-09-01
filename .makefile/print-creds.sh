@@ -96,28 +96,38 @@ function kafka_creds() {
 	${KUBECTL} -n kafka-kraft get service kafka-svc-ext -ojsonpath='{.spec.ports[0].nodePort}'; echo
 }
 
-function postgres_creds() {
-  echo -e "\e[34mPostgres\e[0m"
-	echo -n "	address (in-cluster): postgres-svc.dunedaqers:"
-        ${KUBECTL} -n dunedaqers get service postgres-svc -ojsonpath='{.spec.ports[0].targetPort}'; echo
-	#echo -n "	address (out-cluster): ${NODEPORT_IP}:"
-	#${KUBECTL} -n dunedaqers get service postgres-svc -ojsonpath='{.spec.ports[0].nodePort}' || echo None;  echo
+function erspostgres_creds() {
+  echo -e "\e[34mERS Postgres\e[0m"
+	echo -n "	address (in-cluster): postgres-svc.ers:"
+        ${KUBECTL} -n ers get service postgres-svc -ojsonpath='{.spec.ports[0].targetPort}'; echo
 	echo -n "	User: "
-	${KUBECTL} get -n dunedaqers secret postgres-secrets -o=jsonpath='{.data.POSTGRES_USER}' | base64 --decode;
+	${KUBECTL} get -n ers secret postgres-secrets -o=jsonpath='{.data.POSTGRES_USER}' | base64 --decode;
 	echo -n "	Password: "
-	${KUBECTL} get -n dunedaqers secret postgres-secrets -o=jsonpath='{.data.POSTGRES_PASSWORD}' | base64 --decode; echo
+	${KUBECTL} get -n ers secret postgres-secrets -o=jsonpath='{.data.POSTGRES_PASSWORD}' | base64 --decode; echo
 	echo -n "	ASP Password: "
-	${KUBECTL} get -n dunedaqers secret aspcore-secrets -o=jsonpath='{.data.DOTNETPOSTGRES_PASSWORD}' | base64 --decode; echo
+	${KUBECTL} get -n ers secret aspcore-secrets -o=jsonpath='{.data.DOTNETPOSTGRES_PASSWORD}' | base64 --decode; echo
+}
+
+function dqmpostgres_creds() {
+  echo -e "\e[34mDQM Postgres\e[0m"
+	echo -n "	address (in-cluster): postgres-svc.dqm:"
+        ${KUBECTL} -n dqm get service postgres-svc -ojsonpath='{.spec.ports[0].targetPort}'; echo
+	echo -n "	User: "
+	${KUBECTL} get -n dqm secret postgres-secrets -o=jsonpath='{.data.POSTGRES_USER}' | base64 --decode;
+	echo -n "	Password: "
+	${KUBECTL} get -n dqm secret postgres-secrets -o=jsonpath='{.data.POSTGRES_PASSWORD}' | base64 --decode; echo
+	echo -n "	ASP Password: "
+	${KUBECTL} get -n dqm secret aspcore-secrets -o=jsonpath='{.data.DOTNETPOSTGRES_PASSWORD}' | base64 --decode; echo
 }
 
 function ers_creds() {
   echo -e "\e[34mError Reporting System\e[0m"
-	echo -n "	address (in-cluster): aspcore-svc.dunedaqers:"
-	${KUBECTL} -n dunedaqers get service aspcore-svc -ojsonpath='{.spec.ports[0].targetPort}'; echo
+	echo -n "	address (in-cluster): ers-svc.ers:"
+	${KUBECTL} -n ers get service ers-svc -ojsonpath='{.spec.ports[0].targetPort}'; echo
 	echo -n "	address (out-cluster): ${NODEPORT_IP}:"
-	${KUBECTL} -n dunedaqers get service aspcore-svc -ojsonpath='{.spec.ports[0].nodePort}'; echo
+	${KUBECTL} -n ers get service ers-svc -ojsonpath='{.spec.ports[0].nodePort}'; echo
 	echo -n "	ASP Password: "
-	${KUBECTL} get -n dunedaqers secret aspcore-secrets -o=jsonpath='{.data.DOTNETPOSTGRES_PASSWORD}' | base64 --decode; echo
+	${KUBECTL} get -n ers secret aspcore-secrets -o=jsonpath='{.data.DOTNETPOSTGRES_PASSWORD}' | base64 --decode; echo
 }
 
 function dashboard_creds() {
@@ -130,12 +140,12 @@ function dashboard_creds() {
 
 function dqm_creds() {
   echo -e "\e[34mData Quality Monitoring Platform\e[0m"
-	echo -n "	address (in-cluster): dqm-svc.dunedaqers:"
-	${KUBECTL} -n dunedaqers get service dqm-svc -ojsonpath='{.spec.ports[0].targetPort}'; echo
+	echo -n "	address (in-cluster): dqm-svc.dqm:"
+	${KUBECTL} -n dqm get service dqm-svc -ojsonpath='{.spec.ports[0].targetPort}'; echo
 	echo -n "	address (out-cluster): ${NODEPORT_IP}:"
-	${KUBECTL} -n dunedaqers get service dqm-svc -ojsonpath='{.spec.ports[0].nodePort}'; echo
+	${KUBECTL} -n dqm get service dqm-svc -ojsonpath='{.spec.ports[0].nodePort}'; echo
 	echo -n "	ASP Password: "
-	${KUBECTL} get -n dunedaqers secret aspcore-secrets -o=jsonpath='{.data.DOTNETPOSTGRES_PASSWORD}' | base64 --decode; echo
+	${KUBECTL} get -n dqm secret aspcore-secrets -o=jsonpath='{.data.DOTNETPOSTGRES_PASSWORD}' | base64 --decode; echo
 }
 
 echo "Available services:"
@@ -152,15 +162,19 @@ if > /dev/null 2>&1 ${KUBECTL} -n kafka-kraft get service kafka-svc; then
 	kafka_creds
 fi
 
-if > /dev/null 2>&1 ${KUBECTL} -n dunedaqers get service postgres-svc; then
-  postgres_creds
+if > /dev/null 2>&1 ${KUBECTL} -n ers get service postgres-svc; then
+  erspostgres_creds
 fi
 
-if > /dev/null 2>&1 ${KUBECTL} -n dunedaqers get service aspcore-svc; then
+if > /dev/null 2>&1 ${KUBECTL} -n ers get service ers-svc; then
   ers_creds
 fi
 
-if > /dev/null 2>&1 ${KUBECTL} -n dunedaqers get service dqm-svc; then
+if > /dev/null 2>&1 ${KUBECTL} -n dqm get service postgres-svc; then
+  dqmpostgres_creds
+fi
+
+if > /dev/null 2>&1 ${KUBECTL} -n ers get service dqm-svc; then
   dqm_creds
 fi
 dashboard_creds

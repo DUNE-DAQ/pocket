@@ -5,7 +5,7 @@ metadata:
   name: postgres-svc
   labels:
     app: postgresql
-  namespace: dunedaqers
+  namespace: dqm
 spec:
   type: ClusterIP
   ports:
