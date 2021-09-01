@@ -102,7 +102,7 @@ Kafka
 	address (out-cluster): <server's external IP>:30092
 ```
 
-To configure the DAQ application to report to the Pocket ERS, set the environment variables below to the Kafka address, for example: 
+To configure the DAQ application to report to the Pocket ERS, set the environment variables below to the Kafka address. If you are running the DAQ application outside of pocket, use the out-cluster address. For example: 
 
 ```bash
 export KAFKA=<your Kafka address>
