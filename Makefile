@@ -77,7 +77,7 @@ erspostgres.local: kind kubectl external-manifests namespaces.local
 
 	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/dunedaqers/ers-postgres.yaml ||: 
 	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/dunedaqers/ers-postgres-svc.yaml ||:
-	kubectl -n ers create configmap ers-sql --from-file manifests/dunedaqers/sql/ErrorReportingDb.sql
+	@>/dev/null 2>&  $(KUBECTL) -n ers create configmap ers-sql --from-file manifests/dunedaqers/sql/ErrorReportingDb.sql
 
 .PHONY: dqmpostgres.local
 dqmpostgres.local: kind kubectl external-manifests namespaces.local
