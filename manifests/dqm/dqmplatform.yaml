@@ -32,14 +32,14 @@ spec:
           name: dqm-shared
 
       - name: dqmplatform
-        image: bonniek/dunedqmdotnet:0.7
+        image: bonniek/dunedqmdotnet:0.9
         ports:
         - containerPort: 80
         env:
         - name: KafkaConfig__Logging__BootstrapServers
-          value: 'kafka-svc.kafka-kraft:9092'
+          value: 'kafka-svc.kafka-kraft:9092;'
         - name: MonitoringDbConnectionParameters__Server
-          value: 'Server =postgres-svc.dunedaqers;'
+          value: 'Server =postgres-svc.dqm;'
         - name: MonitoringDbConnectionParameters__Port
           value: 'Port=5432;'
         - name: MonitoringDbConnectionParameters__Database
@@ -52,7 +52,7 @@ spec:
               name: aspcore-secrets
               key: DOTNETPOSTGRES_PASSWORD 
         - name: UserDbConnectionParameters__Server
-          value: 'Server =postgres-svc.dunedaqers;'
+          value: 'Server =postgres-svc.dqm;'
         - name: UserDbConnectionParameters__Port
           value: 'Port=5432;'
         - name: UserDbConnectionParameters__Database
