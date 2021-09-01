@@ -57,6 +57,11 @@ Optionally, to make your shell use binaries (`kubectl`, ...) that pocket ships w
 eval $(make env)
 ```
 
+To destroy after you finished, run
+```bash
+$ make destroy.openstack
+```
+
 ## Quick Start: Error Reporting System
 
 This section covers how to install the Error Reporting System, and the 2.8 Grafana dashboard.
@@ -132,6 +137,8 @@ These are printed out after a successful setup or by running `make print-access-
 |Kafka External|30092|
 |Error Reporting System|30080|
 |DQM Platform|30081|
+
+
 
 For the in-cluster experience with DNS, and to access your own (non-built-in) defined services,
 the cluster will have a http proxy running for you to access any services internal to the cluster.
