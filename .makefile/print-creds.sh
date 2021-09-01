@@ -170,7 +170,7 @@ if > /dev/null 2>&1 ${KUBECTL} -n ers get service aspcore-svc; then
   ers_creds
 fi
 
-if > /dev/null 2>&1 ${KUBECTL} -n ers get service postgres-svc; then
+if > /dev/null 2>&1 ${KUBECTL} -n dqm get service postgres-svc; then
   dqmpostgres_creds
 fi
 
