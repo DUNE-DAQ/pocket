@@ -51,4 +51,10 @@ spec:
         envFrom:
         - secretRef:
             name: postgres-secrets
-
+        volumeMounts:
+          - mountPath: /docker-entrypoint-initdb.d/
+            name: dqm-sql
+      volumes:
+        - name: dqm-sql
+          configMap:
+            name: dqm-sql
