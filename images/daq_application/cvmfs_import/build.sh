@@ -19,13 +19,18 @@ rm -rf $HERE/image
 
 cd $(dirname $1)
 
-# Copy dbt-area here
+echo "Building context"
+echo "- Copying work area"
+# Copy dbt-area here)
 cp -a  $(basename $1) $HERE/image
+
+echo "- Removing build products"
 rm -rf image/build/*
 rm -rf image/install/*
 
+echo "- Patching python environment "
 cd $HERE/image/dbt-pyvenv
-find -name __pycache__ -exec rm -rf "{}" \;
+find -name __pycache__ -type d -prune -execdir rm -rf "{}" "+"
 
 cd $HERE/image/dbt-pyvenv/bin
 sed -i 's|^#!.*|#!'$(realpath ./python)'|' *
