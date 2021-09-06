@@ -39,10 +39,12 @@ sed -i 's|VIRTUAL_ENV=.*|VIRTUAL_ENV=$(cd $(dirname ${BASH_SOURCE[0]})/.. \&\& p
 cd $HERE
 
 cp -a $HERE/../common .
-cp rebuild_work_area.sh ./image
+cp rebuild_work_area.sh ./image/
 
 # chmod 777 image/.rebuild_work_area.sh
 
-docker run -i -t --rm -v /cvmfs/dunedaq.opensciencegrid.org:/cvmfs/dunedaq.opensciencegrid.org  -v /cvmfs/dunedaq-development.opensciencegrid.org:/cvmfs/dunedaq-development.opensciencegrid.org -v ${HERE}/image:/dunedaq/run:z dunedaq/sl7-minimal:latest -- /dunedaq/run/rebuild_work_area.sh
+docker run --user $(id -u):$(id -g) -i -t --rm -v /cvmfs/dunedaq.opensciencegrid.org:/cvmfs/dunedaq.opensciencegrid.org  -v /cvmfs/dunedaq-development.opensciencegrid.org:/cvmfs/dunedaq-development.opensciencegrid.org -v ${HERE}/image:/dunedaq/run:z dunedaq/sl7-minimal:latest -- /dunedaq/run/rebuild_work_area.sh
+
+rm -rf image/build/*
 
 docker build --tag $DKR_TAG:$DKR_VERSION $HERE 
