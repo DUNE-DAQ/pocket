@@ -93,7 +93,7 @@ dqmpostgres.local: kind kubectl external-manifests namespaces.local
 	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/dqm/dqm-postgres.yaml ||: 
 	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/dqm/dqm-postgres-svc.yaml ||:
 
-	$(KUBECTL) -n dqm create configmap dqm-sql --from-file manifests/dqm/sql/MonitoringDb.sql --from-file manifests/dqm/sql/MonitoringUserDb.sql
+	$(KUBECTL) -n dqm create configmap dqm-sql --from-file manifests/dqm/sql/create_databases.sh --from-file manifests/dqm/sql/MonitoringDb.sql --from-file manifests/dqm/sql/MonitoringUserDb.sql
 
 .PHONY: ers-kafka.local
 ers-kafka.local: kafka.local erspostgres.local

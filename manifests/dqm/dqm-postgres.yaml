@@ -48,6 +48,9 @@ spec:
         - containerPort: 5432
           name: postgres
           protocol: TCP
+        env:
+        - name: POSTGRES_MULTIPLE_DATABASES
+          value: DbDQMMonitoring,DbDQMUser
         envFrom:
         - secretRef:
             name: postgres-secrets

@@ -7,7 +7,9 @@
 
 -- Started on 2021-08-25 13:24:23
 
-CREATE DATABASE "DbDQMUser";
+--- CREATE DATABASE "DbDQMUser";
+
+SET search_path = "DbDQMUser";
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -171,10 +173,10 @@ ALTER TABLE public."AspNetUsers" OWNER TO admin;
 -- Name: __EFMigrationsHistory; Type: TABLE; Schema: public; Owner: admin
 --
 
-CREATE TABLE public."__EFMigrationsHistory" (
-    "MigrationId" character varying(150) NOT NULL,
-    "ProductVersion" character varying(32) NOT NULL
-);
+--- CREATE TABLE public."__EFMigrationsHistory" (
+---     "MigrationId" character varying(150) NOT NULL,
+---     "ProductVersion" character varying(32) NOT NULL
+--- );
 
 
 ALTER TABLE public."__EFMigrationsHistory" OWNER TO admin;
@@ -347,8 +349,8 @@ ALTER TABLE ONLY public."AspNetUsers"
 -- Name: __EFMigrationsHistory PK___EFMigrationsHistory; Type: CONSTRAINT; Schema: public; Owner: admin
 --
 
-ALTER TABLE ONLY public."__EFMigrationsHistory"
-    ADD CONSTRAINT "PK___EFMigrationsHistory" PRIMARY KEY ("MigrationId");
+--- ALTER TABLE ONLY public."__EFMigrationsHistory"
+---    ADD CONSTRAINT "PK___EFMigrationsHistory" PRIMARY KEY ("MigrationId");
 
 
 --
