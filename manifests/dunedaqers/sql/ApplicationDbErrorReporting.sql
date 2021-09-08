@@ -7,8 +7,6 @@
 
 -- Started on 2021-09-01 16:54:45
 
-CREATE DATABASE "ApplicationDbErrorReporting";
-
 SET statement_timeout = 0;
 SET lock_timeout = 0;
 SET idle_in_transaction_session_timeout = 0;
