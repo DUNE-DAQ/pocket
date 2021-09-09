@@ -25,6 +25,8 @@ Note that while this covers a very large variety of setups, currently shared int
 
 If your environment does not already provide a working Docker configuration, install Docker and run the daemon. 
 
+More information about installing Docker is [here](https://docs.docker.com/engine/install/).
+
 On CentOS/SL, as root:
 ```
  $ [yum|dnf] -y install docker
@@ -35,7 +37,7 @@ On CentOS/SL, as root:
 On Fedora you may need to set the kernel commandline parameter:
 ```systemd.unified_cgroup_hierarchy=0```
 
-## Quick-start
+## Cluster Set up
 
 Clone this git repository to a location of your choice.
 
@@ -50,14 +52,72 @@ This will setup your local (one-node) cluster, and print out available default s
 
 ![](print-access-creds.png)
 
-To start a cluster without ElasticSearch
-```bash
-SERVICES=opmon make setup.local
-```
-
 Optionally, to make your shell use binaries (`kubectl`, ...) that pocket ships with
 ```bash
 eval $(make env)
+```
+
+To destroy after you finished, run
+```bash
+$ make destroy.openstack
+```
+
+## Quick Start: Error Reporting System
+
+This section covers how to install the Error Reporting System, and the 2.8 Grafana dashboard.
+
+Clone this repository to your location. Keep in mind that access to the Internet is required.
+
+Set the SERVICES variables and run `make`:
+
+```bash
+SERVICES=opmon,ers make setup.local
+```
+### Access the Error Reporting System
+
+The setup scripts will print the internal (to the cluster) and external addresses for the web application:
+
+To use the interal DNS names, you need to configure the SOCKS5 proxy in your browser:
+
+```
+Error Reporting System
+	address (in-cluster): aspcore-svc.ers:80
+	address (out-cluster): <server's external IP>:30080
+	ASP Password: Password=passsssword;
+```
+
+### Access Grafana
+
+```bash
+Grafana
+	URL (in-cluster): http://grafana.monitoring:3000
+	URL (out-cluster): http://<your IP>:31003
+	User: admin	Password: passssssssworddddd
+```
+
+Navigate to Grafana and log in with the provided credentials.
+
+### Configure the DAQ application
+
+To use the ERS in pocket, the DAQ must send error messages to the Kafka instance running in Pocket. External and internal addresses are printed after setup:
+
+```
+Kafka
+	address (in-cluster): kafka-svc.kafka-kraft:9092
+	address (out-cluster): <server's external IP>:30092
+```
+
+To configure the DAQ application to report to the Pocket ERS, set the environment variables below to the Kafka address. If you are running the DAQ application outside of pocket, use the out-cluster address. For example: 
+
+```bash
+export KAFKA=<your Kafka address>
+
+export DUNEDAQ_ERS_STREAM_LIBS=erskafka
+export DUNEDAQ_PARTITION=ChooseYourPartitionName
+export DUNEDAQ_ERS_INFO="erstrace,throttle(30,100),lstdout,erskafka($KAFKA:30092)"
+export DUNEDAQ_ERS_WARNING="erstrace,throttle(30,100),lstderr,erskafka($KAFKA:30092)"
+export DUNEDAQ_ERS_ERROR="erstrace,throttle(30,100),lstderr,erskafka($KAFKA:30092)"
+export DUNEDAQ_ERS_FATAL="erstrace,lstderr,erskafka($KAFKA:30092)"
 ```
 
 ## Accessing services
@@ -77,6 +137,8 @@ These are printed out after a successful setup or by running `make print-access-
 |Kafka External|30092|
 |Error Reporting System|30080|
 |DQM Platform|30081|
+
+
 
 For the in-cluster experience with DNS, and to access your own (non-built-in) defined services,
 the cluster will have a http proxy running for you to access any services internal to the cluster.
