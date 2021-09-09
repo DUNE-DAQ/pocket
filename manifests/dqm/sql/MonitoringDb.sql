@@ -8,7 +8,7 @@
 -- Started on 2021-08-25 13:30:44
 
 --- CREATE DATABASE "DbDQMMonitoring";
-SET search_path = "DbDQMMonitoring";
+--- SET search_path = "DbDQMMonitoring";
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -23,6 +23,7 @@ SET row_security = off;
 
 SET default_tablespace = '';
 
+\c DbDQMMonitoring
 
 --
 -- TOC entry 205 (class 1259 OID 17271)

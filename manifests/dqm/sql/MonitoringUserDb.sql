@@ -24,6 +24,7 @@ SET row_security = off;
 
 SET default_tablespace = '';
 
+\c DbDQMUser
 --
 -- TOC entry 200 (class 1259 OID 17125)
 -- Name: AspNetRoleClaims; Type: TABLE; Schema: public; Owner: admin
@@ -173,10 +174,10 @@ ALTER TABLE public."AspNetUsers" OWNER TO admin;
 -- Name: __EFMigrationsHistory; Type: TABLE; Schema: public; Owner: admin
 --
 
---- CREATE TABLE public."__EFMigrationsHistory" (
----     "MigrationId" character varying(150) NOT NULL,
----     "ProductVersion" character varying(32) NOT NULL
---- );
+CREATE TABLE public."__EFMigrationsHistory" (
+    "MigrationId" character varying(150) NOT NULL,
+    "ProductVersion" character varying(32) NOT NULL
+);
 
 
 ALTER TABLE public."__EFMigrationsHistory" OWNER TO admin;
@@ -349,8 +350,8 @@ ALTER TABLE ONLY public."AspNetUsers"
 -- Name: __EFMigrationsHistory PK___EFMigrationsHistory; Type: CONSTRAINT; Schema: public; Owner: admin
 --
 
---- ALTER TABLE ONLY public."__EFMigrationsHistory"
----    ADD CONSTRAINT "PK___EFMigrationsHistory" PRIMARY KEY ("MigrationId");
+ALTER TABLE ONLY public."__EFMigrationsHistory"
+   ADD CONSTRAINT "PK___EFMigrationsHistory" PRIMARY KEY ("MigrationId");
 
 
 --
