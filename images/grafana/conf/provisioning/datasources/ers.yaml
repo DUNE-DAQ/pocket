@@ -4,7 +4,7 @@ datasources:
 - name: ERS
   type: postgres
   url: postgres-svc.ers
-  database: postgres
+  database: ApplicationDbErrorReporting
   isDefault: true
   editable: false
   user: admin
