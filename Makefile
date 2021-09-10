@@ -231,12 +231,24 @@ print-access-creds: kubectl ## retrieve and print access data for provided servi
 ##
 
 .PHONY: images
-images: images.grafana ## build all images
+images: images.grafana images.kafka images.aspcore-ers images.aspcore-dqm## build all images
 
 .PHONY: images.grafana
 images.grafana: ## build Grafana image
 	docker build -t dunedaq/pocket-grafana:latest images/grafana
-	docker push dunedaq/pocket-grafana:latest
+# 	docker push juravenator/pocket-grafana:latest
+
+.PHONY: images.kafka
+images.kafka: ## build kafka image
+	docker build -t dunedaq/kafka-kraft:latest images/kafka
+
+.PHONY: images.aspcore-ers
+images.aspcore-ers: ## build aspcore-ers image
+	docker build -t dunedaq/aspcore-ers:latest images/aspcore-ers
+
+.PHONY: images.aspcore-dqm
+images.aspcore-dqm: ## build aspcore-ers image
+	docker build -t dunedaq/aspcore-dqm:latest images/aspcore-dqm
 
 ##
 ### Dependencies
