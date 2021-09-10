@@ -33,11 +33,11 @@ jobs:
         for i in $(seq 10); do curl --fail http://localhost:31001 && s=0 && break || s=$? && sleep 10; done; (exit $s)
     - name: InfluxDB works
       run: |
-        kubectl -n monitoring wait --for condition=available deployment influxdb --timeout=120s
+        kubectl -n monitoring wait --for condition=available deployment influxdb --timeout=240s
         curl --fail http://localhost:31002/health | grep "ready for queries and writes"
     - name: Grafana works
       run: |
-        kubectl -n monitoring wait --for condition=available deployment grafana --timeout=120s
+        kubectl -n monitoring wait --for condition=available deployment grafana --timeout=240s
         curl --fail http://localhost:31003/api/health
 
 
