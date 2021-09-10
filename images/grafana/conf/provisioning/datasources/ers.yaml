@@ -9,6 +9,6 @@ datasources:
   editable: false
   user: admin
   secureJsonData:
-    basicAuthPassword: "${POSTGRES_PASSWORD}"
+    password: "${POSTGRES_PASSWORD}"
   jsonData:
     sslmode: 'disable'
