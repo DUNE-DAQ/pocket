@@ -30,7 +30,7 @@ jobs:
     - name: Kubernetes Dashboard works
       run: |
         kubectl -n kubernetes-dashboard wait --for condition=available deployment kubernetes-dashboard --timeout=120s
-        curl --fail http://localhost:31001
+        for i in $(seq 10); do curl --fail http://localhost:31001 && s=0 && break || s=$? && sleep 10; done; (exit $s)
     - name: InfluxDB works
       run: |
         kubectl -n monitoring wait --for condition=available deployment influxdb --timeout=120s
