@@ -29,53 +29,15 @@ jobs:
         make env >> $GITHUB_ENV
     - name: InfluxDB works
       run: |
-        kubectl -n monitoring wait --for condition=available deployment influxdb --timeout=60s
+        kubectl -n monitoring wait --for condition=available deployment influxdb --timeout=120s
         curl --fail http://localhost:31002/health | grep "ready for queries and writes"
     - name: Grafana works
       run: |
-        kubectl -n monitoring wait --for condition=available deployment grafana
+        kubectl -n monitoring wait --for condition=available deployment grafana --timeout=120s
         curl --fail http://localhost:31003/api/health
     - name: Kubernetes Dashboard works
       run: |
         kubectl -n kubernetes-dashboard wait --for condition=available deployment kubernetes-dashboard
         curl --fail http://localhost:31001
-    - name: ElasticSearch comes online
-      run: |
-        echo "waiting for elasticsearch"
-        i=0
-        while true; do
-          i=$((i+1))
-          if [[ $i -eq 120 ]]; then
-            echo "timout waiting for ES"
-            break
-          elif kubectl -n monitoring get es | grep green > /dev/null; then
-            echo
-            break
-          else
-            echo -n .
-            sleep 1s
-          fi
-        done
-
-        curl -k --user "elastic:$(kubectl get -n monitoring secret dune-eck-es-elastic-user -o=jsonpath='{.data.elastic}' | base64 --decode)" https://localhost:31004/_cluster/health | grep "green" > /dev/null
-    - name: Kibana comes online
-      run: |
-        echo "waiting for Kibana"
-        i=0
-        while true; do
-          i=$((i+1))
-          if [[ $i -eq 120 ]]; then
-            echo "timout waiting for Kibana"
-            break
-          elif kubectl -n monitoring get kibana | grep green > /dev/null; then
-            echo
-            break
-          else
-            echo -n .
-            sleep 1s
-          fi
-        done
-
-        curl -k --user "elastic:$(kubectl get -n monitoring secret dune-eck-es-elastic-user -o=jsonpath='{.data.elastic}' | base64 --decode)" https://localhost:31005/api/status | grep "green" > /dev/null
 
 
