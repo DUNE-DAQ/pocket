@@ -140,12 +140,6 @@ kubectl-apply: kubectl external-manifests namespaces.local ## apply files in `ma
 	@>/dev/null 2>&1 $(KUBECTL) create ns csi-cvmfs ||:
 	@>/dev/null $(KUBECTL) apply -f manifests -f manifests/cvmfs
 
-ifeq ($(OPMON_ENABLED),0)
-	@echo -e "\e[33mskipping installation of opmon\e[0m"
-else
-	@$(MAKE) --no-print-directory opmon.local
-endif
-
 ifeq ($(ECK_ENABLED),0)
 	@echo -e "\e[33mskipping installation of Elastic stack\e[0m"
 else
@@ -163,6 +157,11 @@ else
 	@$(MAKE) --no-print-directory ers-topic
 endif
 
+ifeq ($(OPMON_ENABLED),0)
+	@echo -e "\e[33mskipping installation of opmon\e[0m"
+else
+	@$(MAKE) --no-print-directory opmon.local
+endif
 
 ifeq ($(DQM_ENABLED),0)
 	@echo -e "\e[33mskipping installation of DQM\e[0m"
