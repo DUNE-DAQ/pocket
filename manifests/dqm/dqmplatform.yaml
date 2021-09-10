@@ -32,7 +32,7 @@ spec:
           name: dqm-shared
 
       - name: dqmplatform
-        image: bonniek/dunedqmdotnet:0.9
+        image: bonniek/dunedqmdotnet:1.0
         ports:
         - containerPort: 80
         env:

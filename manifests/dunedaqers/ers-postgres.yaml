@@ -43,12 +43,21 @@ spec:
       storageClassName: 
       containers:
       - name: postgresql-pv-volume
-        image: postgres:11.12
+        image: postgres:12.8
         ports:
         - containerPort: 5432
           name: postgres
           protocol: TCP
+        env:
+        - name: POSTGRES_DB
+          value: ApplicationDbErrorReporting
         envFrom:
         - secretRef:
             name: postgres-secrets
-
+        volumeMounts:
+          - mountPath: /docker-entrypoint-initdb.d/
+            name: ers-sql
+      volumes:
+        - name: ers-sql
+          configMap:
+            name: ers-sql
