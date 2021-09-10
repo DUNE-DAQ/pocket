@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: grafana
-        image: bonniek/pocket-grafana:2.3
+        image: bonniek/pocket-grafana:2.4
         imagePullPolicy: Always
         ports:
         - containerPort: 3000
