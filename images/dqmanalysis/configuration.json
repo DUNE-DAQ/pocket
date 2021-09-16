@@ -1,0 +1,21 @@
+{
+    "Kafka":{
+        "Servers" : [
+            "kafka-svc.kafka-kraft:9092"
+        ],
+        "ClientId" : "AnalysisMiniServices",
+        "Channels" : {
+            "DQMInputs" : "testdunedqm",
+            "HandlerInputs" : "dunedqm-incommingchannel1",
+            "PlatformInputs" : "dunedqm-platforminputs"
+        }
+    },
+    "Database": {
+        "Server":"postgres-svc.dunedaqers",
+        "Port":"5432",
+        "Name":"DbDQMMonitoring",
+        "UserName":"admin",
+        "Password":"Secret from Kubernetes!"
+    },
+    "FileStorage": "/mnt/data"
+}
