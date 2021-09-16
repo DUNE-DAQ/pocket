@@ -230,8 +230,8 @@ images: images.grafana ## build all images
 
 .PHONY: images.grafana
 images.grafana: ## build Grafana image
-	docker build -t juravenator/pocket-grafana:latest images/grafana
-	docker push juravenator/pocket-grafana:latest
+	docker build -t dunedaq/pocket-grafana:latest images/grafana
+	docker push dunedaq/pocket-grafana:latest
 
 ##
 ### Dependencies
