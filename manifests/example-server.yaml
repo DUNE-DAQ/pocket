@@ -17,16 +17,41 @@ spec:
         image: gcr.io/google-samples/kubernetes-bootcamp:v1
         ports:
         - containerPort: 8080
+        volumeMounts:
+        - name: pocket
+          mountPath: /pocket  # in the container filesystem
+      volumes:
+      - name: pocket
+        persistentVolumeClaim: 
+            claimName: pocket-pvc          
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pocket-pvc
+  namespace: default
+  labels:
+    app: pocket
+spec:
+  storageClassName: manual
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      # The amount of the volume's storage to request
+      storage: 20Gi
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: example-server
 spec:
+  type: NodePort
   ports:
   - port: 80
     protocol: TCP
     name: http
     targetPort: 8080
+    nodePort: 32080
   selector:
     app: example-server
