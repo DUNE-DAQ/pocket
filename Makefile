@@ -99,7 +99,7 @@ dqmpostgres.local: kind kubectl external-manifests namespaces.local
 ers-kafka.local: kafka.local erspostgres.local
 	@echo "installing ers-kafka"
 
-	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/dunedaqers/aspcore.yaml ||:
+	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/dunedaqers/ers-aspcore.yaml ||:
 
 
 .PHONY: dqm-kafka.local
