@@ -108,16 +108,11 @@ dqm-kafka.local: kafka.local dqmpostgres.local
 
 	$(KUBECTL) apply -f manifests/dqm/dqmplatform.yaml ||:
 
+	@echo "installing opmon"
 
-.PHONY: kubectl-apply
-kubectl-apply: kubectl external-manifests namespaces.local ## apply files in `manifests` using kubectl
-	@echo "installing basic services"
-	@>/dev/null 2>&1 $(KUBECTL) create ns csi-cvmfs ||:
-	@>/dev/null $(KUBECTL) apply -f manifests -f manifests/cvmfs
 
-ifeq ($(OPMON_ENABLED),0)
-	@echo -e "\e[33mskipping installation of opmon\e[0m"
-else
+.PHONY: opmon.local
+opmon.local:
 	@echo "installing opmon"
 
 	@>/dev/null 2>&1 $(KUBECTL) -n monitoring create secret generic grafana-secrets \
@@ -138,17 +133,12 @@ else
 	--from-literal=INFLUXDB_HTTP_AUTH_ENABLED=false ||:
 
 	@>/dev/null $(KUBECTL) apply -f manifests/opmon
-endif
 
-ifeq ($(ECK_ENABLED),0)
-	@echo -e "\e[33mskipping installation of Elastic stack\e[0m"
-else
-	@echo "installing Elastic stack"
-	@>/dev/null $(KUBECTL) apply -f manifests/ECK/CRDs
-	@>/dev/null $(KUBECTL) wait --for condition=established --timeout=60s crd/kibanas.kibana.k8s.elastic.co
-
-	@>/dev/null $(KUBECTL) apply -f manifests/ECK
-endif
+.PHONY: kubectl-apply
+kubectl-apply: kubectl external-manifests namespaces.local ## apply files in `manifests` using kubectl
+	@echo "installing basic services"
+	@>/dev/null 2>&1 $(KUBECTL) create ns csi-cvmfs ||:
+	@>/dev/null $(KUBECTL) apply -f manifests -f manifests/cvmfs
 
 ifeq ($(ERS_ENABLED),0)
 	@echo -e "\e[33mskipping installation of Kafka-ERS\e[0m"
@@ -157,6 +147,11 @@ else
 	@$(MAKE) --no-print-directory ers-topic
 endif
 
+ifeq ($(OPMON_ENABLED),0)
+	@echo -e "\e[33mskipping installation of opmon\e[0m"
+else
+	@$(MAKE) --no-print-directory opmon.local
+endif
 
 ifeq ($(DQM_ENABLED),0)
 	@echo -e "\e[33mskipping installation of DQM\e[0m"
@@ -196,7 +191,7 @@ ers-topic: env
 	@echo "Configuring Kafka Topic erskafka-reporting"
 	@>/dev/null 2>&1 $(KUBECTL) -n kafka-kraft exec --stdin --tty kafka-0 -- kafka-topics.sh --create --bootstrap-server kafka-svc.kafka-kraft:9092 --partitions 1 --topic erskafka-reporting ||:
 
-.PHONY: dqm-topc
+.PHONY: dqm-topic
 dqm-topic: env
 	@echo "Configuring topics for DQM"
 	@>/dev/null 2>&1 $(KUBECTL) -n kafka-kraft exec --stdin --tty kafka-0 -- kafka-topics.sh --create --bootstrap-server kafka-svc.kafka-kraft:9092 --partitions 1 --topic testdunedqm ||:
@@ -226,12 +221,24 @@ print-access-creds: kubectl ## retrieve and print access data for provided servi
 ##
 
 .PHONY: images
-images: images.grafana ## build all images
+images: images.grafana images.kafka images.aspcore-ers images.aspcore-dqm## build all images
 
 .PHONY: images.grafana
 images.grafana: ## build Grafana image
 	docker build -t dunedaq/pocket-grafana:latest images/grafana
-	docker push dunedaq/pocket-grafana:latest
+# 	docker push juravenator/pocket-grafana:latest
+
+.PHONY: images.kafka
+images.kafka: ## build kafka image
+	docker build -t dunedaq/kafka-kraft:latest images/kafka
+
+.PHONY: images.aspcore-ers
+images.aspcore-ers: ## build aspcore-ers image
+	docker build -t dunedaq/aspcore-ers:latest images/aspcore-ers
+
+.PHONY: images.aspcore-dqm
+images.aspcore-dqm: ## build aspcore-ers image
+	docker build -t dunedaq/aspcore-dqm:latest images/aspcore-dqm
 
 ##
 ### Dependencies
@@ -299,10 +306,7 @@ endif
 	@chmod +x $(KUBECTL)
 
 .PHONY: external-manifests
-external-manifests: manifests/ECK/CRDs/eck.yaml manifests/kubernetes-dashboard-recommended.yaml manifests/cvmfs/deploy.yaml
-
-manifests/ECK/CRDs/eck.yaml: # fetch the ECK operator
-	@curl -Lo $@ --silent --fail https://download.elastic.co/downloads/eck/1.6.0/all-in-one.yaml
+external-manifests: manifests/kubernetes-dashboard-recommended.yaml manifests/cvmfs/deploy.yaml
 
 manifests/kubernetes-dashboard-recommended.yaml: # fetch kubernetes dashboard manifest
 	@curl -Lo $@ --silent --fail https://raw.githubusercontent.com/kubernetes/dashboard/v2.2.0/aio/deploy/recommended.yaml

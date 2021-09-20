@@ -1,0 +1,14 @@
+# syntax=docker/dockerfile:1
+FROM docker.io/dunedaq/sl7-minimal:latest
+
+SHELL ["/bin/bash", "-c"] 
+
+RUN mkdir -p /dunedaq/run
+
+ADD ./image /dunedaq/run
+
+COPY ./common/app-entrypoint.sh /dunedaq/run
+
+RUN chmod 755 /dunedaq/run/app-entrypoint.sh
+
+ENTRYPOINT [ "/dunedaq/run/app-entrypoint.sh" ]
