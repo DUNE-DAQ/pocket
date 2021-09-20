@@ -6,7 +6,7 @@ EXPOSE 80
 FROM mcr.microsoft.com/dotnet/core/sdk:3.1 AS build
 
 WORKDIR /src
-RUN git clone https://github.com/DUNE-DAQ/daqerrordisplay.git 
+RUN git clone https://github.com/DUNE-DAQ/daqerrordisplay.git -b v1.0.0
 
 WORKDIR "/src/daqerrordisplay/"
 RUN dotnet restore

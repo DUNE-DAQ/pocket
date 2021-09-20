@@ -1,4 +1,3 @@
-
 {
   "annotations": {
     "list": [
@@ -9,6 +8,12 @@
         "hide": true,
         "iconColor": "rgba(0, 211, 255, 1)",
         "name": "Annotations & Alerts",
+        "target": {
+          "limit": 100,
+          "matchAny": false,
+          "tags": [],
+          "type": "dashboard"
+        },
         "type": "dashboard"
       }
     ]
@@ -16,8 +21,8 @@
   "editable": true,
   "gnetId": null,
   "graphTooltip": 0,
-  "id": 2,
-  "iteration": 1627490513742,
+  "id": 1,
+  "iteration": 1632148069558,
   "links": [],
   "panels": [
     {
@@ -109,7 +114,7 @@
         "showHeader": true,
         "sortBy": []
       },
-      "pluginVersion": "7.5.7",
+      "pluginVersion": "8.1.1",
       "targets": [
         {
           "format": "table",
@@ -163,10 +168,6 @@
       "dashLength": 10,
       "dashes": false,
       "datasource": "influxdb",
-      "fieldConfig": {
-        "defaults": {},
-        "overrides": []
-      },
       "fill": 0,
       "fillGradient": 0,
       "gridPos": {
@@ -194,7 +195,7 @@
         "alertThreshold": true
       },
       "percentage": false,
-      "pluginVersion": "7.5.7",
+      "pluginVersion": "8.1.1",
       "pointradius": 1,
       "points": false,
       "renderer": "flot",
@@ -287,10 +288,6 @@
       "dashLength": 10,
       "dashes": false,
       "datasource": "influxdb",
-      "fieldConfig": {
-        "defaults": {},
-        "overrides": []
-      },
       "fill": 0,
       "fillGradient": 0,
       "gridPos": {
@@ -318,7 +315,7 @@
         "alertThreshold": true
       },
       "percentage": false,
-      "pluginVersion": "7.5.7",
+      "pluginVersion": "8.1.1",
       "pointradius": 1,
       "points": false,
       "renderer": "flot",
@@ -548,10 +545,6 @@
       "dashLength": 10,
       "dashes": false,
       "datasource": "influxdb",
-      "fieldConfig": {
-        "defaults": {},
-        "overrides": []
-      },
       "fill": 0,
       "fillGradient": 0,
       "gridPos": {
@@ -579,7 +572,7 @@
         "alertThreshold": true
       },
       "percentage": false,
-      "pluginVersion": "7.5.7",
+      "pluginVersion": "8.1.1",
       "pointradius": 1,
       "points": false,
       "renderer": "flot",
@@ -770,10 +763,6 @@
       "dashLength": 10,
       "dashes": false,
       "datasource": "influxdb",
-      "fieldConfig": {
-        "defaults": {},
-        "overrides": []
-      },
       "fill": 0,
       "fillGradient": 0,
       "gridPos": {
@@ -801,7 +790,7 @@
         "alertThreshold": true
       },
       "percentage": false,
-      "pluginVersion": "7.5.7",
+      "pluginVersion": "8.1.1",
       "pointradius": 1,
       "points": false,
       "renderer": "flot",
@@ -891,10 +880,6 @@
       "dashLength": 10,
       "dashes": false,
       "datasource": "influxdb",
-      "fieldConfig": {
-        "defaults": {},
-        "overrides": []
-      },
       "fill": 0,
       "fillGradient": 0,
       "gridPos": {
@@ -922,7 +907,7 @@
         "alertThreshold": true
       },
       "percentage": false,
-      "pluginVersion": "7.5.7",
+      "pluginVersion": "8.1.1",
       "pointradius": 1,
       "points": false,
       "renderer": "flot",
@@ -1043,10 +1028,6 @@
       "dashLength": 10,
       "dashes": false,
       "datasource": "influxdb",
-      "fieldConfig": {
-        "defaults": {},
-        "overrides": []
-      },
       "fill": 0,
       "fillGradient": 0,
       "gridPos": {
@@ -1074,7 +1055,7 @@
         "alertThreshold": true
       },
       "percentage": false,
-      "pluginVersion": "7.5.7",
+      "pluginVersion": "8.1.1",
       "pointradius": 1,
       "points": false,
       "renderer": "flot",
@@ -1288,10 +1269,6 @@
       "dashLength": 10,
       "dashes": false,
       "datasource": "influxdb",
-      "fieldConfig": {
-        "defaults": {},
-        "overrides": []
-      },
       "fill": 0,
       "fillGradient": 0,
       "gridPos": {
@@ -1320,7 +1297,7 @@
         "alertThreshold": true
       },
       "percentage": false,
-      "pluginVersion": "7.5.7",
+      "pluginVersion": "8.1.1",
       "pointradius": 1,
       "points": false,
       "renderer": "flot",
@@ -1457,10 +1434,6 @@
       "dashLength": 10,
       "dashes": false,
       "datasource": "influxdb",
-      "fieldConfig": {
-        "defaults": {},
-        "overrides": []
-      },
       "fill": 0,
       "fillGradient": 0,
       "gridPos": {
@@ -1489,7 +1462,7 @@
         "alertThreshold": true
       },
       "percentage": false,
-      "pluginVersion": "7.5.7",
+      "pluginVersion": "8.1.1",
       "pointradius": 1,
       "points": false,
       "renderer": "flot",
@@ -1577,10 +1550,6 @@
       "dashLength": 10,
       "dashes": false,
       "datasource": "influxdb",
-      "fieldConfig": {
-        "defaults": {},
-        "overrides": []
-      },
       "fill": 0,
       "fillGradient": 0,
       "gridPos": {
@@ -1607,7 +1576,7 @@
         "alertThreshold": true
       },
       "percentage": false,
-      "pluginVersion": "7.5.7",
+      "pluginVersion": "8.1.1",
       "pointradius": 2,
       "points": false,
       "renderer": "flot",
@@ -1690,32 +1659,34 @@
     }
   ],
   "refresh": "10s",
-  "schemaVersion": 27,
+  "schemaVersion": 30,
   "style": "dark",
   "tags": [],
   "templating": {
     "list": [
       {
+        "allValue": null,
         "current": {
           "selected": false,
-          "text": "glehmann_test",
-          "value": "glehmann_test"
+          "text": "ale_test",
+          "value": "ale_test"
         },
+        "datasource": null,
+        "definition": "SELECT partition FROM public.\"ErrorReports\"",
         "description": null,
         "error": null,
         "hide": 0,
+        "includeAll": false,
         "label": "Partition name",
+        "multi": false,
         "name": "partition",
-        "options": [
-          {
-            "selected": true,
-            "text": "glehmann_test",
-            "value": "glehmann_test"
-          }
-        ],
-        "query": "glehmann_test",
+        "options": [],
+        "query": "SELECT partition FROM public.\"ErrorReports\"",
+        "refresh": 1,
+        "regex": "",
         "skipUrlSync": false,
-        "type": "textbox"
+        "sort": 0,
+        "type": "query"
       }
     ]
   },
@@ -1749,7 +1720,7 @@
     ]
   },
   "timezone": "",
-  "title": "dunedaq-v2.8.0",
+  "title": "DAQ overview",
   "uid": "U_8ZFDZnz",
-  "version": 3
+  "version": 4
 }
