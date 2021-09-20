@@ -225,20 +225,20 @@ images: images.grafana images.kafka images.aspcore-ers images.aspcore-dqm## buil
 
 .PHONY: images.grafana
 images.grafana: ## build Grafana image
-	docker build -t dunedaq/pocket-grafana:latest images/grafana
+	docker buildx build -t dunedaq/pocket-grafana:latest images/grafana
 # 	docker push juravenator/pocket-grafana:latest
 
 .PHONY: images.kafka
 images.kafka: ## build kafka image
-	docker build -t dunedaq/kafka-kraft:latest images/kafka
+	docker buildx build -t dunedaq/kafka-kraft:latest images/kafka
 
 .PHONY: images.aspcore-ers
 images.aspcore-ers: ## build aspcore-ers image
-	docker build -t dunedaq/aspcore-ers:latest images/aspcore-ers
+	docker buildx build -t dunedaq/aspcore-ers:latest images/aspcore-ers
 
 .PHONY: images.aspcore-dqm
 images.aspcore-dqm: ## build aspcore-ers image
-	docker build -t dunedaq/aspcore-dqm:latest images/aspcore-dqm
+	docker buildx build -t dunedaq/aspcore-dqm:latest images/aspcore-dqm
 
 ##
 ### Dependencies
