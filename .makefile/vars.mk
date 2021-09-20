@@ -98,5 +98,17 @@ define node_hostname
 $(shell hostname)
 endef
 
-PGPASS := $(call random_password)
+ifeq ($(RANDOM_PWDS),1)
+	GF_SECURITY_SECRET_KEY := $(call random_password)
+	GF_SECURITY_ADMIN_PASSWORD :=$(call random_password)
+	INFLUXDB_USER_PASSWORD := $(call random_password)
+	INFLUXDB_ADMIN_USER_PASSWORD :=$(call random_password)
+	PGPASS :=$(call random_password)
+else	
+	GF_SECURITY_SECRET_KEY := "01234567890"
+	GF_SECURITY_ADMIN_PASSWORD := "run4evah"
+	INFLUXDB_USER_PASSWORD := "dunedaq"
+	INFLUXDB_ADMIN_USER_PASSWORD := "run4evah"
+	PGPASS := "run4evah"
+endif
 
