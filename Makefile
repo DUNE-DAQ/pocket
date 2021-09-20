@@ -38,10 +38,11 @@ setup.openstack: on-cern-network check_openstack_login terraform ansible depende
 	@cat ~/.kube/config | grep -Eo '://[a-zA-Z0-9-]*-pocketdune.cern.ch:' | tr -d '\012\015'
 	@echo "31000"
 
+
 .PHONY: namespaces.local
 namespaces.local: kind kubectl external-manifests
-
 	@echo "setting up namespaces"
+	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/cvmfs/ns-cvmfs.yaml ||:
 	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/dunedaqers/ns-kafka-kraft.yaml ||:
 	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/opmon/ns-monitoring.yaml ||:
 	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/dunedaqers/ns-ers.yaml ||:
@@ -50,7 +51,6 @@ namespaces.local: kind kubectl external-manifests
 
 .PHONY: kafka.local
 kafka.local: dependency.docker kind kubectl external-manifests namespaces.local
-
 	@echo "installing kafka"
 	@echo -n "setting advertised listener to "
 	@echo "$(call node_ip)"
@@ -59,6 +59,7 @@ kafka.local: dependency.docker kind kubectl external-manifests namespaces.local
 
 	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/dunedaqers/kafka.yaml ||:
 	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/dunedaqers/kafka-svc.yaml ||:
+
 
 .PHONY: erspostgres.local
 erspostgres.local: kind kubectl external-manifests namespaces.local
@@ -79,6 +80,7 @@ erspostgres.local: kind kubectl external-manifests namespaces.local
 	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/dunedaqers/ers-postgres-svc.yaml ||:
 	@>/dev/null 2>&1 $(KUBECTL) -n ers create configmap ers-sql --from-file manifests/dunedaqers/sql/ApplicationDbErrorReporting.sql
 
+
 .PHONY: dqmpostgres.local
 dqmpostgres.local: kind kubectl external-manifests namespaces.local
 	@echo "installing postgres"
@@ -94,6 +96,7 @@ dqmpostgres.local: kind kubectl external-manifests namespaces.local
 	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/dqm/dqm-postgres-svc.yaml ||:
 
 	$(KUBECTL) -n dqm create configmap dqm-sql --from-file manifests/dqm/sql/create_databases.sh --from-file manifests/dqm/sql/MonitoringDb.sql --from-file manifests/dqm/sql/MonitoringUserDb.sql
+
 
 .PHONY: ers-kafka.local
 ers-kafka.local: kafka.local erspostgres.local
@@ -134,11 +137,17 @@ opmon.local:
 
 	@>/dev/null $(KUBECTL) apply -f manifests/opmon
 
+
 .PHONY: kubectl-apply
 kubectl-apply: kubectl external-manifests namespaces.local ## apply files in `manifests` using kubectl
 	@echo "installing basic services"
-	@>/dev/null 2>&1 $(KUBECTL) create ns csi-cvmfs ||:
-	@>/dev/null $(KUBECTL) apply -f manifests -f manifests/cvmfs
+	@>/dev/null $(KUBECTL) apply -f manifests
+
+ifeq ($(CVMFS_ENABLED),0) 
+	@echo -e "\e[33mskipping installation of CVMFS stack\e[0m"
+else
+	@>/dev/null $(KUBECTL) apply -f manifests/cvmfs
+endif
 
 ifeq ($(ERS_ENABLED),0)
 	@echo -e "\e[33mskipping installation of Kafka-ERS\e[0m"

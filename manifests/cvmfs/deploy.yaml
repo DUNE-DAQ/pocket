@@ -65,15 +65,15 @@ parameters:
   repository: dunedaq.opensciencegrid.org
 ---
 # Source: cvmfs-csi/templates/storageclass.yaml
-apiVersion: storage.k8s.io/v1
-kind: StorageClass
-metadata:
-  name: cms.cern.ch
-provisioner: cvmfs.csi.cern.ch
-reclaimPolicy: Delete
-volumeBindingMode: Immediate
-parameters:
-  repository: cms.cern.ch
+# apiVersion: storage.k8s.io/v1
+# kind: StorageClass
+# metadata:
+#   name: cms.cern.ch
+# provisioner: cvmfs.csi.cern.ch
+# reclaimPolicy: Delete
+# volumeBindingMode: Immediate
+# parameters:
+#   repository: cms.cern.ch
 ---
 # Source: cvmfs-csi/templates/persistentvolumeclaim.yaml
 apiVersion: v1
@@ -89,17 +89,17 @@ spec:
   storageClassName: dunedaq.opensciencegrid.org
 ---
 # Source: cvmfs-csi/templates/persistentvolumeclaim.yaml
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: cms.cern.ch
-spec:
-  accessModes:
-  - ReadOnlyMany
-  resources:
-    requests:
-      storage: 1Gi
-  storageClassName: cms.cern.ch
+# apiVersion: v1
+# kind: PersistentVolumeClaim
+# metadata:
+#   name: cms.cern.ch
+# spec:
+#   accessModes:
+#   - ReadOnlyMany
+#   resources:
+#     requests:
+#       storage: 1Gi
+#   storageClassName: cms.cern.ch
 ---
 # Source: cvmfs-csi/templates/rbac-attacher.yaml
 # Attacher must be able to work with PVs, CSINodes and VolumeAttachments

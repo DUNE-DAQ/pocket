@@ -22,6 +22,12 @@ KUBECTL := $(KUBECTL_NOVER)-$(KUBECTL_VERSION)
 ##
 SERVICES ?= ""
 
+ifeq ($(findstring cvmfs,$(SERVICES)),)
+	CVMFS_ENABLED=0
+else
+	CVMFS_ENABLED=1
+endif
+
 ifeq ($(findstring opmon,$(SERVICES)),)
 	OPMON_ENABLED=0
 else
