@@ -18,7 +18,7 @@ spec:
           emptyDir: {}
       containers:
       - name: dqmanalysis
-        image: dunedaq/pocket-dqmanalysis:latest
+        image: dunedaq/pocket-dqmanalysis:1.0
         ports:
         - containerPort: 80
         env:
@@ -32,7 +32,7 @@ spec:
           name: dqm-shared
 
       - name: dqmplatform
-        image: dunedaq/pocket-dqmplatform:latest
+        image: dunedaq/pocket-dqmplatform:1.0
         ports:
         - containerPort: 80
         env:

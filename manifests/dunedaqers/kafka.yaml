@@ -51,7 +51,7 @@ spec:
             claimName: kafka-pv-claim
       containers:
         - name: kafka-container
-          image: dunedaq/pocket-kafka:latest
+          image: dunedaq/pocket-kafka:1.0
           ports:
             - containerPort: 30092
             - containerPort: 9092
