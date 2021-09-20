@@ -139,7 +139,7 @@ opmon.local:
 
 
 .PHONY: kubectl-apply
-kubectl-apply: kubectl external-manifests namespaces.local ## apply files in `manifests` using kubectl
+kubectl-apply: kubectl external-manifests namespaces.local share/ ## apply files in `manifests` using kubectl
 	@echo "installing basic services"
 	@>/dev/null $(KUBECTL) apply -f manifests
 
@@ -322,5 +322,8 @@ manifests/kubernetes-dashboard-recommended.yaml: # fetch kubernetes dashboard ma
 
 manifests/cvmfs/deploy.yaml: # fetch the CVMFS CSI Driver
 	@curl -Lo $@ --silent --fail https://raw.githubusercontent.com/Juravenator/cvmfs-csi/master/deployments/kubernetes/deploy.yaml
+
+share/:
+	@mkdir -p $@
 
 include .makefile/help.mk
