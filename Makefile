@@ -316,10 +316,7 @@ endif
 	@chmod +x $(KUBECTL)
 
 .PHONY: external-manifests
-external-manifests: manifests/ECK/CRDs/eck.yaml manifests/kubernetes-dashboard-recommended.yaml manifests/cvmfs/deploy.yaml
-
-manifests/ECK/CRDs/eck.yaml: # fetch the ECK operator
-	@curl -Lo $@ --silent --fail https://download.elastic.co/downloads/eck/1.6.0/all-in-one.yaml
+external-manifests: manifests/kubernetes-dashboard-recommended.yaml manifests/cvmfs/deploy.yaml
 
 manifests/kubernetes-dashboard-recommended.yaml: # fetch kubernetes dashboard manifest
 	@curl -Lo $@ --silent --fail https://raw.githubusercontent.com/kubernetes/dashboard/v2.2.0/aio/deploy/recommended.yaml
