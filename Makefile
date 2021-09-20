@@ -140,16 +140,6 @@ kubectl-apply: kubectl external-manifests namespaces.local ## apply files in `ma
 	@>/dev/null 2>&1 $(KUBECTL) create ns csi-cvmfs ||:
 	@>/dev/null $(KUBECTL) apply -f manifests -f manifests/cvmfs
 
-ifeq ($(ECK_ENABLED),0)
-	@echo -e "\e[33mskipping installation of Elastic stack\e[0m"
-else
-	@echo "installing Elastic stack"
-	@>/dev/null $(KUBECTL) apply -f manifests/ECK/CRDs
-	@>/dev/null $(KUBECTL) wait --for condition=established --timeout=60s crd/kibanas.kibana.k8s.elastic.co
-
-	@>/dev/null $(KUBECTL) apply -f manifests/ECK
-endif
-
 ifeq ($(ERS_ENABLED),0)
 	@echo -e "\e[33mskipping installation of Kafka-ERS\e[0m"
 else

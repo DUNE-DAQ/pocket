@@ -28,12 +28,6 @@ else
 	OPMON_ENABLED=1
 endif
 
-ifeq ($(findstring ECK,$(SERVICES)),)
-	ECK_ENABLED=0
-else
-	ECK_ENABLED=1
-endif
-
 ifeq ($(findstring ers,$(SERVICES)),)
 	ERS_ENABLED=0
 else
