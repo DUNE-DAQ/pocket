@@ -12,7 +12,7 @@ include .makefile/vars.mk
 #
 
 .PHONY: setup.local
-setup.local: dependency.docker kind kubectl ## start local setup
+setup.local: dependency.docker kind kubectl share/ ## start local setup
 	@$(KIND) create cluster --config local/kind.config.yml
 	@$(MAKE) --no-print-directory kubectl-apply
 	@echo ""
@@ -139,7 +139,7 @@ opmon.local:
 
 
 .PHONY: kubectl-apply
-kubectl-apply: kubectl external-manifests namespaces.local share/ ## apply files in `manifests` using kubectl
+kubectl-apply: kubectl external-manifests namespaces.local ## apply files in `manifests` using kubectl
 	@echo "installing basic services"
 	@>/dev/null $(KUBECTL) apply -f manifests
 
