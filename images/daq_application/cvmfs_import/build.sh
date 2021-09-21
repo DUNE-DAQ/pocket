@@ -32,9 +32,11 @@ echo "- Patching python environment "
 cd $HERE/image/dbt-pyvenv
 find -name __pycache__ -type d -prune -execdir rm -rf "{}" "+"
 
+set -x
 cd $HERE/image/dbt-pyvenv/bin
-sed -i 's|^#!.*|#!'$(realpath ./python)'|' *
+sed -i 's|^#!.*|#!/dunedaq/run/dbt-pyvenv/bin/python|' *
 sed -i 's|VIRTUAL_ENV=.*|VIRTUAL_ENV=$(cd $(dirname ${BASH_SOURCE[0]})/.. \&\& pwd)|' activate
+set +x
 
 cd $HERE
 
@@ -47,4 +49,4 @@ docker run --user $(id -u):$(id -g) -i -t --rm -v /cvmfs/dunedaq.opensciencegrid
 
 rm -rf image/build/*
 
-docker build --tag $DKR_TAG:$DKR_VERSION $HERE 
+docker buildx build --tag $DKR_TAG:$DKR_VERSION $HERE 
