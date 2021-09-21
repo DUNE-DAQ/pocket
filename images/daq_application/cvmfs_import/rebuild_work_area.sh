@@ -11,5 +11,6 @@ echo export LD_LIBRARY_PATH=$LD_LIBRARY_PATH >> run_env.sh
 echo export PATH=$PATH >> run_env.sh
 echo export READOUT_SHARE=$READOUT_SHARE >> run_env.sh
 echo export TIMING_SHARE=$TIMING_SHARE >> run_env.sh
+echo export TRACE_BIN=$TRACE_BIN >> run_env.sh
 echo export TRACE_FILE=$TRACE_FILE >> run_env.sh
 echo "Build completed"
