@@ -3,7 +3,7 @@ FROM docker.io/dunedaq/sl7-minimal:latest
 
 SHELL ["/bin/bash", "-c"] 
 
-RUN mkdir -p /dunedaq/run
+RUN mkdir -p /dunedaq
 
 ADD ./image /dunedaq/run
 
