@@ -1,9 +1,9 @@
-from grafana/grafana:8.1.1
+from grafana/grafana:8.1.8
 
 USER root
 
 # installing plugins
-RUN apk add --no-cache curl unzip
+RUN apk add curl unzip
 
 COPY dashboards /opt/grafana/dashboards
 

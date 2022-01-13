@@ -115,7 +115,7 @@ dqm-kafka.local: kafka.local dqmpostgres.local
 
 
 .PHONY: opmon.local
-opmon.local:
+opmon.local: erspostgres.local
 	@echo "installing opmon"
 
 	@>/dev/null 2>&1 $(KUBECTL) -n monitoring create secret generic grafana-secrets \
