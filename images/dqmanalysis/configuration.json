@@ -11,7 +11,7 @@
         }
     },
     "Database": {
-        "Server":"postgres-svc.dqm"
+        "Server":"postgres-svc.dqm",
         "Port":"5432",
         "Name":"DbDQMMonitoring",
         "UserName":"admin",
