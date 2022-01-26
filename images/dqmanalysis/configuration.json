@@ -6,9 +6,12 @@
         "ClientId" : "AnalysisMiniServices",
         "Channels" : {
             "DQMInputs" : "testdunedqm",
+            "FrequencyADC" : "dunedqm-incomingadcfrequency",
             "HandlerInputs" : "dunedqm-incommingchannel1",
+            "RawTriggerReader" : "dunedqm-incommingchannel2",
+            "PlatformOutputs" : "dunedqm-platformoutputs",
             "PlatformInputs" : "dunedqm-platforminputs"
-        }
+        },
     },
     "Database": {
         "Server":"postgres-svc.dqm",
