@@ -20,6 +20,7 @@ SET row_security = off;
 
 SET default_tablespace = '';
 
+\c DbDQMMonitoring
 --
 -- TOC entry 205 (class 1259 OID 18275)
 -- Name: Analyse; Type: TABLE; Schema: public; Owner: admin
