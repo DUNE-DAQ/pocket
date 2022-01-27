@@ -20,9 +20,16 @@ setup.local: dependency.docker kind kubectl share/ ## start local setup
 
 .PHONY: setup.multinode
 setup.multinode: kubernetes-yum
-	@$(KUBECTL) init --pod-network-cidr=10.244.0.0/16
-	@$(MAKE) --no-print-directory print-access-creds
+        cd multinode/ansible && \
+        ansible-playbook -i hosts.yaml playbook.yaml
 
+	KUBECONFIG=~/.kube/config:/tmp/kubeconfig-pocketdune $(KUBECTL) config view --flatten > /tmp/kubeconfig
+	cp /tmp/kubeconfig ~/.kube/config
+	$(KUBECTL) config use-context 'admin@pocketdune'
+	-$(KUBECTL) taint nodes --all node-role.kubernetes.io/master-
+	$(MAKE) --no-print-directory kubectl-apply
+
+	$(MAKE) --no-print-directory print-access-creds
 
 .PHONY: setup.openstack
 setup.openstack: on-cern-network check_openstack_login terraform ansible dependency.ssh ## create a setup in your openstack account

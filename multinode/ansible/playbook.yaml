@@ -11,15 +11,6 @@
       daemon_reload: no
       enabled: no
 
-  - name: disable selinux
-    selinux:
-      state: disabled
-    register: selinux
-
-  - name: reboot
-    reboot:
-    when: selinux.changed
-
   - name: Install Docker yum repo
     get_url:
       url: https://download.docker.com/linux/centos/docker-ce.repo
@@ -51,9 +42,9 @@
       - jq
       - tc
       - "{{ ( (ansible_facts.distribution_major_version | int) < 8) | ternary('libselinux-python','python3-libselinux') }}"
-      - kubelet-1.21.1
-      - kubeadm-1.21.1
-      - kubectl-1.21.1
+      - kubelet
+      - kubeadm
+      - kubectl
       state: latest
 
   - name: docker config folder
@@ -111,7 +102,7 @@
 
   - name: bootstrap cluster
     when: kube_conf_present.stat.exists == false
-    script: kubeadm-init.sh {{ lookup('env', 'OS_USERNAME') }}-pocketdune.cern.ch
+    script: kubeadm-init.sh {{ lookup('env', 'OS_USERNAME') }}
     register: bootstrap_script
     run_once: true
   - debug: var=bootstrap_script.stdout_lines
