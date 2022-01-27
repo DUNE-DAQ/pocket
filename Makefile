@@ -18,6 +18,12 @@ setup.local: dependency.docker kind kubectl share/ ## start local setup
 	@echo ""
 	@$(MAKE) --no-print-directory print-access-creds
 
+.PHONY: setup.multinode
+setup.multinode: kubernetes-yum
+	@$(KUBECTL) init --pod-network-cidr=10.244.0.0/16
+	@$(MAKE) --no-print-directory print-access-creds
+
+
 .PHONY: setup.openstack
 setup.openstack: on-cern-network check_openstack_login terraform ansible dependency.ssh ## create a setup in your openstack account
 	cd openstack/terraform && \
@@ -278,6 +284,10 @@ python3: dependency.python3 # check if python3 is installed
 .PHONY: on-cern-network
 on-cern-network:
 	@curl --connect-timeout 1 network.cern.ch > /dev/null 2>&1 || (echo -e "\e[31mThe CERN network is not accessible\e[0m" && exit 1)
+
+.PHONY: kuberbetes-yum
+kuberbetes-yum: ## fetch kubernetes binaries
+	@yum -y install kubeadm kubectl
 
 .PHONY: kind
 kind: $(KIND) ## fetch Kubernetes In Docker (KIND) binary
