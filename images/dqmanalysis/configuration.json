@@ -7,7 +7,8 @@
         "Channels" : {
             "DQMInputs" : "testdunedqm",
             "FrequencyADC" : "dunedqm-incomingadcfrequency",
-            "HandlerInputs" : "dunedqm-incommingchannel1",
+            "HandlerInputs-commented" : "dunedqm-incommingchannel1",
+            "HandlerInputs" : "testdunedqm",
             "RawTriggerReader" : "dunedqm-incommingchannel2",
             "PlatformOutputs" : "dunedqm-platformoutputs",
             "PlatformInputs" : "dunedqm-platforminputs"
