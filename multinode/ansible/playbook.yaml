@@ -3,6 +3,10 @@
 # https://gitlab.cern.ch/cms-cactus/ops/cactus-review/-/blob/master/docs/cactus-review-openstack/ansible/playbook.yaml
 
 - hosts: all
+  vars:
+    proxy_env:
+      http_proxy: http://np04-web-proxy.cern.ch:3128
+      https_proxy: http://np04-web-proxy.cern.ch:3128
   tasks:
   - name: disable firewalld
     systemd:
@@ -12,6 +16,9 @@
       enabled: no
 
   - name: Install Docker yum repo
+    environment: "{{ proxy_env }}"
+    become: yes
+    become_user: root
     get_url:
       url: https://download.docker.com/linux/centos/docker-ce.repo
       dest: /etc/yum.repos.d/docker-ce.repo
@@ -30,6 +37,7 @@
       dest: /etc/yum.repos.d/kubernetes.repo
 
   - name: install stuff
+    environment: "{{ proxy_env }}" 
     yum:
       name: 
       - docker-ce
@@ -45,7 +53,7 @@
       - kubelet
       - kubeadm
       - kubectl
-      state: latest
+      state: installed
 
   - name: docker config folder
     file:
