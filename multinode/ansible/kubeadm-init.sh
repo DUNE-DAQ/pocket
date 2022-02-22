@@ -8,7 +8,7 @@ LOAD_BALANCER_PORT=6443
 rm -rf /var/lib/etcd/lost+found
 kubeadm init --control-plane-endpoint "$LOAD_BALANCER_DNS:$LOAD_BALANCER_PORT" \
              --upload-certs \
-             --pod-network-cidr=192.168.0.0/16 \
+             --pod-network-cidr=192.168.66.0/8 \
              --ignore-preflight-errors=NumCPU
 
 mkdir -p $HOME/.kube

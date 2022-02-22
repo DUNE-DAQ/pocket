@@ -19,9 +19,9 @@ setup.local: dependency.docker kind kubectl share/ ## start local setup
 	@$(MAKE) --no-print-directory print-access-creds
 
 .PHONY: setup.multinode
-setup.multinode: kubernetes-yum
-        cd multinode/ansible && \
-        ansible-playbook -i hosts.yaml playbook.yaml
+setup.multinode: ansible dependency.ssh
+	cd multinode/ansible && \
+	ansible-playbook -i hosts.yaml playbook.yaml
 
 	KUBECONFIG=~/.kube/config:/tmp/kubeconfig-pocketdune $(KUBECTL) config view --flatten > /tmp/kubeconfig
 	cp /tmp/kubeconfig ~/.kube/config
@@ -51,6 +51,10 @@ setup.openstack: on-cern-network check_openstack_login terraform ansible depende
 	@cat ~/.kube/config | grep -Eo '://[a-zA-Z0-9-]*-pocketdune.cern.ch:' | tr -d '\012\015'
 	@echo "31000"
 
+.PHONY: setup.multinode
+setup.multinode: ansible dependency.ssh
+	cd multinode/ansible && \
+	ansible-playbook -i hosts.yaml playbook.yaml
 
 .PHONY: namespaces.local
 namespaces.local: kind kubectl external-manifests
@@ -286,7 +290,7 @@ endif
 
 .PHONY: python3
 python3: dependency.python3 # check if python3 is installed
-	@python3 --version | awk -F. '{if($$2<8)exit 1}' || (echo -e "\e[31mMinimum Python 3.8 is required\e[0m" && $(MAKE) --no-print-directory dependencyhint.python3)
+	@python3 --version | awk -F. '{if($$2<6)exit 1}' || (echo -e "\e[31mMinimum Python 3.8 is required\e[0m" && $(MAKE) --no-print-directory dependencyhint.python3)
 
 .PHONY: on-cern-network
 on-cern-network:
