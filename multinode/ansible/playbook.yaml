@@ -106,9 +106,14 @@
 
 # check if k8s cluster is present, create it if not
 - hosts: bootstrapper
+  vars:
+    proxy_env:
+      http_proxy: http://np04-web-proxy.cern.ch:3128
+      https_proxy: http://np04-web-proxy.cern.ch:3128
   tasks:
 
   - name: bootstrap cluster
+    environment: "{{ proxy_env }}"
     when: kube_conf_present.stat.exists == false
     script: kubeadm-init.sh {{ lookup('env', 'OS_USERNAME') }}
     register: bootstrap_script
@@ -116,6 +121,7 @@
   - debug: var=bootstrap_script.stdout_lines
 
   - name: fetch certificate key hash
+    environment: "{{ proxy_env }}"
     shell: kubeadm init phase upload-certs --upload-certs | tail -1
     register: certificate_key_script
     run_once: true
