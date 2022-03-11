@@ -56,3 +56,6 @@ nodes:
   - # example-server
     containerPort: 32080
     hostPort: 32080
+  - # daqconfig
+    containerPort: 31007
+    hostPort: 27017
