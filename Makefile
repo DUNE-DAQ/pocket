@@ -47,6 +47,7 @@ namespaces.local: kind kubectl external-manifests
 	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/opmon/ns-monitoring.yaml ||:
 	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/dunedaqers/ns-ers.yaml ||:
 	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/dqm/ns-dqm.yaml ||:
+	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/daqconfig/ns-daqconfig.yaml ||:
 
 
 .PHONY: kafka.local
@@ -76,7 +77,7 @@ erspostgres.local: kind kubectl external-manifests namespaces.local
 	@>/dev/null 2>&1 $(KUBECTL) -n ers create secret generic aspcore-secrets \
 	--from-literal=DOTNETPOSTGRES_PASSWORD="Password=$(PGPASS);" ||:
 
-	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/dunedaqers/ers-postgres.yaml ||: 
+	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/dunedaqers/ers-postgres.yaml ||:
 	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/dunedaqers/ers-postgres-svc.yaml ||:
 	@>/dev/null 2>&1 $(KUBECTL) -n ers create configmap ers-sql --from-file manifests/dunedaqers/sql/ApplicationDbErrorReporting.sql
 
@@ -92,7 +93,7 @@ dqmpostgres.local: kind kubectl external-manifests namespaces.local
 	@>/dev/null 2>&1 $(KUBECTL) -n dqm create secret generic aspcore-secrets \
 	--from-literal=DOTNETPOSTGRES_PASSWORD="Password=$(PGPASS);" ||:
 
-	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/dqm/dqm-postgres.yaml ||: 
+	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/dqm/dqm-postgres.yaml ||:
 	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/dqm/dqm-postgres-svc.yaml ||:
 
 	$(KUBECTL) -n dqm create configmap dqm-sql --from-file manifests/dqm/sql/create_databases.sh --from-file manifests/dqm/sql/MonitoringDb.sql --from-file manifests/dqm/sql/MonitoringUserDb.sql
@@ -113,6 +114,23 @@ dqm-kafka.local: kafka.local dqmpostgres.local
 
 	@echo "installing opmon"
 
+.PHONY: daqconfig.local
+daqconfig.local: daqconfig-mongo.local
+	@echo "installing config service"
+
+
+.PHONY: daqconfig-mongo.local
+daqconfig-mongo.local: kind kubectl external-manifests namespaces.local
+	@echo "installing mongodb"
+	@>/dev/null 2>&1 $(KUBECTL) -n daqconfig create secret generic daqconfig-mongodb \
+	--from-literal=publicKey="admin" \
+	--from-literal=privateKey="${MONGOPASS}"
+
+	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/daqconfig/volume-claim.yaml
+	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/daqconfig/persistent-volume-claim.yaml
+	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/daqconfig/mongodb-deployment.yaml
+	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/daqconfig/mongodb-nodeport-svc.yaml
+	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/daqconfig/mongodb-client.yaml
 
 .PHONY: opmon.local
 opmon.local: erspostgres.local
@@ -143,7 +161,7 @@ kubectl-apply: kubectl external-manifests namespaces.local ## apply files in `ma
 	@echo "installing basic services"
 	@>/dev/null $(KUBECTL) apply -f manifests
 
-ifeq ($(CVMFS_ENABLED),0) 
+ifeq ($(CVMFS_ENABLED),0)
 	@echo -e "\e[33mskipping installation of CVMFS stack\e[0m"
 else
 	@>/dev/null $(KUBECTL) apply -f manifests/cvmfs
@@ -167,6 +185,12 @@ ifeq ($(DQM_ENABLED),0)
 else
 	@$(MAKE) --no-print-directory dqm-kafka.local
 	@$(MAKE) --no-print-directory dqm-topic
+endif
+
+ifeq ($(DAQCONFIG_ENABLED),0)
+	@echo -e "\e[33mskipping installation of DAQConfig\e[0m"
+else
+	@$(MAKE) --no-print-directory daqconfig.local
 endif
 
 
