@@ -122,15 +122,15 @@ daqconfig.local: daqconfig-mongo.local
 .PHONY: daqconfig-mongo.local
 daqconfig-mongo.local: kind kubectl external-manifests namespaces.local
 	@echo "installing mongodb"
-	@>/dev/null 2>&1 $(KUBECTL) -n daqconfig create secret generic daqconfig-mongodb \
-	--from-literal=publicKey="admin" \
-	--from-literal=privateKey="${MONGOPASS}"
+	$(KUBECTL) -n daqconfig create secret generic daqconfig-secrets \
+	--from-literal=username="admin" \
+	--from-literal=password="${MONGOPASS}"
 
-	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/daqconfig/volume-claim.yaml
-	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/daqconfig/persistent-volume-claim.yaml
-	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/daqconfig/mongodb-deployment.yaml
-	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/daqconfig/mongodb-nodeport-svc.yaml
-	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/daqconfig/mongodb-client.yaml
+	$(KUBECTL) apply -f manifests/daqconfig/volumeclaim.yaml
+	$(KUBECTL) apply -f manifests/daqconfig/persistent-volume-claim.yaml
+	$(KUBECTL) apply -f manifests/daqconfig/mongodb-deployment.yaml
+	$(KUBECTL) apply -f manifests/daqconfig/mongodb-nodeport-svc.yaml
+# $(KUBECTL) apply -f manifests/daqconfig/mongodb-client.yaml
 
 .PHONY: opmon.local
 opmon.local: erspostgres.local

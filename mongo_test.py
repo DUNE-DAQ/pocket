@@ -1,7 +1,13 @@
 from pymongo import MongoClient
 from pprint import pprint
-
-client = MongoClient("127.0.0.1:27018")
+host='localhost'
+port=27017
+user='admin'
+pwd='run4evah'
+# client = MongoClient(f'mongodb://{user}:{pwd}@{host}:{port}')
+client = MongoClient()
+print('connected?')
+print(client.is_mongos)
 db=client.admin
 # Issue the serverStatus command and print the results
 serverStatusResult=db.command("serverStatus")

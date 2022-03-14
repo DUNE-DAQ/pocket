@@ -5,6 +5,7 @@ metadata:
   labels:
     app: mongo-client
   name: mongo-client
+  namespace: daqconfig
 spec:
   replicas: 1
   selector:
