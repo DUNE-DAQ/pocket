@@ -63,18 +63,18 @@ kafka.local: dependency.docker kind kubectl external-manifests namespaces.local
 
 .PHONY: erspostgres.local
 erspostgres.local: kind kubectl external-manifests namespaces.local
-	@echo "installing postgres"
+	@echo "installing postgres for ERS"
 
 	@>/dev/null 2>&1 $(KUBECTL) -n ers create secret generic postgres-secrets \
 	--from-literal=POSTGRES_USER="admin" \
-	--from-literal=POSTGRES_PASSWORD="$(PGPASS)" ||:
+	--from-literal=POSTGRES_PASSWORD="$(PGPASS)"
 
 	@>/dev/null 2>&1 $(KUBECTL) -n monitoring create secret generic postgres-secrets \
 	--from-literal=POSTGRES_USER="admin" \
-	--from-literal=POSTGRES_PASSWORD="$(PGPASS)" ||:
+	--from-literal=POSTGRES_PASSWORD="$(PGPASS)" 
 
 	@>/dev/null 2>&1 $(KUBECTL) -n ers create secret generic aspcore-secrets \
-	--from-literal=DOTNETPOSTGRES_PASSWORD="Password=$(PGPASS);" ||:
+	--from-literal=DOTNETPOSTGRES_PASSWORD="Password=$(PGPASS);" 
 
 	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/dunedaqers/ers-postgres.yaml ||: 
 	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/dunedaqers/ers-postgres-svc.yaml ||:
@@ -83,7 +83,7 @@ erspostgres.local: kind kubectl external-manifests namespaces.local
 
 .PHONY: dqmpostgres.local
 dqmpostgres.local: kind kubectl external-manifests namespaces.local
-	@echo "installing postgres"
+	@echo "installing postgres for DQM"
 
 	@>/dev/null 2>&1 $(KUBECTL) -n dqm create secret generic postgres-secrets \
 	--from-literal=POSTGRES_USER="admin" \
@@ -99,7 +99,7 @@ dqmpostgres.local: kind kubectl external-manifests namespaces.local
 
 
 .PHONY: ers-kafka.local
-ers-kafka.local: kafka.local erspostgres.local
+ers-kafka.local: kafka.local 
 	@echo "installing ers-kafka"
 
 	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/dunedaqers/ers-aspcore.yaml ||:
