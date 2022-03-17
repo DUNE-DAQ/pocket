@@ -54,7 +54,7 @@
       {
         "allValue": null,
         "current": {},
-        "datasource": influxdb,
+        "datasource": "influxdb",
         "definition": "SHOW TAG VALUES WITH KEY=\"partition_id\" WHERE $timeFilter",
         "description": null,
         "error": null,

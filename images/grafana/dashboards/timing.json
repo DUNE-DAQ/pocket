@@ -94,7 +94,7 @@
     },
     {
       "cacheTimeout": null,
-      "datasource": influxdb,
+      "datasource": "influxdb",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -177,7 +177,7 @@
     },
     {
       "columns": [],
-      "datasource": influxdb,
+      "datasource": "influxdb",
       "fontSize": "100%",
       "gridPos": {
         "h": 16,
@@ -252,7 +252,7 @@
       "type": "table-old"
     },
     {
-      "datasource": influxdb,
+      "datasource": "influxdb",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -371,7 +371,7 @@
       "type": "alertlist"
     },
     {
-      "datasource": influxdb,
+      "datasource": "influxdb",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -454,7 +454,7 @@
       "type": "stat"
     },
     {
-      "datasource": influxdb,
+      "datasource": "influxdb",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -551,7 +551,7 @@
       "type": "stat"
     },
     {
-      "datasource": influxdb,
+      "datasource": "influxdb",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -634,7 +634,7 @@
       "type": "stat"
     },
     {
-      "datasource": influxdb,
+      "datasource": "influxdb",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -763,7 +763,7 @@
         "noDataState": "no_data",
         "notifications": []
       },
-      "datasource": influxdb,
+      "datasource": "influxdb",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -866,7 +866,7 @@
       "type": "timeseries"
     },
     {
-      "datasource": influxdb,
+      "datasource": "influxdb",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -976,7 +976,7 @@
       "id": 26,
       "panels": [
         {
-          "datasource": influxdb,
+          "datasource": "influxdb",
           "fieldConfig": {
             "defaults": {
               "color": {
@@ -1114,7 +1114,7 @@
           "type": "timeseries"
         },
         {
-          "datasource": influxdb,
+          "datasource": "influxdb",
           "fieldConfig": {
             "defaults": {
               "color": {
@@ -1352,7 +1352,7 @@
           "type": "timeseries"
         },
         {
-          "datasource": influxdb,
+          "datasource": "influxdb",
           "fieldConfig": {
             "defaults": {
               "color": {
@@ -1467,7 +1467,7 @@
           "type": "timeseries"
         },
         {
-          "datasource": influxdb,
+          "datasource": "influxdb",
           "fieldConfig": {
             "defaults": {
               "color": {
@@ -1575,7 +1575,7 @@
           "type": "bargauge"
         },
         {
-          "datasource": influxdb,
+          "datasource": "influxdb",
           "fieldConfig": {
             "defaults": {
               "color": {
@@ -1790,7 +1790,7 @@
           "type": "bargauge"
         },
         {
-          "datasource": influxdb,
+          "datasource": "influxdb",
           "fieldConfig": {
             "defaults": {
               "color": {
@@ -1898,7 +1898,7 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": influxdb,
+      "datasource": "influxdb",
       "fill": 1,
       "fillGradient": 0,
       "gridPos": {
@@ -2001,7 +2001,7 @@
       }
     },
     {
-      "datasource": influxdb,
+      "datasource": "influxdb",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -2073,7 +2073,7 @@
       "type": "stat"
     },
     {
-      "datasource": influxdb,
+      "datasource": "influxdb",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -2159,7 +2159,7 @@
       "type": "bargauge"
     },
     {
-      "datasource": influxdb,
+      "datasource": "influxdb",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -2231,7 +2231,7 @@
       "type": "stat"
     },
     {
-      "datasource": influxdb,
+      "datasource": "influxdb",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -2338,7 +2338,7 @@
         "noDataState": "no_data",
         "notifications": []
       },
-      "datasource": influxdb,
+      "datasource": "influxdb",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -2455,7 +2455,7 @@
       "type": "row"
     },
     {
-      "datasource": influxdb,
+      "datasource": "influxdb",
       "description": "",
       "fieldConfig": {
         "defaults": {
@@ -2654,7 +2654,7 @@
       "type": "timeseries"
     },
     {
-      "datasource": influxdb,
+      "datasource": "influxdb",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -2726,7 +2726,7 @@
       "type": "stat"
     },
     {
-      "datasource": influxdb,
+      "datasource": "influxdb",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -2856,7 +2856,7 @@
       "type": "bargauge"
     },
     {
-      "datasource": influxdb,
+      "datasource": "influxdb",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -2929,7 +2929,7 @@
       "type": "stat"
     },
     {
-      "datasource": influxdb,
+      "datasource": "influxdb",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -3001,7 +3001,7 @@
       "type": "stat"
     },
     {
-      "datasource": influxdb,
+      "datasource": "influxdb",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -3077,7 +3077,7 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": influxdb,
+      "datasource": "influxdb",
       "fill": 1,
       "fillGradient": 0,
       "gridPos": {
@@ -3215,7 +3215,7 @@
         "noDataState": "no_data",
         "notifications": []
       },
-      "datasource": influxdb,
+      "datasource": "influxdb",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -3318,7 +3318,7 @@
       "type": "timeseries"
     },
     {
-      "datasource": influxdb,
+      "datasource": "influxdb",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -3386,7 +3386,7 @@
       "type": "stat"
     },
     {
-      "datasource": influxdb,
+      "datasource": "influxdb",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -3489,7 +3489,7 @@
         "noDataState": "no_data",
         "notifications": []
       },
-      "datasource": influxdb,
+      "datasource": "influxdb",
       "fieldConfig": {
         "defaults": {
           "color": {

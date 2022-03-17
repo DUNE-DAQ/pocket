@@ -70,7 +70,7 @@
       "type": "row"
     },
     {
-      "datasource": influxdb,
+      "datasource": "influxdb",
       "description": "",
       "fieldConfig": {
         "defaults": {
@@ -210,7 +210,7 @@
       "type": "timeseries"
     },
     {
-      "datasource": influxdb,
+      "datasource": "influxdb",
       "description": "",
       "fieldConfig": {
         "defaults": {
@@ -350,7 +350,7 @@
       "type": "timeseries"
     },
     {
-      "datasource": influxdb,
+      "datasource": "influxdb",
       "description": "",
       "fieldConfig": {
         "defaults": {
@@ -602,7 +602,7 @@
       "type": "timeseries"
     },
     {
-      "datasource": influxdb,
+      "datasource": "influxdb",
       "description": "",
       "fieldConfig": {
         "defaults": {
@@ -754,7 +754,7 @@
       {
         "allValue": null,
         "current": {},
-        "datasource": influxdb,
+        "datasource": "influxdb",
         "definition": "SHOW TAG VALUES WITH KEY=\"partition_id\" where $timeFilter",
         "description": null,
         "error": null,

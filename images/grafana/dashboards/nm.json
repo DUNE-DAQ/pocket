@@ -50,7 +50,7 @@
   "links": [],
   "panels": [
     {
-      "datasource": influxdb,
+      "datasource": "influxdb",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -190,7 +190,7 @@
       "type": "timeseries"
     },
     {
-      "datasource": influxdb,
+      "datasource": "influxdb",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -330,7 +330,7 @@
       "type": "timeseries"
     },
     {
-      "datasource": influxdb,
+      "datasource": "influxdb",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -629,7 +629,7 @@
       "type": "timeseries"
     },
     {
-      "datasource": influxdb,
+      "datasource": "influxdb",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -769,7 +769,7 @@
       "type": "timeseries"
     },
     {
-      "datasource": influxdb,
+      "datasource": "influxdb",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -909,7 +909,7 @@
       "type": "timeseries"
     },
     {
-      "datasource": influxdb,
+      "datasource": "influxdb",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -1049,7 +1049,7 @@
       "type": "timeseries"
     },
     {
-      "datasource": influxdb,
+      "datasource": "influxdb",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -1292,7 +1292,7 @@
       "type": "timeseries"
     },
     {
-      "datasource": influxdb,
+      "datasource": "influxdb",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -1444,7 +1444,7 @@
       "type": "row"
     },
     {
-      "datasource": influxdb,
+      "datasource": "influxdb",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -1640,7 +1640,7 @@
       "type": "row"
     },
     {
-      "datasource": influxdb,
+      "datasource": "influxdb",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -1836,7 +1836,7 @@
       {
         "allValue": null,
         "current": {},
-        "datasource": influxdb,
+        "datasource": "influxdb",
         "definition": "SHOW TAG VALUES WITH KEY=\"partition_id\" WHERE $timeFilter",
         "description": null,
         "error": null,
@@ -1856,7 +1856,7 @@
       {
         "allValue": null,
         "current": {},
-        "datasource": influxdb,
+        "datasource": "influxdb",
         "definition": "SHOW TAG VALUES FROM \"dunedaq.networkmanager.connectioninfo.Info\" WITH KEY=\"source_id\"  WHERE \"partition_id\"='$partition' AND $timeFilter",
         "description": null,
         "error": null,
@@ -1876,7 +1876,7 @@
       {
         "allValue": null,
         "current": {},
-        "datasource": influxdb,
+        "datasource": "influxdb",
         "definition": "SHOW TAG VALUES FROM \"dunedaq.networkmanager.connectioninfo.Info\" WITH KEY=\"source_id\"  WHERE \"partition_id\"='$partition' AND $timeFilter",
         "description": "This selection removes the topics from the source ids, in this way we can setup alarms on the connections",
         "error": null,
@@ -1896,7 +1896,7 @@
       {
         "allValue": null,
         "current": {},
-        "datasource": influxdb,
+        "datasource": "influxdb",
         "definition": "SHOW TAG VALUES FROM \"dunedaq.networkmanager.connectioninfo.Info\" WITH KEY=\"source_id\"  WHERE \"partition_id\"='$partition' AND $timeFilter",
         "description": "This selection removes the topics from the source ids, in this way we can setup alarms on the connections",
         "error": null,

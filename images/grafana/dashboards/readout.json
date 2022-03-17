@@ -70,7 +70,7 @@
       "type": "row"
     },
     {
-      "datasource": influxdb,
+      "datasource": "influxdb",
       "description": "",
       "fieldConfig": {
         "defaults": {
@@ -200,7 +200,7 @@
       "type": "timeseries"
     },
     {
-      "datasource": influxdb,
+      "datasource": "influxdb",
       "description": "",
       "fieldConfig": {
         "defaults": {
@@ -348,7 +348,7 @@
       "type": "timeseries"
     },
     {
-      "datasource": influxdb,
+      "datasource": "influxdb",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -816,7 +816,7 @@
       "type": "timeseries"
     },
     {
-      "datasource": influxdb,
+      "datasource": "influxdb",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -1110,7 +1110,7 @@
       "type": "timeseries"
     },
     {
-      "datasource": influxdb,
+      "datasource": "influxdb",
       "description": "",
       "fieldConfig": {
         "defaults": {
@@ -1296,7 +1296,7 @@
       "type": "timeseries"
     },
     {
-      "datasource": influxdb,
+      "datasource": "influxdb",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -1450,7 +1450,7 @@
       "type": "row"
     },
     {
-      "datasource": influxdb,
+      "datasource": "influxdb",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -1744,7 +1744,7 @@
       "type": "timeseries"
     },
     {
-      "datasource": influxdb,
+      "datasource": "influxdb",
       "description": "",
       "fieldConfig": {
         "defaults": {
@@ -1910,7 +1910,7 @@
       "type": "timeseries"
     },
     {
-      "datasource": influxdb,
+      "datasource": "influxdb",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -2390,7 +2390,7 @@
       {
         "allValue": null,
         "current": {},
-        "datasource": influxdb,
+        "datasource": "influxdb",
         "definition": "SHOW TAG VALUES WITH KEY=\"partition_id\" where $timeFilter",
         "description": null,
         "error": null,
@@ -2410,7 +2410,7 @@
       {
         "allValue": null,
         "current": {},
-        "datasource": influxdb,
+        "datasource": "influxdb",
         "definition": "SHOW  TAG VALUES  FROM \"dunedaq.readoutlibs.readoutinfo.RawDataProcessorInfo\" WITH KEY=\"source_id\" WHERE $timeFilter AND \"partition_id\"='${partition}'",
         "description": null,
         "error": null,
@@ -2430,7 +2430,7 @@
       {
         "allValue": null,
         "current": {},
-        "datasource": influxdb,
+        "datasource": "influxdb",
         "definition": "SHOW TAG VALUES FROM \"dunedaq.readoutlibs.readoutinfo.RawDataProcessorInfo\" WITH KEY=\"source_id\" WHERE $timeFilter AND \"partition_id\"='${partition}'",
         "description": null,
         "error": null,

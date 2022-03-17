@@ -68,7 +68,7 @@
   "links": [],
   "panels": [
     {
-      "datasource": influxdb,
+      "datasource": "influxdb",
       "description": "Only available for real HSI",
       "fieldConfig": {
         "defaults": {
@@ -179,7 +179,7 @@
       "type": "timeseries"
     },
     {
-      "datasource": influxdb,
+      "datasource": "influxdb",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -296,7 +296,7 @@
         "noDataState": "no_data",
         "notifications": []
       },
-      "datasource": influxdb,
+      "datasource": "influxdb",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -408,7 +408,7 @@
       "type": "timeseries"
     },
     {
-      "datasource": influxdb,
+      "datasource": "influxdb",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -505,7 +505,7 @@
       "type": "bargauge"
     },
     {
-      "datasource": influxdb,
+      "datasource": "influxdb",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -585,7 +585,7 @@
       "type": "stat"
     },
     {
-      "datasource": influxdb,
+      "datasource": "influxdb",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -665,7 +665,7 @@
       "type": "stat"
     },
     {
-      "datasource": influxdb,
+      "datasource": "influxdb",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -1007,7 +1007,7 @@
       "type": "timeseries"
     },
     {
-      "datasource": influxdb,
+      "datasource": "influxdb",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -1349,7 +1349,7 @@
       "type": "timeseries"
     },
     {
-      "datasource": influxdb,
+      "datasource": "influxdb",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -1652,7 +1652,7 @@
       {
         "allValue": null,
         "current": {},
-        "datasource": influxdb,
+        "datasource": "influxdb",
         "definition": "SHOW TAG VALUES WITH KEY=\"partition_id\" WHERE $timeFilter",
         "description": null,
         "error": null,
@@ -1672,7 +1672,7 @@
       {
         "allValue": null,
         "current": {},
-        "datasource": influxdb,
+        "datasource": "influxdb",
         "definition": "SHOW SERIES WHERE \"partition_id\"='${partition}' AND $timeFilter",
         "description": null,
         "error": null,
@@ -1692,7 +1692,7 @@
       {
         "allValue": null,
         "current": {},
-        "datasource": influxdb,
+        "datasource": "influxdb",
         "definition": "SHOW FIELD KEYS FROM \"dunedaq.timinglibs.${series}.Info\"",
         "description": null,
         "error": null,
@@ -1712,7 +1712,7 @@
       {
         "allValue": null,
         "current": {},
-        "datasource": influxdb,
+        "datasource": "influxdb",
         "definition": "SHOW TAG VALUES FROM \"dunedaq.trigger.moduleleveltriggerinfo.Info\" WITH KEY=\"source_id\" WHERE \"partition_id\"='${partition}' AND $timeFilter",
         "description": null,
         "error": null,
@@ -1732,7 +1732,7 @@
       {
         "allValue": null,
         "current": {},
-        "datasource": influxdb,
+        "datasource": "influxdb",
         "definition": "SHOW TAG VALUES FROM \"dunedaq.trigger.moduleleveltriggerinfo.Info\" WITH KEY=\"source_id\" WHERE \"partition_id\"='${partition}' AND $timeFilter",
         "description": null,
         "error": null,

@@ -140,7 +140,7 @@
     },
     {
       "cacheTimeout": null,
-      "datasource": influxdb,
+      "datasource": "influxdb",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -250,7 +250,7 @@
     },
     {
       "cacheTimeout": null,
-      "datasource": influxdb,
+      "datasource": "influxdb",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -372,7 +372,7 @@
       "type": "stat"
     },
     {
-      "datasource": influxdb,
+      "datasource": "influxdb",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -482,7 +482,7 @@
     },
     {
       "cacheTimeout": null,
-      "datasource": influxdb,
+      "datasource": "influxdb",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -578,7 +578,7 @@
     },
     {
       "cacheTimeout": null,
-      "datasource": influxdb,
+      "datasource": "influxdb",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -670,7 +670,7 @@
     },
     {
       "cacheTimeout": null,
-      "datasource": influxdb,
+      "datasource": "influxdb",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -796,7 +796,7 @@
     },
     {
       "cacheTimeout": null,
-      "datasource": influxdb,
+      "datasource": "influxdb",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -910,7 +910,7 @@
       "type": "stat"
     },
     {
-      "datasource": influxdb,
+      "datasource": "influxdb",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -1660,7 +1660,7 @@
       "type": "table"
     },
     {
-      "datasource": influxdb,
+      "datasource": "influxdb",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -1847,7 +1847,7 @@
       "type": "timeseries"
     },
     {
-      "datasource": influxdb,
+      "datasource": "influxdb",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -1967,7 +1967,7 @@
       "type": "timeseries"
     },
     {
-      "datasource": influxdb,
+      "datasource": "influxdb",
       "description": "",
       "fieldConfig": {
         "defaults": {
@@ -2301,7 +2301,7 @@
       {
         "allValue": null,
         "current": {},
-        "datasource": influxdb,
+        "datasource": "influxdb",
         "definition": "SHOW TAG VALUES WITH KEY=\"partition_id\" WHERE $timeFilter",
         "description": null,
         "error": null,
@@ -2321,7 +2321,7 @@
       {
         "allValue": null,
         "current": {},
-        "datasource": influxdb,
+        "datasource": "influxdb",
         "definition": "SHOW SERIES WHERE \"partition_id\"='${partition}' AND $timeFilter",
         "description": null,
         "error": null,
@@ -2341,7 +2341,7 @@
       {
         "allValue": null,
         "current": {},
-        "datasource": influxdb,
+        "datasource": "influxdb",
         "definition": "SHOW FIELD KEYS FROM \"dunedaq.timinglibs.${hsi_series}.Info\"",
         "description": null,
         "error": null,
@@ -2361,7 +2361,7 @@
       {
         "allValue": null,
         "current": {},
-        "datasource": influxdb,
+        "datasource": "influxdb",
         "definition": "SELECT last(\"runtime\") FROM \"dunedaq.rcif.runinfo.Info\" WHERE (\"partition_id\" = '${partition}') AND $timeFilter",
         "description": null,
         "error": null,

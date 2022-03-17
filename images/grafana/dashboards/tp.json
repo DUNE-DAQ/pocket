@@ -70,7 +70,7 @@
       "type": "row"
     },
     {
-      "datasource": influxdb,
+      "datasource": "influxdb",
       "description": "This should only contain the rates for TP DLHs",
       "fieldConfig": {
         "defaults": {
@@ -214,7 +214,7 @@
       "type": "row"
     },
     {
-      "datasource": influxdb,
+      "datasource": "influxdb",
       "description": "",
       "fieldConfig": {
         "defaults": {
@@ -349,7 +349,7 @@
       "type": "timeseries"
     },
     {
-      "datasource": influxdb,
+      "datasource": "influxdb",
       "description": "",
       "fieldConfig": {
         "defaults": {
@@ -535,7 +535,7 @@
       "type": "timeseries"
     },
     {
-      "datasource": influxdb,
+      "datasource": "influxdb",
       "description": "",
       "fieldConfig": {
         "defaults": {
@@ -713,7 +713,7 @@
       {
         "allValue": null,
         "current": {},
-        "datasource": influxdb,
+        "datasource": "influxdb",
         "definition": "SHOW TAG VALUES WITH KEY=\"partition_id\" where $timeFilter ",
         "description": null,
         "error": null,
@@ -733,7 +733,7 @@
       {
         "allValue": null,
         "current": {},
-        "datasource": influxdb,
+        "datasource": "influxdb",
         "definition": "SHOW  TAG VALUES FROM \"dunedaq.readoutlibs.readoutinfo.RequestHandlerInfo\" WITH KEY=\"source_id\" WHERE $timeFilter AND \"partition_id\"='${partition}'",
         "description": null,
         "error": null,
@@ -753,7 +753,7 @@
       {
         "allValue": null,
         "current": {},
-        "datasource": influxdb,
+        "datasource": "influxdb",
         "definition": "SHOW  TAG VALUES FROM \"dunedaq.readoutlibs.readoutinfo.RequestHandlerInfo\" WITH KEY=\"source_id\" WHERE $timeFilter AND \"partition_id\"='${partition}'",
         "description": null,
         "error": null,
