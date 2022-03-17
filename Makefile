@@ -126,11 +126,12 @@ daqconfig-mongo.local: kind kubectl external-manifests namespaces.local
 	--from-literal=username="admin" \
 	--from-literal=password="${MONGOPASS}"
 
-	$(KUBECTL) apply -f manifests/daqconfig/volumeclaim.yaml
-	$(KUBECTL) apply -f manifests/daqconfig/persistent-volume-claim.yaml
+# $(KUBECTL) apply -f manifests/daqconfig/volumeclaim.yaml
+# $(KUBECTL) apply -f manifests/daqconfig/persistent-volume-claim.yaml
 	$(KUBECTL) apply -f manifests/daqconfig/mongodb-deployment.yaml
 	$(KUBECTL) apply -f manifests/daqconfig/mongodb-nodeport-svc.yaml
-# $(KUBECTL) apply -f manifests/daqconfig/mongodb-client.yaml
+	$(KUBECTL) apply -f manifests/daqconfig/mongodb-clusterip-svc.yaml
+	$(KUBECTL) apply -f manifests/daqconfig/mongodb-client.yaml
 
 .PHONY: opmon.local
 opmon.local: erspostgres.local

@@ -1,39 +1,18 @@
----
 apiVersion: v1
 kind: Service
 metadata:
-  name: mongo-svc-ext
-  labels:
-    app: mongo
   namespace: daqconfig
+  name: mongo-db-svc-ext
+  labels:
+    app: mongo-db
 spec:
   type: NodePort
   ports:
-  - port: 27017
-    # name: exteral
-    # protocol: TCP
-    # targetPort: 27017
-    nodePort: 31007
+    - port: 27017
+      name: exteral
+      protocol: TCP
+      targetPort: 27017
+      nodePort: 31007
   selector:
-    app: mongo
-status:
-  loadBalancer: {}
+    app: mongo-db
 
-# PL 2022/04/10: not sure we need that?
-# 
-# ---
-# apiVersion: v1
-# kind: Service
-# metadata:
-#   name: mongo-svc
-#   labels:
-#     app: mongo
-#   namespace: daqconfig
-# spec:
-#   selector:
-#     app: mongo
-#   type: ClusterIP
-#   ports:
-#   - protocol: TCP
-#     port: 9092
-#     targetPort: 9092
