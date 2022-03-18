@@ -23,7 +23,10 @@ spec:
         name: daqconfig-service
         env:
         - name: MONGO_CONNECTION_STRING
-          value: 'mongodb://mongodb-user:run4evah@scram-mongodb-daqconfig-0.scram-mongodb-daqconfig-svc.daqconfig.svc.cluster.local:27017/admin?ssl=false'
+          valueFrom:
+            secretKeyRef:
+              name: scram-mongodb-daqconfig-admin-mongodb-user
+              key: .data.connectionString.standard
 ---
 apiVersion: v1
 kind: Service
