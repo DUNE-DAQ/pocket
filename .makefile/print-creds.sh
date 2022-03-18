@@ -148,6 +148,22 @@ function dqm_creds() {
 	${KUBECTL} get -n dqm secret aspcore-secrets -o=jsonpath='{.data.DOTNETPOSTGRES_PASSWORD}' | base64 --decode; echo
 }
 
+function daqconfig_creds() {
+    mongo_user=$(${KUBECTL} get secret scram-mongodb-daqconfig-admin-mongodb-user -n daqconfig -o=jsonpath='{.data.username}'|base64 --decode)
+    mongo_pass=$(${KUBECTL} get secret scram-mongodb-daqconfig-admin-mongodb-user -n daqconfig -o=jsonpath='{.data.password}'|base64 --decode)
+    echo -e "\e[34mDAQ config\e[0m"
+    echo "    mongo connection string (in-cluster):"
+    ${KUBECTL} get secret scram-mongodb-daqconfig-admin-mongodb-user -n daqconfig -o=jsonpath='{.data.connectionString\.standard}'|base64 --decode; echo
+    echo "username: ${mongo_user}"
+    echo "password: ${mongo_pass}"
+    echo
+    echo "    mongo connection string (out-cluster maybe?):"
+    # mongo_port=$(${KUBECTL} get service mongo-db-svc-ext -n daqconfig -o=jsonpath='{.spec.ports[0].nodePort}')
+    # mongo_port=27017 # That's in kind.config.yaml
+    # echo "mongodb://${mongo_user}:${mongo_pass}@${NODEPORT_IP}:${mongo_port}/admin?ssl=false"
+    echo
+}
+
 echo "Available services:"
 
 if >/dev/null 2>&1 ${KUBECTL} get crd/kibanas.kibana.k8s.elastic.co; then
@@ -176,6 +192,10 @@ fi
 
 if > /dev/null 2>&1 ${KUBECTL} -n dqm get service dqm-svc; then
   dqm_creds
+fi
+
+if > /dev/null 2>&1 ${KUBECTL} -n daqconfig get service mongodb-daqconfig-svc; then
+  daqconfig_creds
 fi
 dashboard_creds
 

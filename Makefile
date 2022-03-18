@@ -117,21 +117,24 @@ dqm-kafka.local: kafka.local dqmpostgres.local
 .PHONY: daqconfig.local
 daqconfig.local: daqconfig-mongo.local
 	@echo "installing config service"
+	$(KUBECTL) apply -f manifests/daqconfig/daqconfig-svc.yaml
 
 
 .PHONY: daqconfig-mongo.local
 daqconfig-mongo.local: kind kubectl external-manifests namespaces.local
 	@echo "installing mongodb"
-	$(KUBECTL) -n daqconfig create secret generic daqconfig-secrets \
-	--from-literal=username="admin" \
+	$(KUBECTL) -n daqconfig create secret generic mongodb-daqconfig-user-password \
 	--from-literal=password="${MONGOPASS}"
 
-# $(KUBECTL) apply -f manifests/daqconfig/volumeclaim.yaml
-# $(KUBECTL) apply -f manifests/daqconfig/persistent-volume-claim.yaml
-	$(KUBECTL) apply -f manifests/daqconfig/mongodb-deployment.yaml
-	$(KUBECTL) apply -f manifests/daqconfig/mongodb-nodeport-svc.yaml
-	$(KUBECTL) apply -f manifests/daqconfig/mongodb-clusterip-svc.yaml
-	$(KUBECTL) apply -f manifests/daqconfig/mongodb-client.yaml
+	$(KUBECTL) -n daqconfig create secret generic mongodb-daqconfig-admin-password \
+	--from-literal=password="${MONGOPASS}_ADMIN"
+
+	$(KUBECTL) apply -f manifests/daqconfig/mongodbcommunity.mongodb.com_mongodbcommunity.yaml
+	$(KUBECTL) apply -k manifests/daqconfig/rbac/
+	$(KUBECTL) create -f manifests/daqconfig/manager.yaml
+	$(KUBECTL) apply -f manifests/daqconfig/mongodb.com_v1_mongodbcommunity_cr.yaml
+	$(KUBECTL) apply -f manifests/daqconfig/mongodb-user.yaml
+#$(KUBECTL) apply -f manifests/daqconfig/mongodb-client.yaml
 
 .PHONY: opmon.local
 opmon.local: erspostgres.local

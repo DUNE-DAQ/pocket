@@ -110,5 +110,6 @@ else
 	INFLUXDB_USER_PASSWORD := "dunedaq"
 	INFLUXDB_ADMIN_USER_PASSWORD := "run4evah"
 	PGPASS := "run4evah"
+	MONGOPASS := "run4evah"
 endif
 
