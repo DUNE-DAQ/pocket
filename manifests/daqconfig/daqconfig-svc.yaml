@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: daqconfig-service
+  name: daqconfig-service
+  namespace: daqconfig
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: daqconfig-service
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: daqconfig-service
+    spec:
+      containers:
+      - image: plaso/daqconfig-service:latest
+        name: daqconfig-service
+        env:
+        - name: MONGO_CONNECTION_STRING
+          value: 'mongodb://mongodb-user:run4evah@scram-mongodb-daqconfig-0.scram-mongodb-daqconfig-svc.daqconfig.svc.cluster.local:27017/admin?ssl=false'
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: daqconfig
+  name: daqconfig-svc-ext
+  labels:
+    app: daqconfig-service
+spec:
+  type: NodePort
+  ports:
+    - port: 5003
+      name: external
+      protocol: TCP
+      targetPort: 5003
+      nodePort: 31011
+  selector:
+    app: mongo-db
+

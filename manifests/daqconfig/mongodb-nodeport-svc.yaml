@@ -9,7 +9,7 @@ spec:
   type: NodePort
   ports:
     - port: 27017
-      name: exteral
+      name: external
       protocol: TCP
       targetPort: 27017
       nodePort: 31007

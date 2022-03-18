@@ -1,0 +1,26 @@
+---
+apiVersion: mongodbcommunity.mongodb.com/v1
+kind: MongoDBCommunity
+metadata:
+  namespace: daqconfig
+  name: mongodb-daqconfig
+spec:
+  members: 1
+  type: ReplicaSet
+  version: "4.2.6"
+  security:
+    authentication:
+      modes: ["SCRAM"]
+  users:
+    - name: mongo-admin
+      db: admin
+      passwordSecretRef: # a reference to the secret that will be used to generate the user's password
+        name: mongo-daqconfig-admin-password
+      roles:
+        - name: clusterAdmin
+          db: admin
+        - name: userAdminAnyDatabase
+          db: admin
+      scramCredentialsSecretName: mongodb-scram
+  additionalMongodConfig:
+    storage.wiredTiger.engineConfig.journalCompressor: zlib
