@@ -26,7 +26,7 @@ spec:
           valueFrom:
             secretKeyRef:
               name: scram-mongodb-daqconfig-admin-mongodb-user
-              key: .data.connectionString.standard
+              key: connectionString.standard
 ---
 apiVersion: v1
 kind: Service
