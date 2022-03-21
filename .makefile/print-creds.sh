@@ -149,19 +149,17 @@ function dqm_creds() {
 }
 
 function daqconfig_creds() {
-    mongo_user=$(${KUBECTL} get secret scram-mongodb-daqconfig-admin-mongodb-user -n daqconfig -o=jsonpath='{.data.username}'|base64 --decode)
-    mongo_pass=$(${KUBECTL} get secret scram-mongodb-daqconfig-admin-mongodb-user -n daqconfig -o=jsonpath='{.data.password}'|base64 --decode)
+    mongo_user=$(${KUBECTL} get secret mongodb-root -n daqconfig -o=jsonpath='{.user}'|base64 --decode)
+    mongo_pass=$(${KUBECTL} get secret mongodb-root -n daqconfig -o=jsonpath='{.password}'|base64 --decode)
     echo -e "\e[34mDAQ config\e[0m"
-    echo "    mongo connection string (in-cluster):"
-    ${KUBECTL} get secret scram-mongodb-daqconfig-admin-mongodb-user -n daqconfig -o=jsonpath='{.data.connectionString\.standard}'|base64 --decode; echo
+    echo -n "    Mongo connection (in-cluster): mongodb-0:"
+    # ${KUBECTL} get secret -user -n daqconfig -o=jsonpath='{.data.connectionString\.standard}'|base64 --decode; echo
+    ${KUBECTL} -n daqconfig get service mongodb-svc-ext -ojsonpath='{.spec.ports[0].targetPort}'; echo
+    echo -n "    Mongo connection (out-cluster): http://${NODEPORT_IP}:"
+    ${KUBECTL} -n daqconfig get service mongodb-svc-ext -ojsonpath='{.spec.ports[0].nodePort}'; echo
+    echo "Mongo credentials"
     echo "username: ${mongo_user}"
     echo "password: ${mongo_pass}"
-    echo
-    echo "    mongo connection string (out-cluster maybe?):"
-    # mongo_port=$(${KUBECTL} get service mongo-db-svc-ext -n daqconfig -o=jsonpath='{.spec.ports[0].nodePort}')
-    # mongo_port=27017 # That's in kind.config.yaml
-    # echo "mongodb://${mongo_user}:${mongo_pass}@${NODEPORT_IP}:${mongo_port}/admin?ssl=false"
-    echo
 }
 
 echo "Available services:"
@@ -194,7 +192,7 @@ if > /dev/null 2>&1 ${KUBECTL} -n dqm get service dqm-svc; then
   dqm_creds
 fi
 
-if > /dev/null 2>&1 ${KUBECTL} -n daqconfig get service mongodb-daqconfig-svc; then
+if > /dev/null 2>&1 ${KUBECTL} -n daqconfig get service daqconfig-svc-ext; then
   daqconfig_creds
 fi
 dashboard_creds

@@ -117,23 +117,33 @@ dqm-kafka.local: kafka.local dqmpostgres.local
 .PHONY: daqconfig.local
 daqconfig.local: daqconfig-mongo.local
 	@echo "installing config service"
-	$(KUBECTL) apply -f manifests/daqconfig/daqconfig-svc.yaml
+	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/daqconfig/daqconfig-svc.yaml ||:
 
 
 .PHONY: daqconfig-mongo.local
 daqconfig-mongo.local: kind kubectl external-manifests namespaces.local
 	@echo "installing mongodb"
-	$(KUBECTL) -n daqconfig create secret generic mongodb-daqconfig-user-password \
-	--from-literal=password="${MONGOPASS}"
+	@>/dev/null 2>&1 $(KUBECTL) -n daqconfig create secret generic mongodb-root --from-literal=password="${MONGOPASS}" --from-literal=user="mongo_user" ||:
+	# @>/dev/null 2>&1 $(KUBECTL) create -f manifests/daqconfig/volume-claim.yaml
+	# @>/dev/null 2>&1 $(KUBECTL) create -f manifests/daqconfig/persistent-volume-claim.yaml
+	# @>/dev/null 2>&1 $(KUBECTL) create -f manifests/daqconfig/mongodb-deployment.yaml
+	# @>/dev/null 2>&1 $(KUBECTL) create -f manifests/daqconfig/mongodb-nodeport-svc.yaml
+	$(KUBECTL) create -f manifests/daqconfig/volume-claim.yaml ||:
+	$(KUBECTL) create -f manifests/daqconfig/persistent-volume-claim.yaml ||:
+	$(KUBECTL) create -f manifests/daqconfig/mongodb-statefulset.yaml ||:
+	$(KUBECTL) create -f manifests/daqconfig/mongodb-nodeport-svc.yaml ||:
 
-	$(KUBECTL) -n daqconfig create secret generic mongodb-daqconfig-admin-password \
-	--from-literal=password="${MONGOPASS}_ADMIN"
 
-	$(KUBECTL) apply -f manifests/daqconfig/mongodbcommunity.mongodb.com_mongodbcommunity.yaml
-	$(KUBECTL) apply -k manifests/daqconfig/rbac/
-	$(KUBECTL) create -f manifests/daqconfig/manager.yaml
-	$(KUBECTL) apply -f manifests/daqconfig/mongodb.com_v1_mongodbcommunity_cr.yaml
-	$(KUBECTL) apply -f manifests/daqconfig/mongodb-user.yaml
+# @>/dev/null 2>&1 $(KUBECTL) -n daqconfig create secret generic mongodb-daqconfig-admin-password \
+# --from-literal=password="${MONGOPASS}_ADMIN" ||:
+# @>/dev/null 2>&1 $(KUBECTL) apply -f manifests/daqconfig/mongodbcommunity.mongodb.com_mongodbcommunity.yaml ||:
+# @echo "Now waiting for the MongoDB operator to be up"
+# @>/dev/null 2>&1 $(KUBECTL) wait -n daqconfig --for=condition=Ready pod/mongodb-daqconfig-operator ||:
+# @echo "MongoDB operator is up!"
+# @>/dev/null 2>&1 $(KUBECTL) apply -k manifests/daqconfig/rbac/ ||:
+# @>/dev/null 2>&1 $(KUBECTL) create -f manifests/daqconfig/manager.yaml ||:
+# @>/dev/null 2>&1 $(KUBECTL) apply -f manifests/daqconfig/mongodb.com_v1_mongodbcommunity_cr.yaml ||:
+# @>/dev/null 2>&1 $(KUBECTL) apply -f manifests/daqconfig/mongodb-user.yaml ||:
 #$(KUBECTL) apply -f manifests/daqconfig/mongodb-client.yaml
 
 .PHONY: opmon.local
