@@ -149,17 +149,30 @@ function dqm_creds() {
 }
 
 function daqconfig_creds() {
-    mongo_user=$(${KUBECTL} get secret mongodb-root -n daqconfig -o=jsonpath='{.user}'|base64 --decode)
-    mongo_pass=$(${KUBECTL} get secret mongodb-root -n daqconfig -o=jsonpath='{.password}'|base64 --decode)
+    mongo_user=$(${KUBECTL} get secret mongodb-root -n daqconfig -o=jsonpath='{.data.user}'|base64 --decode)
+    mongo_pass=$(${KUBECTL} get secret mongodb-root -n daqconfig -o=jsonpath='{.data.password}'|base64 --decode)
+    echo
     echo -e "\e[34mDAQ config\e[0m"
-    echo -n "    Mongo connection (in-cluster): mongodb-0:"
+    echo -n "    Mongo connection (in-cluster): mongodb-svc-ext:"
     # ${KUBECTL} get secret -user -n daqconfig -o=jsonpath='{.data.connectionString\.standard}'|base64 --decode; echo
     ${KUBECTL} -n daqconfig get service mongodb-svc-ext -ojsonpath='{.spec.ports[0].targetPort}'; echo
     echo -n "    Mongo connection (out-cluster): http://${NODEPORT_IP}:"
     ${KUBECTL} -n daqconfig get service mongodb-svc-ext -ojsonpath='{.spec.ports[0].nodePort}'; echo
-    echo "Mongo credentials"
-    echo "username: ${mongo_user}"
-    echo "password: ${mongo_pass}"
+    echo "    Mongo credentials"
+    echo "        username: ${mongo_user}"
+    echo "        password: ${mongo_pass}"
+    echo
+    echo -n "    Mongo-express connection (in-cluster): mongo-express-ext-svc:"
+    ${KUBECTL} -n daqconfig get service mongo-express-ext-svc -ojsonpath='{.spec.ports[0].targetPort}'; echo
+    echo -n "    Mongo-express connection (out-cluster): http://${NODEPORT_IP}:"
+    ${KUBECTL} -n daqconfig get service mongo-express-ext-svc -ojsonpath='{.spec.ports[0].nodePort}'; echo
+    echo
+    echo -n "    Configuration utility connection (in-cluster): daqconfig-svc-ext:"
+    ${KUBECTL} -n daqconfig get service daqconfig-svc-ext -ojsonpath='{.spec.ports[0].targetPort}'; echo
+    echo -n "    Configuration utility connection (out-cluster): http://${NODEPORT_IP}:"
+    ${KUBECTL} -n daqconfig get service daqconfig-svc-ext -ojsonpath='{.spec.ports[0].nodePort}'; echo
+    echo
+    echo
 }
 
 echo "Available services:"

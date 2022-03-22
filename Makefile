@@ -124,14 +124,11 @@ daqconfig.local: daqconfig-mongo.local
 daqconfig-mongo.local: kind kubectl external-manifests namespaces.local
 	@echo "installing mongodb"
 	@>/dev/null 2>&1 $(KUBECTL) -n daqconfig create secret generic mongodb-root --from-literal=password="${MONGOPASS}" --from-literal=user="mongo_user" ||:
-	# @>/dev/null 2>&1 $(KUBECTL) create -f manifests/daqconfig/volume-claim.yaml
-	# @>/dev/null 2>&1 $(KUBECTL) create -f manifests/daqconfig/persistent-volume-claim.yaml
-	# @>/dev/null 2>&1 $(KUBECTL) create -f manifests/daqconfig/mongodb-deployment.yaml
-	# @>/dev/null 2>&1 $(KUBECTL) create -f manifests/daqconfig/mongodb-nodeport-svc.yaml
-	$(KUBECTL) create -f manifests/daqconfig/volume-claim.yaml ||:
-	$(KUBECTL) create -f manifests/daqconfig/persistent-volume-claim.yaml ||:
-	$(KUBECTL) create -f manifests/daqconfig/mongodb-statefulset.yaml ||:
-	$(KUBECTL) create -f manifests/daqconfig/mongodb-nodeport-svc.yaml ||:
+	@>/dev/null 2>&1 $(KUBECTL) create -f manifests/daqconfig/volume-claim.yaml ||:
+	@>/dev/null 2>&1 $(KUBECTL) create -f manifests/daqconfig/persistent-volume-claim.yaml ||:
+	@>/dev/null 2>&1 $(KUBECTL) create -f manifests/daqconfig/mongodb-statefulset.yaml ||:
+	@>/dev/null 2>&1 $(KUBECTL) create -f manifests/daqconfig/mongodb-nodeport-svc.yaml ||:
+	@>/dev/null 2>&1 $(KUBECTL) create -f manifests/daqconfig/mongo-express-deployment.yaml ||:
 
 
 # @>/dev/null 2>&1 $(KUBECTL) -n daqconfig create secret generic mongodb-daqconfig-admin-password \

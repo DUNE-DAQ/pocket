@@ -56,9 +56,12 @@ nodes:
   - # example-server
     containerPort: 32080
     hostPort: 32080
-  - # daqconfig-mongodb (never managed to actually connect it)
+  - # daqconfig-mongodb
     containerPort: 31007
     hostPort: 31007
   - # daqconfig-service
     containerPort: 31011
     hostPort: 31011
+  - # mongo-express for the daqconfig-mongodb
+    containerPort: 31012
+    hostPort: 31012
