@@ -8,4 +8,4 @@ spec:
   capacity:
     storage: 1Gi
   hostPath:
-    path: /nfs/home/plasorak/mongodb-data
+    path: /pocket/daqconfig-mongodb
