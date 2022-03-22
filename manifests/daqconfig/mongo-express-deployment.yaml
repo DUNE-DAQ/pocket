@@ -55,4 +55,4 @@ spec:
       protocol: TCP
       nodePort: 31012
   selector:
-    app: mongo-express-ext-svc
+    app: mongo-express
