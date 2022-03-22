@@ -22,8 +22,10 @@ spec:
       - image: mongo-express
         name: mongo-express
         env:
-        # - name: ME_CONFIG_MONGODB_ENABLE_ADMIN
-        #   value: false
+        - name: ME_CONFIG_OPTIONS_NO_DELETE
+          value: "true"
+        - name: ME_CONFIG_OPTIONS_READONLY
+          value: "true"
         - name: ME_CONFIG_MONGODB_PORT
           value: "27017"
         - name: ME_CONFIG_MONGODB_SERVER
