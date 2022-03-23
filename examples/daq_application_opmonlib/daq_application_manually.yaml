@@ -6,6 +6,7 @@ kind: Pod
 metadata:
   name: example-daq-app-manually
 spec:
+  hostPID: true
   containers:
   - name: sl7
     image: dunedaq/sl7:latest # yes, this image only has latest tages
