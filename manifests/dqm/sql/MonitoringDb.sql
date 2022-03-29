@@ -3,12 +3,9 @@
 --
 
 -- Dumped from database version 11.10
--- Dumped by pg_dump version 13.2
+-- Dumped by pg_dump version 14.1
 
--- Started on 2021-08-25 13:30:44
-
---- CREATE DATABASE "DbDQMMonitoring";
---- SET search_path = "DbDQMMonitoring";
+-- Started on 2022-01-19 15:14:52
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -24,9 +21,8 @@ SET row_security = off;
 SET default_tablespace = '';
 
 \c DbDQMMonitoring
-
 --
--- TOC entry 205 (class 1259 OID 17271)
+-- TOC entry 205 (class 1259 OID 18275)
 -- Name: Analyse; Type: TABLE; Schema: public; Owner: admin
 --
 
@@ -43,7 +39,7 @@ CREATE TABLE public."Analyse" (
 ALTER TABLE public."Analyse" OWNER TO admin;
 
 --
--- TOC entry 208 (class 1259 OID 17314)
+-- TOC entry 208 (class 1259 OID 18318)
 -- Name: AnalysisPannel; Type: TABLE; Schema: public; Owner: admin
 --
 
@@ -58,7 +54,7 @@ CREATE TABLE public."AnalysisPannel" (
 ALTER TABLE public."AnalysisPannel" OWNER TO admin;
 
 --
--- TOC entry 209 (class 1259 OID 17334)
+-- TOC entry 209 (class 1259 OID 18338)
 -- Name: AnalysisParameter; Type: TABLE; Schema: public; Owner: admin
 --
 
@@ -75,7 +71,7 @@ CREATE TABLE public."AnalysisParameter" (
 ALTER TABLE public."AnalysisParameter" OWNER TO admin;
 
 --
--- TOC entry 211 (class 1259 OID 17367)
+-- TOC entry 211 (class 1259 OID 18371)
 -- Name: AnalysisResult; Type: TABLE; Schema: public; Owner: admin
 --
 
@@ -91,7 +87,7 @@ CREATE TABLE public."AnalysisResult" (
 ALTER TABLE public."AnalysisResult" OWNER TO admin;
 
 --
--- TOC entry 197 (class 1259 OID 17210)
+-- TOC entry 197 (class 1259 OID 18214)
 -- Name: AnalysisSource; Type: TABLE; Schema: public; Owner: admin
 --
 
@@ -105,7 +101,7 @@ CREATE TABLE public."AnalysisSource" (
 ALTER TABLE public."AnalysisSource" OWNER TO admin;
 
 --
--- TOC entry 203 (class 1259 OID 17240)
+-- TOC entry 203 (class 1259 OID 18244)
 -- Name: Data; Type: TABLE; Schema: public; Owner: admin
 --
 
@@ -120,7 +116,24 @@ CREATE TABLE public."Data" (
 ALTER TABLE public."Data" OWNER TO admin;
 
 --
--- TOC entry 204 (class 1259 OID 17253)
+-- TOC entry 212 (class 1259 OID 20809)
+-- Name: DataAnalyse; Type: TABLE; Schema: public; Owner: admin
+--
+
+CREATE TABLE public."DataAnalyse" (
+    "Id" uuid NOT NULL,
+    "AnalyseId" uuid,
+    "DataId" uuid,
+    description text,
+    channel integer NOT NULL,
+    "dataDisplayId" uuid
+);
+
+
+ALTER TABLE public."DataAnalyse" OWNER TO admin;
+
+--
+-- TOC entry 204 (class 1259 OID 18257)
 -- Name: DataDisplay; Type: TABLE; Schema: public; Owner: admin
 --
 
@@ -136,7 +149,7 @@ CREATE TABLE public."DataDisplay" (
 ALTER TABLE public."DataDisplay" OWNER TO admin;
 
 --
--- TOC entry 210 (class 1259 OID 17352)
+-- TOC entry 210 (class 1259 OID 18356)
 -- Name: DataDisplayAnalyse; Type: TABLE; Schema: public; Owner: admin
 --
 
@@ -150,7 +163,7 @@ CREATE TABLE public."DataDisplayAnalyse" (
 ALTER TABLE public."DataDisplayAnalyse" OWNER TO admin;
 
 --
--- TOC entry 207 (class 1259 OID 17299)
+-- TOC entry 207 (class 1259 OID 18303)
 -- Name: DataDisplayData; Type: TABLE; Schema: public; Owner: admin
 --
 
@@ -164,7 +177,7 @@ CREATE TABLE public."DataDisplayData" (
 ALTER TABLE public."DataDisplayData" OWNER TO admin;
 
 --
--- TOC entry 206 (class 1259 OID 17286)
+-- TOC entry 206 (class 1259 OID 18290)
 -- Name: DataPaths; Type: TABLE; Schema: public; Owner: admin
 --
 
@@ -183,7 +196,7 @@ CREATE TABLE public."DataPaths" (
 ALTER TABLE public."DataPaths" OWNER TO admin;
 
 --
--- TOC entry 198 (class 1259 OID 17215)
+-- TOC entry 198 (class 1259 OID 18219)
 -- Name: DataSources; Type: TABLE; Schema: public; Owner: admin
 --
 
@@ -197,7 +210,7 @@ CREATE TABLE public."DataSources" (
 ALTER TABLE public."DataSources" OWNER TO admin;
 
 --
--- TOC entry 199 (class 1259 OID 17220)
+-- TOC entry 199 (class 1259 OID 18224)
 -- Name: DataType; Type: TABLE; Schema: public; Owner: admin
 --
 
@@ -212,7 +225,7 @@ CREATE TABLE public."DataType" (
 ALTER TABLE public."DataType" OWNER TO admin;
 
 --
--- TOC entry 200 (class 1259 OID 17225)
+-- TOC entry 200 (class 1259 OID 18229)
 -- Name: Pannel; Type: TABLE; Schema: public; Owner: admin
 --
 
@@ -226,7 +239,7 @@ CREATE TABLE public."Pannel" (
 ALTER TABLE public."Pannel" OWNER TO admin;
 
 --
--- TOC entry 201 (class 1259 OID 17230)
+-- TOC entry 201 (class 1259 OID 18234)
 -- Name: Parameter; Type: TABLE; Schema: public; Owner: admin
 --
 
@@ -240,7 +253,7 @@ CREATE TABLE public."Parameter" (
 ALTER TABLE public."Parameter" OWNER TO admin;
 
 --
--- TOC entry 202 (class 1259 OID 17235)
+-- TOC entry 202 (class 1259 OID 18239)
 -- Name: SamplingProfile; Type: TABLE; Schema: public; Owner: admin
 --
 
@@ -256,7 +269,7 @@ CREATE TABLE public."SamplingProfile" (
 ALTER TABLE public."SamplingProfile" OWNER TO admin;
 
 --
--- TOC entry 196 (class 1259 OID 17205)
+-- TOC entry 196 (class 1259 OID 18209)
 -- Name: __EFMigrationsHistory; Type: TABLE; Schema: public; Owner: admin
 --
 
@@ -269,174 +282,7 @@ CREATE TABLE public."__EFMigrationsHistory" (
 ALTER TABLE public."__EFMigrationsHistory" OWNER TO admin;
 
 --
--- TOC entry 3219 (class 0 OID 17271)
--- Dependencies: 205
--- Data for Name: Analyse; Type: TABLE DATA; Schema: public; Owner: admin
---
-
-COPY public."Analyse" ("Id", "AnalysisSourceId", "DataId", "Running", "Name", "Description") FROM stdin;
-\.
-
-
---
--- TOC entry 3222 (class 0 OID 17314)
--- Dependencies: 208
--- Data for Name: AnalysisPannel; Type: TABLE DATA; Schema: public; Owner: admin
---
-
-COPY public."AnalysisPannel" ("Id", "PannelId", "AnalyseId", "DataDisplayId") FROM stdin;
-\.
-
-
---
--- TOC entry 3223 (class 0 OID 17334)
--- Dependencies: 209
--- Data for Name: AnalysisParameter; Type: TABLE DATA; Schema: public; Owner: admin
---
-
-COPY public."AnalysisParameter" ("Id", "ParameterId", "AnalyseId", "Degree", "Interval", "Type") FROM stdin;
-\.
-
-
---
--- TOC entry 3225 (class 0 OID 17367)
--- Dependencies: 211
--- Data for Name: AnalysisResult; Type: TABLE DATA; Schema: public; Owner: admin
---
-
-COPY public."AnalysisResult" ("Id", "AnalysisParameterId", "DataPathId", "Decision", "Confidence") FROM stdin;
-\.
-
-
---
--- TOC entry 3211 (class 0 OID 17210)
--- Dependencies: 197
--- Data for Name: AnalysisSource; Type: TABLE DATA; Schema: public; Owner: admin
---
-
-COPY public."AnalysisSource" ("Id", "Name", "Description") FROM stdin;
-\.
-
-
---
--- TOC entry 3217 (class 0 OID 17240)
--- Dependencies: 203
--- Data for Name: Data; Type: TABLE DATA; Schema: public; Owner: admin
---
-
-COPY public."Data" ("Id", "DataSourceId", "RententionTime", "Name") FROM stdin;
-\.
-
-
---
--- TOC entry 3218 (class 0 OID 17253)
--- Dependencies: 204
--- Data for Name: DataDisplay; Type: TABLE DATA; Schema: public; Owner: admin
---
-
-COPY public."DataDisplay" ("Id", "DataTypeId", "SamplingProfileId", "PlotLength", "Name") FROM stdin;
-\.
-
-
---
--- TOC entry 3224 (class 0 OID 17352)
--- Dependencies: 210
--- Data for Name: DataDisplayAnalyse; Type: TABLE DATA; Schema: public; Owner: admin
---
-
-COPY public."DataDisplayAnalyse" ("Id", "AnalyseId", "DataDisplayId") FROM stdin;
-\.
-
-
---
--- TOC entry 3221 (class 0 OID 17299)
--- Dependencies: 207
--- Data for Name: DataDisplayData; Type: TABLE DATA; Schema: public; Owner: admin
---
-
-COPY public."DataDisplayData" ("Id", "DataId", "DataDisplayId") FROM stdin;
-\.
-
-
---
--- TOC entry 3220 (class 0 OID 17286)
--- Dependencies: 206
--- Data for Name: DataPaths; Type: TABLE DATA; Schema: public; Owner: admin
---
-
-COPY public."DataPaths" ("Id", "DataId", "WriteTime", "Path", "Storage", "Run", "SubRun", "EventNumber") FROM stdin;
-\.
-
-
---
--- TOC entry 3212 (class 0 OID 17215)
--- Dependencies: 198
--- Data for Name: DataSources; Type: TABLE DATA; Schema: public; Owner: admin
---
-
-COPY public."DataSources" ("Id", "Source", "Description") FROM stdin;
-\.
-
-
---
--- TOC entry 3213 (class 0 OID 17220)
--- Dependencies: 199
--- Data for Name: DataType; Type: TABLE DATA; Schema: public; Owner: admin
---
-
-COPY public."DataType" ("Id", "Name", "PlottingType", "Description") FROM stdin;
-8d83a885-c0aa-4d36-ab49-a93c8525d3f5	Heatmap plot	heatmap	Default heatmap plotting
-b0ab9f47-bd2a-462b-aa24-fb52b7184885	Histogram plot	histogram	Default histogram plotting
-7592e161-e925-4d58-9c68-0f93431e439c	Scatter plot with lines and markers	lines+markers	Default scatter plotting, Scatter plot with lines and markers
-34e44dd0-7219-493e-8cd9-c63d8a0387e3	Scatter plot with lines	lines	Scatter plot without markers (lines only)
-0e14499d-8106-4c05-953f-e52a5f91da8b	Scatter plot with markers	markers	Scatter plot without lines (markers only)
-\.
-
-
---
--- TOC entry 3214 (class 0 OID 17225)
--- Dependencies: 200
--- Data for Name: Pannel; Type: TABLE DATA; Schema: public; Owner: admin
---
-
-COPY public."Pannel" ("Id", "Name", "Description") FROM stdin;
-\.
-
-
---
--- TOC entry 3215 (class 0 OID 17230)
--- Dependencies: 201
--- Data for Name: Parameter; Type: TABLE DATA; Schema: public; Owner: admin
---
-
-COPY public."Parameter" ("Id", "Name", "Factor") FROM stdin;
-\.
-
-
---
--- TOC entry 3216 (class 0 OID 17235)
--- Dependencies: 202
--- Data for Name: SamplingProfile; Type: TABLE DATA; Schema: public; Owner: admin
---
-
-COPY public."SamplingProfile" ("Id", "Name", "PlottingType", "Description", "Factor") FROM stdin;
-c7b9ec99-1a44-4ef5-8b89-f6a0404fb4d4	Default	Default	Default 1:1 sampling	1
-\.
-
-
---
--- TOC entry 3210 (class 0 OID 17205)
--- Dependencies: 196
--- Data for Name: __EFMigrationsHistory; Type: TABLE DATA; Schema: public; Owner: admin
---
-
-COPY public."__EFMigrationsHistory" ("MigrationId", "ProductVersion") FROM stdin;
-20210730141657_initSeed	3.1.15
-\.
-
-
---
--- TOC entry 3047 (class 2606 OID 17275)
+-- TOC entry 3052 (class 2606 OID 18279)
 -- Name: Analyse PK_Analyse; Type: CONSTRAINT; Schema: public; Owner: admin
 --
 
@@ -445,7 +291,7 @@ ALTER TABLE ONLY public."Analyse"
 
 
 --
--- TOC entry 3059 (class 2606 OID 17318)
+-- TOC entry 3064 (class 2606 OID 18322)
 -- Name: AnalysisPannel PK_AnalysisPannel; Type: CONSTRAINT; Schema: public; Owner: admin
 --
 
@@ -454,7 +300,7 @@ ALTER TABLE ONLY public."AnalysisPannel"
 
 
 --
--- TOC entry 3063 (class 2606 OID 17341)
+-- TOC entry 3068 (class 2606 OID 18345)
 -- Name: AnalysisParameter PK_AnalysisParameter; Type: CONSTRAINT; Schema: public; Owner: admin
 --
 
@@ -463,7 +309,7 @@ ALTER TABLE ONLY public."AnalysisParameter"
 
 
 --
--- TOC entry 3071 (class 2606 OID 17374)
+-- TOC entry 3076 (class 2606 OID 18378)
 -- Name: AnalysisResult PK_AnalysisResult; Type: CONSTRAINT; Schema: public; Owner: admin
 --
 
@@ -472,7 +318,7 @@ ALTER TABLE ONLY public."AnalysisResult"
 
 
 --
--- TOC entry 3026 (class 2606 OID 17214)
+-- TOC entry 3031 (class 2606 OID 18218)
 -- Name: AnalysisSource PK_AnalysisSource; Type: CONSTRAINT; Schema: public; Owner: admin
 --
 
@@ -481,7 +327,7 @@ ALTER TABLE ONLY public."AnalysisSource"
 
 
 --
--- TOC entry 3039 (class 2606 OID 17247)
+-- TOC entry 3044 (class 2606 OID 18251)
 -- Name: Data PK_Data; Type: CONSTRAINT; Schema: public; Owner: admin
 --
 
@@ -490,7 +336,16 @@ ALTER TABLE ONLY public."Data"
 
 
 --
--- TOC entry 3043 (class 2606 OID 17260)
+-- TOC entry 3081 (class 2606 OID 20816)
+-- Name: DataAnalyse PK_DataAnalyse; Type: CONSTRAINT; Schema: public; Owner: admin
+--
+
+ALTER TABLE ONLY public."DataAnalyse"
+    ADD CONSTRAINT "PK_DataAnalyse" PRIMARY KEY ("Id");
+
+
+--
+-- TOC entry 3048 (class 2606 OID 18264)
 -- Name: DataDisplay PK_DataDisplay; Type: CONSTRAINT; Schema: public; Owner: admin
 --
 
@@ -499,7 +354,7 @@ ALTER TABLE ONLY public."DataDisplay"
 
 
 --
--- TOC entry 3067 (class 2606 OID 17356)
+-- TOC entry 3072 (class 2606 OID 18360)
 -- Name: DataDisplayAnalyse PK_DataDisplayAnalyse; Type: CONSTRAINT; Schema: public; Owner: admin
 --
 
@@ -508,7 +363,7 @@ ALTER TABLE ONLY public."DataDisplayAnalyse"
 
 
 --
--- TOC entry 3054 (class 2606 OID 17303)
+-- TOC entry 3059 (class 2606 OID 18307)
 -- Name: DataDisplayData PK_DataDisplayData; Type: CONSTRAINT; Schema: public; Owner: admin
 --
 
@@ -517,7 +372,7 @@ ALTER TABLE ONLY public."DataDisplayData"
 
 
 --
--- TOC entry 3050 (class 2606 OID 17293)
+-- TOC entry 3055 (class 2606 OID 18297)
 -- Name: DataPaths PK_DataPaths; Type: CONSTRAINT; Schema: public; Owner: admin
 --
 
@@ -526,7 +381,7 @@ ALTER TABLE ONLY public."DataPaths"
 
 
 --
--- TOC entry 3028 (class 2606 OID 17219)
+-- TOC entry 3033 (class 2606 OID 18223)
 -- Name: DataSources PK_DataSources; Type: CONSTRAINT; Schema: public; Owner: admin
 --
 
@@ -535,7 +390,7 @@ ALTER TABLE ONLY public."DataSources"
 
 
 --
--- TOC entry 3030 (class 2606 OID 17224)
+-- TOC entry 3035 (class 2606 OID 18228)
 -- Name: DataType PK_DataType; Type: CONSTRAINT; Schema: public; Owner: admin
 --
 
@@ -544,7 +399,7 @@ ALTER TABLE ONLY public."DataType"
 
 
 --
--- TOC entry 3032 (class 2606 OID 17229)
+-- TOC entry 3037 (class 2606 OID 18233)
 -- Name: Pannel PK_Pannel; Type: CONSTRAINT; Schema: public; Owner: admin
 --
 
@@ -553,7 +408,7 @@ ALTER TABLE ONLY public."Pannel"
 
 
 --
--- TOC entry 3034 (class 2606 OID 17234)
+-- TOC entry 3039 (class 2606 OID 18238)
 -- Name: Parameter PK_Parameter; Type: CONSTRAINT; Schema: public; Owner: admin
 --
 
@@ -562,7 +417,7 @@ ALTER TABLE ONLY public."Parameter"
 
 
 --
--- TOC entry 3036 (class 2606 OID 17239)
+-- TOC entry 3041 (class 2606 OID 18243)
 -- Name: SamplingProfile PK_SamplingProfile; Type: CONSTRAINT; Schema: public; Owner: admin
 --
 
@@ -571,7 +426,7 @@ ALTER TABLE ONLY public."SamplingProfile"
 
 
 --
--- TOC entry 3024 (class 2606 OID 17209)
+-- TOC entry 3029 (class 2606 OID 18213)
 -- Name: __EFMigrationsHistory PK___EFMigrationsHistory; Type: CONSTRAINT; Schema: public; Owner: admin
 --
 
@@ -580,7 +435,7 @@ ALTER TABLE ONLY public."__EFMigrationsHistory"
 
 
 --
--- TOC entry 3044 (class 1259 OID 17385)
+-- TOC entry 3049 (class 1259 OID 18389)
 -- Name: IX_Analyse_AnalysisSourceId; Type: INDEX; Schema: public; Owner: admin
 --
 
@@ -588,7 +443,7 @@ CREATE INDEX "IX_Analyse_AnalysisSourceId" ON public."Analyse" USING btree ("Ana
 
 
 --
--- TOC entry 3045 (class 1259 OID 17386)
+-- TOC entry 3050 (class 1259 OID 18390)
 -- Name: IX_Analyse_DataId; Type: INDEX; Schema: public; Owner: admin
 --
 
@@ -596,7 +451,7 @@ CREATE INDEX "IX_Analyse_DataId" ON public."Analyse" USING btree ("DataId");
 
 
 --
--- TOC entry 3055 (class 1259 OID 17387)
+-- TOC entry 3060 (class 1259 OID 18391)
 -- Name: IX_AnalysisPannel_AnalyseId; Type: INDEX; Schema: public; Owner: admin
 --
 
@@ -604,7 +459,7 @@ CREATE INDEX "IX_AnalysisPannel_AnalyseId" ON public."AnalysisPannel" USING btre
 
 
 --
--- TOC entry 3056 (class 1259 OID 17388)
+-- TOC entry 3061 (class 1259 OID 18392)
 -- Name: IX_AnalysisPannel_DataDisplayId; Type: INDEX; Schema: public; Owner: admin
 --
 
@@ -612,7 +467,7 @@ CREATE INDEX "IX_AnalysisPannel_DataDisplayId" ON public."AnalysisPannel" USING 
 
 
 --
--- TOC entry 3057 (class 1259 OID 17389)
+-- TOC entry 3062 (class 1259 OID 18393)
 -- Name: IX_AnalysisPannel_PannelId; Type: INDEX; Schema: public; Owner: admin
 --
 
@@ -620,7 +475,7 @@ CREATE INDEX "IX_AnalysisPannel_PannelId" ON public."AnalysisPannel" USING btree
 
 
 --
--- TOC entry 3060 (class 1259 OID 17390)
+-- TOC entry 3065 (class 1259 OID 18394)
 -- Name: IX_AnalysisParameter_AnalyseId; Type: INDEX; Schema: public; Owner: admin
 --
 
@@ -628,7 +483,7 @@ CREATE INDEX "IX_AnalysisParameter_AnalyseId" ON public."AnalysisParameter" USIN
 
 
 --
--- TOC entry 3061 (class 1259 OID 17391)
+-- TOC entry 3066 (class 1259 OID 18395)
 -- Name: IX_AnalysisParameter_ParameterId; Type: INDEX; Schema: public; Owner: admin
 --
 
@@ -636,7 +491,7 @@ CREATE INDEX "IX_AnalysisParameter_ParameterId" ON public."AnalysisParameter" US
 
 
 --
--- TOC entry 3068 (class 1259 OID 17392)
+-- TOC entry 3073 (class 1259 OID 18396)
 -- Name: IX_AnalysisResult_AnalysisParameterId; Type: INDEX; Schema: public; Owner: admin
 --
 
@@ -644,7 +499,7 @@ CREATE INDEX "IX_AnalysisResult_AnalysisParameterId" ON public."AnalysisResult" 
 
 
 --
--- TOC entry 3069 (class 1259 OID 17393)
+-- TOC entry 3074 (class 1259 OID 18397)
 -- Name: IX_AnalysisResult_DataPathId; Type: INDEX; Schema: public; Owner: admin
 --
 
@@ -652,7 +507,31 @@ CREATE INDEX "IX_AnalysisResult_DataPathId" ON public."AnalysisResult" USING btr
 
 
 --
--- TOC entry 3064 (class 1259 OID 17397)
+-- TOC entry 3077 (class 1259 OID 20827)
+-- Name: IX_DataAnalyse_AnalyseId; Type: INDEX; Schema: public; Owner: admin
+--
+
+CREATE INDEX "IX_DataAnalyse_AnalyseId" ON public."DataAnalyse" USING btree ("AnalyseId");
+
+
+--
+-- TOC entry 3078 (class 1259 OID 20828)
+-- Name: IX_DataAnalyse_DataId; Type: INDEX; Schema: public; Owner: admin
+--
+
+CREATE INDEX "IX_DataAnalyse_DataId" ON public."DataAnalyse" USING btree ("DataId");
+
+
+--
+-- TOC entry 3079 (class 1259 OID 20829)
+-- Name: IX_DataAnalyse_dataDisplayId; Type: INDEX; Schema: public; Owner: admin
+--
+
+CREATE INDEX "IX_DataAnalyse_dataDisplayId" ON public."DataAnalyse" USING btree ("dataDisplayId");
+
+
+--
+-- TOC entry 3069 (class 1259 OID 18401)
 -- Name: IX_DataDisplayAnalyse_AnalyseId; Type: INDEX; Schema: public; Owner: admin
 --
 
@@ -660,7 +539,7 @@ CREATE INDEX "IX_DataDisplayAnalyse_AnalyseId" ON public."DataDisplayAnalyse" US
 
 
 --
--- TOC entry 3065 (class 1259 OID 17398)
+-- TOC entry 3070 (class 1259 OID 18402)
 -- Name: IX_DataDisplayAnalyse_DataDisplayId; Type: INDEX; Schema: public; Owner: admin
 --
 
@@ -668,7 +547,7 @@ CREATE INDEX "IX_DataDisplayAnalyse_DataDisplayId" ON public."DataDisplayAnalyse
 
 
 --
--- TOC entry 3051 (class 1259 OID 17399)
+-- TOC entry 3056 (class 1259 OID 18403)
 -- Name: IX_DataDisplayData_DataDisplayId; Type: INDEX; Schema: public; Owner: admin
 --
 
@@ -676,7 +555,7 @@ CREATE INDEX "IX_DataDisplayData_DataDisplayId" ON public."DataDisplayData" USIN
 
 
 --
--- TOC entry 3052 (class 1259 OID 17400)
+-- TOC entry 3057 (class 1259 OID 18404)
 -- Name: IX_DataDisplayData_DataId; Type: INDEX; Schema: public; Owner: admin
 --
 
@@ -684,7 +563,7 @@ CREATE INDEX "IX_DataDisplayData_DataId" ON public."DataDisplayData" USING btree
 
 
 --
--- TOC entry 3040 (class 1259 OID 17395)
+-- TOC entry 3045 (class 1259 OID 18399)
 -- Name: IX_DataDisplay_DataTypeId; Type: INDEX; Schema: public; Owner: admin
 --
 
@@ -692,7 +571,7 @@ CREATE INDEX "IX_DataDisplay_DataTypeId" ON public."DataDisplay" USING btree ("D
 
 
 --
--- TOC entry 3041 (class 1259 OID 17396)
+-- TOC entry 3046 (class 1259 OID 18400)
 -- Name: IX_DataDisplay_SamplingProfileId; Type: INDEX; Schema: public; Owner: admin
 --
 
@@ -700,7 +579,7 @@ CREATE INDEX "IX_DataDisplay_SamplingProfileId" ON public."DataDisplay" USING bt
 
 
 --
--- TOC entry 3048 (class 1259 OID 17401)
+-- TOC entry 3053 (class 1259 OID 18405)
 -- Name: IX_DataPaths_DataId; Type: INDEX; Schema: public; Owner: admin
 --
 
@@ -708,7 +587,7 @@ CREATE INDEX "IX_DataPaths_DataId" ON public."DataPaths" USING btree ("DataId");
 
 
 --
--- TOC entry 3037 (class 1259 OID 17394)
+-- TOC entry 3042 (class 1259 OID 18398)
 -- Name: IX_Data_DataSourceId; Type: INDEX; Schema: public; Owner: admin
 --
 
@@ -716,7 +595,7 @@ CREATE INDEX "IX_Data_DataSourceId" ON public."Data" USING btree ("DataSourceId"
 
 
 --
--- TOC entry 3075 (class 2606 OID 17276)
+-- TOC entry 3085 (class 2606 OID 18280)
 -- Name: Analyse FK_Analyse_AnalysisSource_AnalysisSourceId; Type: FK CONSTRAINT; Schema: public; Owner: admin
 --
 
@@ -725,7 +604,7 @@ ALTER TABLE ONLY public."Analyse"
 
 
 --
--- TOC entry 3076 (class 2606 OID 17281)
+-- TOC entry 3086 (class 2606 OID 18285)
 -- Name: Analyse FK_Analyse_Data_DataId; Type: FK CONSTRAINT; Schema: public; Owner: admin
 --
 
@@ -734,7 +613,7 @@ ALTER TABLE ONLY public."Analyse"
 
 
 --
--- TOC entry 3080 (class 2606 OID 17319)
+-- TOC entry 3090 (class 2606 OID 18323)
 -- Name: AnalysisPannel FK_AnalysisPannel_Analyse_AnalyseId; Type: FK CONSTRAINT; Schema: public; Owner: admin
 --
 
@@ -743,7 +622,7 @@ ALTER TABLE ONLY public."AnalysisPannel"
 
 
 --
--- TOC entry 3081 (class 2606 OID 17324)
+-- TOC entry 3091 (class 2606 OID 18328)
 -- Name: AnalysisPannel FK_AnalysisPannel_DataDisplay_DataDisplayId; Type: FK CONSTRAINT; Schema: public; Owner: admin
 --
 
@@ -752,7 +631,7 @@ ALTER TABLE ONLY public."AnalysisPannel"
 
 
 --
--- TOC entry 3082 (class 2606 OID 17329)
+-- TOC entry 3092 (class 2606 OID 18333)
 -- Name: AnalysisPannel FK_AnalysisPannel_Pannel_PannelId; Type: FK CONSTRAINT; Schema: public; Owner: admin
 --
 
@@ -761,7 +640,7 @@ ALTER TABLE ONLY public."AnalysisPannel"
 
 
 --
--- TOC entry 3083 (class 2606 OID 17342)
+-- TOC entry 3093 (class 2606 OID 18346)
 -- Name: AnalysisParameter FK_AnalysisParameter_Analyse_AnalyseId; Type: FK CONSTRAINT; Schema: public; Owner: admin
 --
 
@@ -770,7 +649,7 @@ ALTER TABLE ONLY public."AnalysisParameter"
 
 
 --
--- TOC entry 3084 (class 2606 OID 17347)
+-- TOC entry 3094 (class 2606 OID 18351)
 -- Name: AnalysisParameter FK_AnalysisParameter_Parameter_ParameterId; Type: FK CONSTRAINT; Schema: public; Owner: admin
 --
 
@@ -779,7 +658,7 @@ ALTER TABLE ONLY public."AnalysisParameter"
 
 
 --
--- TOC entry 3087 (class 2606 OID 17375)
+-- TOC entry 3097 (class 2606 OID 18379)
 -- Name: AnalysisResult FK_AnalysisResult_AnalysisParameter_AnalysisParameterId; Type: FK CONSTRAINT; Schema: public; Owner: admin
 --
 
@@ -788,7 +667,7 @@ ALTER TABLE ONLY public."AnalysisResult"
 
 
 --
--- TOC entry 3088 (class 2606 OID 17380)
+-- TOC entry 3098 (class 2606 OID 18384)
 -- Name: AnalysisResult FK_AnalysisResult_DataPaths_DataPathId; Type: FK CONSTRAINT; Schema: public; Owner: admin
 --
 
@@ -797,7 +676,43 @@ ALTER TABLE ONLY public."AnalysisResult"
 
 
 --
--- TOC entry 3085 (class 2606 OID 17357)
+-- TOC entry 3099 (class 2606 OID 20817)
+-- Name: DataAnalyse FK_DataAnalyse_Analyse_AnalyseId; Type: FK CONSTRAINT; Schema: public; Owner: admin
+--
+
+ALTER TABLE ONLY public."DataAnalyse"
+    ADD CONSTRAINT "FK_DataAnalyse_Analyse_AnalyseId" FOREIGN KEY ("AnalyseId") REFERENCES public."Analyse"("Id") ON DELETE RESTRICT;
+
+
+--
+-- TOC entry 3100 (class 2606 OID 20822)
+-- Name: DataAnalyse FK_DataAnalyse_DataDisplay_DataId; Type: FK CONSTRAINT; Schema: public; Owner: admin
+--
+
+ALTER TABLE ONLY public."DataAnalyse"
+    ADD CONSTRAINT "FK_DataAnalyse_DataDisplay_DataId" FOREIGN KEY ("DataId") REFERENCES public."DataDisplay"("Id") ON DELETE RESTRICT;
+
+
+--
+-- TOC entry 3102 (class 2606 OID 20835)
+-- Name: DataAnalyse FK_DataAnalyse_DataDisplay_dataDisplayId; Type: FK CONSTRAINT; Schema: public; Owner: admin
+--
+
+ALTER TABLE ONLY public."DataAnalyse"
+    ADD CONSTRAINT "FK_DataAnalyse_DataDisplay_dataDisplayId" FOREIGN KEY ("dataDisplayId") REFERENCES public."DataDisplay"("Id") ON DELETE RESTRICT;
+
+
+--
+-- TOC entry 3101 (class 2606 OID 20830)
+-- Name: DataAnalyse FK_DataAnalyse_Data_DataId; Type: FK CONSTRAINT; Schema: public; Owner: admin
+--
+
+ALTER TABLE ONLY public."DataAnalyse"
+    ADD CONSTRAINT "FK_DataAnalyse_Data_DataId" FOREIGN KEY ("DataId") REFERENCES public."Data"("Id") ON DELETE RESTRICT;
+
+
+--
+-- TOC entry 3095 (class 2606 OID 18361)
 -- Name: DataDisplayAnalyse FK_DataDisplayAnalyse_Analyse_AnalyseId; Type: FK CONSTRAINT; Schema: public; Owner: admin
 --
 
@@ -806,7 +721,7 @@ ALTER TABLE ONLY public."DataDisplayAnalyse"
 
 
 --
--- TOC entry 3086 (class 2606 OID 17362)
+-- TOC entry 3096 (class 2606 OID 18366)
 -- Name: DataDisplayAnalyse FK_DataDisplayAnalyse_DataDisplay_DataDisplayId; Type: FK CONSTRAINT; Schema: public; Owner: admin
 --
 
@@ -815,7 +730,7 @@ ALTER TABLE ONLY public."DataDisplayAnalyse"
 
 
 --
--- TOC entry 3078 (class 2606 OID 17304)
+-- TOC entry 3088 (class 2606 OID 18308)
 -- Name: DataDisplayData FK_DataDisplayData_DataDisplay_DataDisplayId; Type: FK CONSTRAINT; Schema: public; Owner: admin
 --
 
@@ -824,7 +739,7 @@ ALTER TABLE ONLY public."DataDisplayData"
 
 
 --
--- TOC entry 3079 (class 2606 OID 17309)
+-- TOC entry 3089 (class 2606 OID 18313)
 -- Name: DataDisplayData FK_DataDisplayData_Data_DataId; Type: FK CONSTRAINT; Schema: public; Owner: admin
 --
 
@@ -833,7 +748,7 @@ ALTER TABLE ONLY public."DataDisplayData"
 
 
 --
--- TOC entry 3073 (class 2606 OID 17261)
+-- TOC entry 3083 (class 2606 OID 18265)
 -- Name: DataDisplay FK_DataDisplay_DataType_DataTypeId; Type: FK CONSTRAINT; Schema: public; Owner: admin
 --
 
@@ -842,7 +757,7 @@ ALTER TABLE ONLY public."DataDisplay"
 
 
 --
--- TOC entry 3074 (class 2606 OID 17266)
+-- TOC entry 3084 (class 2606 OID 18270)
 -- Name: DataDisplay FK_DataDisplay_SamplingProfile_SamplingProfileId; Type: FK CONSTRAINT; Schema: public; Owner: admin
 --
 
@@ -851,7 +766,7 @@ ALTER TABLE ONLY public."DataDisplay"
 
 
 --
--- TOC entry 3077 (class 2606 OID 17294)
+-- TOC entry 3087 (class 2606 OID 18298)
 -- Name: DataPaths FK_DataPaths_Data_DataId; Type: FK CONSTRAINT; Schema: public; Owner: admin
 --
 
@@ -860,7 +775,7 @@ ALTER TABLE ONLY public."DataPaths"
 
 
 --
--- TOC entry 3072 (class 2606 OID 17248)
+-- TOC entry 3082 (class 2606 OID 18252)
 -- Name: Data FK_Data_DataSources_DataSourceId; Type: FK CONSTRAINT; Schema: public; Owner: admin
 --
 
@@ -868,7 +783,7 @@ ALTER TABLE ONLY public."Data"
     ADD CONSTRAINT "FK_Data_DataSources_DataSourceId" FOREIGN KEY ("DataSourceId") REFERENCES public."DataSources"("Id") ON DELETE CASCADE;
 
 
--- Completed on 2021-08-25 13:30:45
+-- Completed on 2022-01-19 15:14:54
 
 --
 -- PostgreSQL database dump complete

@@ -1,9 +1,9 @@
 # syntax=docker/dockerfile:1
-FROM mcr.microsoft.com/dotnet/core/aspnet:3.1-buster-slim AS base
+FROM mcr.microsoft.com/dotnet/aspnet:3.1-buster-slim AS base
 WORKDIR /src
 EXPOSE 80
 
-FROM mcr.microsoft.com/dotnet/core/sdk:3.1 AS build
+FROM mcr.microsoft.com/dotnet/sdk:3.1 AS build
 
 WORKDIR /src
 #RUN git clone https://github.com/DUNE-DAQ/dqmplatform.git

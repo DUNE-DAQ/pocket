@@ -1,0 +1,17 @@
+apiVersion: v1
+
+
+kind: PersistentVolumeClaim
+metadata:
+  name: mongodb-data
+  namespace: daqconfig
+  labels:
+    type: local
+spec:
+  storageClassName: ""
+  accessModes:
+    - ReadWriteOnce 
+  volumeName: mongodb-data
+  resources:
+    requests:
+      storage: 1Gi

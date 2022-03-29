@@ -1,3 +1,5 @@
 images/daq_application/cvmfs_import/common/
 images/daq_application/cvmfs_import/image/
 share/
+env
+*~

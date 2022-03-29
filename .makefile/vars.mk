@@ -46,6 +46,12 @@ else
 	DQM_ENABLED=1
 endif
 
+ifeq ($(findstring daqconfig,$(SERVICES)),)
+	DAQCONFIG_ENABLED=0
+else
+	DAQCONFIG_ENABLED=1
+endif
+
 ##
 ## Helper variables so we download the right binaries for your machine
 ##
@@ -104,11 +110,13 @@ ifeq ($(RANDOM_PWDS),1)
 	INFLUXDB_USER_PASSWORD := $(call random_password)
 	INFLUXDB_ADMIN_USER_PASSWORD :=$(call random_password)
 	PGPASS :=$(call random_password)
+	MONGOPASS :=$(call random_password)
 else	
 	GF_SECURITY_SECRET_KEY := "01234567890"
 	GF_SECURITY_ADMIN_PASSWORD := "run4evah"
 	INFLUXDB_USER_PASSWORD := "dunedaq"
 	INFLUXDB_ADMIN_USER_PASSWORD := "run4evah"
 	PGPASS := "run4evah"
+	MONGOPASS := "run4evah"
 endif
 

@@ -148,6 +148,33 @@ function dqm_creds() {
 	${KUBECTL} get -n dqm secret aspcore-secrets -o=jsonpath='{.data.DOTNETPOSTGRES_PASSWORD}' | base64 --decode; echo
 }
 
+function daqconfig_creds() {
+    mongo_user=$(${KUBECTL} get secret mongodb-root -n daqconfig -o=jsonpath='{.data.user}'|base64 --decode)
+    mongo_pass=$(${KUBECTL} get secret mongodb-root -n daqconfig -o=jsonpath='{.data.password}'|base64 --decode)
+    echo
+    echo -e "\e[34mDAQ config\e[0m"
+    echo -n "    Mongo connection (in-cluster): mongodb-svc-ext:"
+    # ${KUBECTL} get secret -user -n daqconfig -o=jsonpath='{.data.connectionString\.standard}'|base64 --decode; echo
+    ${KUBECTL} -n daqconfig get service mongodb-svc-ext -ojsonpath='{.spec.ports[0].targetPort}'; echo
+    echo -n "    Mongo connection (out-cluster): http://${NODEPORT_IP}:"
+    ${KUBECTL} -n daqconfig get service mongodb-svc-ext -ojsonpath='{.spec.ports[0].nodePort}'; echo
+    echo "    Mongo credentials"
+    echo "        username: ${mongo_user}"
+    echo "        password: ${mongo_pass}"
+    echo
+    echo -n "    Mongo-express connection (in-cluster): mongo-express-ext-svc:"
+    ${KUBECTL} -n daqconfig get service mongo-express-ext-svc -ojsonpath='{.spec.ports[0].targetPort}'; echo
+    echo -n "    Mongo-express connection (out-cluster): http://${NODEPORT_IP}:"
+    ${KUBECTL} -n daqconfig get service mongo-express-ext-svc -ojsonpath='{.spec.ports[0].nodePort}'; echo
+    echo
+    echo -n "    Configuration utility connection (in-cluster): daqconfig-svc-ext:"
+    ${KUBECTL} -n daqconfig get service daqconfig-svc-ext -ojsonpath='{.spec.ports[0].targetPort}'; echo
+    echo -n "    Configuration utility connection (out-cluster): http://${NODEPORT_IP}:"
+    ${KUBECTL} -n daqconfig get service daqconfig-svc-ext -ojsonpath='{.spec.ports[0].nodePort}'; echo
+    echo
+    echo
+}
+
 echo "Available services:"
 
 if >/dev/null 2>&1 ${KUBECTL} get crd/kibanas.kibana.k8s.elastic.co; then
@@ -176,6 +203,10 @@ fi
 
 if > /dev/null 2>&1 ${KUBECTL} -n dqm get service dqm-svc; then
   dqm_creds
+fi
+
+if > /dev/null 2>&1 ${KUBECTL} -n daqconfig get service daqconfig-svc-ext; then
+  daqconfig_creds
 fi
 dashboard_creds
 
