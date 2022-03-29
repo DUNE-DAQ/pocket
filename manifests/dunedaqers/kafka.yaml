@@ -2,7 +2,7 @@ apiVersion: v1
 kind: PersistentVolume
 metadata:
   name: kafka-pv-volume
-  namespace: kafka-kraft
+  namespace: maroda-test
   labels:
     type: local
 spec:
@@ -18,7 +18,7 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: kafka-pv-claim
-  namespace: kafka-kraft
+  namespace: maroda-test
 spec:
   storageClassName: manual
   accessModes:
@@ -33,7 +33,7 @@ metadata:
   name: kafka
   labels:
     app: kafka-app
-  namespace: kafka-kraft
+  namespace: maroda-test
 spec:
   serviceName: kafka-svc
   replicas: 1
@@ -61,7 +61,7 @@ spec:
             - name: SERVICE
               value: kafka-svc
             - name: NAMESPACE
-              value: kafka-kraft
+              value: maroda-test
             - name: SHARE_DIR
               value: /mnt/kafka
             - name: EXTERNAL_LISTENER

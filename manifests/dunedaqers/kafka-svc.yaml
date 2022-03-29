@@ -5,7 +5,7 @@ metadata:
   name: kafka-svc-ext
   labels:
     app: kafka-app
-  namespace: kafka-kraft
+  namespace: maroda-test
 spec:
   type: NodePort
   ports:
@@ -23,7 +23,7 @@ metadata:
   name: kafka-svc
   labels:
     app: kafka-app
-  namespace: kafka-kraft
+  namespace: maroda-test
 spec:
   selector:
     app: kafka-app
