@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1
-FROM docker.io/dunedaq/sl7-minimal:latest
+FROM docker.io/dunedaq/c8-minimal:latest
 
 SHELL ["/bin/bash", "-c"] 
 

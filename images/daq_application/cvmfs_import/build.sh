@@ -45,7 +45,7 @@ cp rebuild_work_area.sh ./image/
 
 # chmod 777 image/.rebuild_work_area.sh
 
-docker run --user $(id -u):$(id -g) -i -t --rm -v /cvmfs/dunedaq.opensciencegrid.org:/cvmfs/dunedaq.opensciencegrid.org  -v /cvmfs/dunedaq-development.opensciencegrid.org:/cvmfs/dunedaq-development.opensciencegrid.org -v ${HERE}/image:/dunedaq/run:z dunedaq/sl7-minimal:latest -- /dunedaq/run/rebuild_work_area.sh
+docker run --user $(id -u):$(id -g) -i -t --rm -v /cvmfs/dunedaq.opensciencegrid.org:/cvmfs/dunedaq.opensciencegrid.org  -v /cvmfs/dunedaq-development.opensciencegrid.org:/cvmfs/dunedaq-development.opensciencegrid.org -v ${HERE}/image:/dunedaq/run:z dunedaq/c8-minimal:latest -- /dunedaq/run/rebuild_work_area.sh
 
 rm -rf image/build/*
 
