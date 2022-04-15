@@ -1,8 +1,8 @@
 apiVersion: kind.x-k8s.io/v1alpha4
 kind: Cluster
 name: pocketdune
-featureGates:
-  ServiceAppProtocol: true
+# featureGates:
+  # ServiceAppProtocol: true
 nodes:
 - role: control-plane
   # very strange sporadic slowdowns on certain hosts on kind images > 1.18.6
@@ -13,12 +13,15 @@ nodes:
   # yum install -y http://ecsft.cern.ch/dist/cvmfs/cvmfs-release/cvmfs-release-latest.noarch.rpm
   # yum install -y cvmfs (this will take forever)
   # mkdir -p /cvmfs/cvmfs-config.cern.ch && mount -t cvmfs cvmfs-config.cern.ch /cvmfs/cvmfs-config.cern.ch (takes forever)
-  image: kindest/node:v1.18.6
+  # image: kindest/node:v1.18.6
   # image: kindest/node:v1.21.2
-  # image: kindest/node:v1.22.1
+  # image: kindest/node:v1.22.7
+  image: kindest/node:v1.23.5
   extraMounts:
   - hostPath: ./share
     containerPath: /pocket
+  - hostPath: /cvmfs/dunedaq.opensciencegrid.org
+    containerPath: /cvmfs/dunedaq.opensciencegrid.org
   extraPortMappings:
   - # proxy server
     containerPort: 31000
