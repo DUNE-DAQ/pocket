@@ -10,7 +10,7 @@ if [[ $# -ne 1 ]]; then
     exit 2
 fi
 
-if [[ ! -d $1 && ( -L $1 && ! -d "$(readlink $1)" )]]; then
+if [[ ! -d $1 && ( -L $1 && ! -d "$(readlink $1)" ) ]]; then
     echo "$1 is not a directory"
     exit 2
 fi

@@ -3,9 +3,9 @@ FROM docker.io/dunedaq/c8-minimal:latest
 
 SHELL ["/bin/bash", "-c"] 
 
-RUN mkdir -p /dunedaq/run
+RUN mkdir -p /dunedaq/
 
-COPY daq_app_rte.sh /dunedaq/run
+ADD ./image /dunedaq/run
 
 COPY ./common/app-entrypoint.sh /dunedaq/run
 
