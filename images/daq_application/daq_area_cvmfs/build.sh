@@ -38,34 +38,24 @@ DOCKER_OPTS="--user $(id -u):$(id -g) \
     -v /cvmfs/dunedaq.opensciencegrid.org:/cvmfs/dunedaq.opensciencegrid.org \
     -v /cvmfs/dunedaq-development.opensciencegrid.org:/cvmfs/dunedaq-development.opensciencegrid.org"
 
-# docker run \
-#     --user $(id -u):$(id -g) \
-#     -it \
-#     -v /etc/passwd:/etc/passwd:ro -v /etc/group:/etc/group:ro \
-#     -v /cvmfs/dunedaq.opensciencegrid.org:/cvmfs/dunedaq.opensciencegrid.org \
-#     -v /cvmfs/dunedaq-development.opensciencegrid.org:/cvmfs/dunedaq-development.opensciencegrid.org \
-#     -v ${SRC_AREA}:${SRC_AREA} \
-#     -v ${DST_AREA}:/dunedaq/run:z \
-#     -v ${DKR_BUILD_HERE}/clone_daq_area.sh:/dunedaq/bin/clone_daq_area.sh \
-#     dunedaq/c8-minimal:latest -- \
-#     "export PATH=\"/dunedaq/bin/:$PATH\"; clone_daq_area.sh ${SRC_AREA} /dunedaq/run"
 
+docker run ${DOCKER_OPTS}\
+    -v ${SRC_AREA}:${SRC_AREA} \
+    -v ${DST_AREA}:/dunedaq/run:z \
+    -v ${DKR_BUILD_HERE}/clone_daq_area.sh:/dunedaq/bin/clone_daq_area.sh \
+    dunedaq/c8-minimal:latest -- \
+    "export PATH=\"/dunedaq/bin/:$PATH\"; clone_daq_area.sh ${SRC_AREA} /dunedaq/run"
 
-# echo "------------------------------------------"
-# echo "Rebuilding workarea '$SRC_AREA' in docker"
-# echo "------------------------------------------"
+echo "------------------------------------------"
+echo "Rebuilding workarea '$SRC_AREA' in docker"
+echo "------------------------------------------"
 
-# docker run \
-#     --user $(id -u):$(id -g) \
-#     -i -t --rm \
-#     -v /etc/passwd:/etc/passwd:ro -v /etc/group:/etc/group:ro \
-#     -v /cvmfs/dunedaq.opensciencegrid.org:/cvmfs/dunedaq.opensciencegrid.org \
-#     -v /cvmfs/dunedaq-development.opensciencegrid.org:/cvmfs/dunedaq-development.opensciencegrid.org \
-#     -v ${DKR_BUILD_HERE}/image:/dunedaq/run:z \
-#     -v ${DKR_BUILD_HERE}/rebuild_work_area.sh:/dunedaq/bin/rebuild_work_area.sh \
-#     -v ${DKR_BUILD_HERE}/../common/make_env_script.sh:/dunedaq/bin/make_env_script.sh \
-#     dunedaq/c8-minimal:latest -- \
-#     "export PATH=\"/dunedaq/bin/:$PATH\"; rebuild_work_area.sh /dunedaq/run"
+docker run ${DOCKER_OPTS}\
+    -v ${DKR_BUILD_HERE}/image:/dunedaq/run:z \
+    -v ${DKR_BUILD_HERE}/rebuild_work_area.sh:/dunedaq/bin/rebuild_work_area.sh \
+    -v ${DKR_BUILD_HERE}/../common/make_env_script.sh:/dunedaq/bin/make_env_script.sh \
+    dunedaq/c8-minimal:latest -- \
+    "export PATH=\"/dunedaq/bin/:$PATH\"; rebuild_work_area.sh /dunedaq/run"
 
 echo "------------------------------------------"
 echo "Building $DKR_TAG:$DKR_VERSION docker image"
