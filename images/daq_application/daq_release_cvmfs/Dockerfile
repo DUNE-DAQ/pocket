@@ -5,6 +5,7 @@ SHELL ["/bin/bash", "-c"]
 
 RUN mkdir -p /dunedaq/run
 
+COPY daq_app_rte.sh /dunedaq/run
 COPY ./common/app-entrypoint.sh /dunedaq/run
 
 RUN chmod 755 /dunedaq/run/app-entrypoint.sh
