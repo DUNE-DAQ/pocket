@@ -1,8 +1,10 @@
+#!/usr/bin/bash
 # Bash/Zsh independent way of determining the source path
 SH_SOURCE=${BASH_SOURCE[0]:-${(%):-%x}}
 DKR_BUILD_HERE=$(cd $(dirname ${SH_SOURCE}) && pwd)
 
 DKR_TAG=pocket-daq-area-cvmfs
+DKR_BASE_IMG=dunedaq/c8-minimal:latest
 
 if [[ $# -ne 1 ]]; then
     echo "ERROR: Wrong number of arguments: 1 expecgted, $# found."
@@ -40,10 +42,10 @@ DOCKER_OPTS="--user $(id -u):$(id -g) \
 
 
 docker run ${DOCKER_OPTS}\
-    -v ${SRC_AREA}:${SRC_AREA} \
     -v ${DST_AREA}:/dunedaq/run:z \
+    -v ${SRC_AREA}:${SRC_AREA} \
     -v ${DKR_BUILD_HERE}/clone_daq_area.sh:/dunedaq/bin/clone_daq_area.sh \
-    dunedaq/c8-minimal:latest -- \
+    ${DKR_BASE_IMG} -- \
     "export PATH=\"/dunedaq/bin/:$PATH\"; clone_daq_area.sh ${SRC_AREA} /dunedaq/run"
 
 echo "------------------------------------------"
@@ -51,10 +53,10 @@ echo "Rebuilding workarea '$SRC_AREA' in docker"
 echo "------------------------------------------"
 
 docker run ${DOCKER_OPTS}\
-    -v ${DKR_BUILD_HERE}/image:/dunedaq/run:z \
+    -v ${DST_AREA}:/dunedaq/run:z \
     -v ${DKR_BUILD_HERE}/rebuild_work_area.sh:/dunedaq/bin/rebuild_work_area.sh \
     -v ${DKR_BUILD_HERE}/../common/make_env_script.sh:/dunedaq/bin/make_env_script.sh \
-    dunedaq/c8-minimal:latest -- \
+    ${DKR_BASE_IMG} -- \
     "export PATH=\"/dunedaq/bin/:$PATH\"; rebuild_work_area.sh /dunedaq/run"
 
 echo "------------------------------------------"

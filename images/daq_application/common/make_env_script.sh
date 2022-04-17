@@ -1,3 +1,4 @@
+#!/usr/bin/bash
 SCRIPT_NAME="daq_app_rte.sh"
 
 rm -rf ${SCRIPT_NAME}
