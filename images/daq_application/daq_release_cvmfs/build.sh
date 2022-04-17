@@ -26,10 +26,13 @@ echo "Capturing runtime environment"
 echo "------------------------------------------"
 ${DKR_BUILD_HERE}/../common/make_env_script.sh
 
-set -x 
 echo "------------------------------------------"
 echo "Bringing common scripts in view of docker build"
 echo "------------------------------------------"
 cp -a $DKR_BUILD_HERE/../common .
 
+
+echo "------------------------------------------"
+echo "Building $DKR_TAG:$DKR_VERSION docker image"
+echo "------------------------------------------"
 docker buildx build --tag $DKR_TAG:$DKR_VERSION $DKR_BUILD_HERE 
