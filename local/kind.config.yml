@@ -17,11 +17,15 @@ nodes:
   # image: kindest/node:v1.21.2
   # image: kindest/node:v1.22.7
   image: kindest/node:v1.23.5
+- role: worker
+  image: kindest/node:v1.23.5
   extraMounts:
   - hostPath: ./share
     containerPath: /pocket
   - hostPath: /cvmfs/dunedaq.opensciencegrid.org
     containerPath: /cvmfs/dunedaq.opensciencegrid.org
+  - hostPath: /cvmfs/dunedaq-development.opensciencegrid.org
+    containerPath: /cvmfs/dunedaq-development.opensciencegrid.org
   extraPortMappings:
   - # proxy server
     containerPort: 31000
