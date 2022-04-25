@@ -73,5 +73,5 @@ spec:
           volumeMounts:
             - name: kafka-storage
               mountPath: /mnt/kafka
-	    - name: kafka-config
-	      mountPath: /opt/kafka/libs
+            - name: kafka-config
+              mountPath: /opt/kafka/libs
