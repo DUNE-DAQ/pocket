@@ -1,0 +1,20 @@
+
+These are the operations to run the kafka
+
+create your namespace `$MYNAMESPACE`
+
+```bash
+kubectl create namespace $MYNAMESPACE
+kubectl config set-context --current --namespace=$MYNAMESPACE
+```
+import the external listener
+```bash
+kubectl -n $MYNAMESPACE create secret generic kafka-secrets --from-literal=EXTERNAL_LISTENER=<your desired server>
+```
+
+apply the kafka
+
+```bash
+kubectl apply -f manifests/dunedaqers/kafka.yaml
+kubectl apply -f manifests/dunedaqers/kafka-svc.yaml
+```
