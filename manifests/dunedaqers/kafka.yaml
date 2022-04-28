@@ -68,13 +68,25 @@ spec:
           volumeMounts:
             - name: kafka-storage
               mountPath: /mnt/kafka
-            - name: kafka-config
+            - name: dune-kafka-libs
               mountPath: /opt/kafka/libs/dune-daq-monitor.jar
               subPath: dune-daq-monitor.jar
+            - name: dune-kafka-config
+              mountPath: /opt/kafka/config/dune-daq-exporter.yml
+              subPath: dune-daq-exporter.yml
       volumes:
         - name: kafka-storage
           persistentVolumeClaim:
             claimName: kafka-pv-claim
-        - name: kafka-config
+        - name: dune-kafka-libs
           configMap:
-            name: kafka-config
+            name: dune-kafka-libs
+            items:
+            - key: jmx_prometheus_javaagent-0.16.1.jar
+              path: dune-daq-monitor.jar
+        - name: dune-kafka-config
+          configMap:
+            name: dune-kafka-config
+            items:
+            - key: sample_jmx_exporter.yml
+              path: dune-daq-exporter.yml
