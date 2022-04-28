@@ -15,6 +15,7 @@ kubectl -n $MYNAMESPACE create secret generic kafka-secrets --from-literal=EXTER
 apply the kafka
 
 ```bash
+kubectl -n $MYNAMESPACE create configmap kafka-config --from-file images/kafka/jmx_prometheus_javaagent-0.16.1.jar
 kubectl apply -f manifests/dunedaqers/kafka.yaml
 kubectl apply -f manifests/dunedaqers/kafka-svc.yaml
 ```

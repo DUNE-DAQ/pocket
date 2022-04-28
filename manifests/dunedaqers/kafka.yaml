@@ -45,13 +45,6 @@ spec:
       labels:
         app: kafka-app
     spec:
-      volumes:
-        - name: kafka-storage
-          persistentVolumeClaim:
-            claimName: kafka-pv-claim
-        - name: kafka-config
-          configMap:
-            name: kafka-config
       containers:
         - name: kafka-container
           image: dunedaq/pocket-kafka:1.0
@@ -76,4 +69,12 @@ spec:
             - name: kafka-storage
               mountPath: /mnt/kafka
             - name: kafka-config
-              mountPath: /opt/kafka/libs
+              mountPath: /opt/kafka/libs/dune-daq-monitor.jar
+              subPath: dune-daq-monitor.jar
+      volumes:
+        - name: kafka-storage
+          persistentVolumeClaim:
+            claimName: kafka-pv-claim
+        - name: kafka-config
+          configMap:
+            name: kafka-config
