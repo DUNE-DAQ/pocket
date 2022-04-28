@@ -49,6 +49,9 @@ spec:
         - name: kafka-storage
           persistentVolumeClaim:
             claimName: kafka-pv-claim
+        - name: kafka-config
+          configMap:
+            name: kafka-config
       containers:
         - name: kafka-container
           image: dunedaq/pocket-kafka:1.0
@@ -69,7 +72,6 @@ spec:
                   secretKeyRef:
                     name: kafka-secrets
                     key: EXTERNAL_LISTENER
-
           volumeMounts:
             - name: kafka-storage
               mountPath: /mnt/kafka
