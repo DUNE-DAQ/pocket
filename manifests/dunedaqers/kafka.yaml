@@ -60,6 +60,8 @@ spec:
               value: maroda-test
             - name: SHARE_DIR
               value: /mnt/kafka
+            - name: KAFKA_OPTS
+              value: ' -javaagent:/opt/kafka/libs/dune-daq-monitor.jar=7075:/opt/kafka/config/dune-daq-exporter.yml'
             - name: EXTERNAL_LISTENER
               valueFrom: 
                   secretKeyRef:
