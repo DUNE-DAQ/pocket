@@ -25,20 +25,15 @@ rm -rf ${DST_AREA}
 # # Re-create build
 mkdir -p ${DST_AREA}
 
-# echo "------------------------------------------"
-# echo "Cloning dbt virtual environment"
-# echo "------------------------------------------"
-# # Clone the dacq buildtools virtual environment separately
-# CMD="cd $SRC_AREA; source dbt-env.sh; dbt-workarea-env -s systems; clonevirtualenv.py ${SRC_AREA}/dbt-pyvenv ${DST_AREA}/dbt-pyvenv"
-# echo $CMD
-# bash -c "$CMD"
-# 
+echo "------------------------------------------"
+echo "Cloning dbt virtual environment"
+echo "------------------------------------------"
 
 DOCKER_OPTS="--user $(id -u):$(id -g) \
     -it \
     -v /etc/passwd:/etc/passwd:ro -v /etc/group:/etc/group:ro \
-    -v /cvmfs/dunedaq.opensciencegrid.org:/cvmfs/dunedaq.opensciencegrid.org \
-    -v /cvmfs/dunedaq-development.opensciencegrid.org:/cvmfs/dunedaq-development.opensciencegrid.org"
+    -v /cvmfs/dunedaq.opensciencegrid.org:/cvmfs/dunedaq.opensciencegrid.org:ro \
+    -v /cvmfs/dunedaq-development.opensciencegrid.org:/cvmfs/dunedaq-development.opensciencegrid.org:ro"
 
 
 docker run ${DOCKER_OPTS}\
@@ -64,9 +59,9 @@ echo "Building $DKR_TAG:$DKR_VERSION docker image"
 echo "------------------------------------------"
 
 DKR_TAG=pocket-daq-area-cvmfs
-DKR_VERSION=$(bash -c 'source image/dbt-settings; echo $DUNE_DAQ_BASE_RELEASE | sed "s/dunedaq-\([^-]*\).*/\1/"')
+DKR_VERSION=$(bash -c "source $DKR_BUILD_HERE/image/dbt-settings; echo \$DUNE_DAQ_BASE_RELEASE | sed 's/dunedaq-\([^-]*\).*/\1/'")
 
-cp -a $DKR_BUILD_HERE/../common .
+cp -a $DKR_BUILD_HERE/../common $DKR_BUILD_HERE
 docker buildx build --tag ${DKR_TAG}:${DKR_VERSION} $DKR_BUILD_HERE 
 
 
