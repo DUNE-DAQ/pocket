@@ -1,11 +1,11 @@
 # syntax=docker/dockerfile:1
-FROM docker.io/dunedaq/sl7-minimal:latest
+FROM docker.io/dunedaq/c8-minimal:latest
 
 SHELL ["/bin/bash", "-c"] 
 
 RUN mkdir -p /dunedaq/run
 
-ADD ./image /dunedaq/run
+COPY ./image/daq_app_rte.sh /dunedaq/run
 
 COPY ./common/app-entrypoint.sh /dunedaq/run
 

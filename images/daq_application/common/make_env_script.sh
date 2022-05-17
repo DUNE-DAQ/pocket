@@ -1,0 +1,13 @@
+#!/usr/bin/bash
+SCRIPT_NAME="daq_app_rte.sh"
+
+rm -rf ${SCRIPT_NAME}
+
+echo "export CET_PLUGIN_PATH=$CET_PLUGIN_PATH" >> ${SCRIPT_NAME}
+echo "export DUNEDAQ_SHARE_PATH=$DUNEDAQ_SHARE_PATH" >> ${SCRIPT_NAME}
+echo "export LD_LIBRARY_PATH=$LD_LIBRARY_PATH" >> ${SCRIPT_NAME}
+echo "export PATH=$PATH" >> ${SCRIPT_NAME}
+echo "export READOUT_SHARE=$READOUT_SHARE" >> ${SCRIPT_NAME}
+echo "export TIMING_SHARE=$TIMING_SHARE" >> ${SCRIPT_NAME}
+echo "export TRACE_BIN=$TRACE_BIN" >> ${SCRIPT_NAME}
+echo "export TRACE_FILE=$TRACE_FILE" >> ${SCRIPT_NAME}
