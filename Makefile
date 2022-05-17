@@ -172,11 +172,6 @@ kubectl-apply: kubectl external-manifests namespaces.local ## apply files in `ma
 	@echo "installing basic services"
 	@>/dev/null $(KUBECTL) apply -f manifests
 
-ifeq ($(CVMFS_ENABLED),0)
-	@echo -e "\e[33mskipping installation of CVMFS stack\e[0m"
-else
-	@>/dev/null $(KUBECTL) apply -f manifests/cvmfs
-endif
 
 ifeq ($(ERS_ENABLED),0)
 	@echo -e "\e[33mskipping installation of Kafka-ERS\e[0m"
