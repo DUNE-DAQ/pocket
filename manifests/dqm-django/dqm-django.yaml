@@ -20,16 +20,16 @@ spec:
           emptyDir: {}
       containers:
       - name: dqmbackend
-        image: dunedaq/pocket-dqmdjango:0.3.2
+        image: dunedaq/pocket-dqmdjango:0.3.4
         ports:
         - containerPort: 8000
         env:
         - name: USERNAME
-          value: "foo"
+          value: "admin"
         - name: PASSWORD
-          value: "bar" 
+          value: "admin" 
         - name: ALLOWED_HOSTS
-          value: "baz"
+          value: "10."
         - name: PATH_DATABASE
           value: "/mnt/data/Database"
         - name: PATH_DATABASE_RESULTS
@@ -39,6 +39,9 @@ spec:
           name: dqm-db
         - mountPath: "/mnt/data/Database-results"
           name: dqm-results
+        command:
+        - sh 
+        - /entrypoint.sh
 
 ---
 apiVersion: apps/v1
