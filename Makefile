@@ -46,7 +46,7 @@ namespaces.local: kind kubectl external-manifests
 	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/dunedaqers/ns-kafka-kraft.yaml ||:
 	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/opmon/ns-monitoring.yaml ||:
 	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/dunedaqers/ns-ers.yaml ||:
-	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/dqm/ns-dqm.yaml ||:
+	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/dqm-django/ns-dqm.yaml ||:
 	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/daqconfig/ns-daqconfig.yaml ||:
 
 
@@ -81,24 +81,6 @@ erspostgres.local: kind kubectl external-manifests namespaces.local
 	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/dunedaqers/ers-postgres-svc.yaml ||:
 	@>/dev/null 2>&1 $(KUBECTL) -n ers create configmap ers-sql --from-file manifests/dunedaqers/sql/ApplicationDbErrorReporting.sql
 
-
-.PHONY: dqmpostgres.local
-dqmpostgres.local: kind kubectl external-manifests namespaces.local
-	@echo "installing postgres"
-
-	@>/dev/null 2>&1 $(KUBECTL) -n dqm create secret generic postgres-secrets \
-	--from-literal=POSTGRES_USER="admin" \
-	--from-literal=POSTGRES_PASSWORD="$(PGPASS)" ||:
-
-	@>/dev/null 2>&1 $(KUBECTL) -n dqm create secret generic aspcore-secrets \
-	--from-literal=DOTNETPOSTGRES_PASSWORD="Password=$(PGPASS);" ||:
-
-	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/dqm/dqm-postgres.yaml ||:
-	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/dqm/dqm-postgres-svc.yaml ||:
-
-	$(KUBECTL) -n dqm create configmap dqm-sql --from-file manifests/dqm/sql/create_databases.sh --from-file manifests/dqm/sql/MonitoringDb.sql --from-file manifests/dqm/sql/MonitoringUserDb.sql
-
-
 .PHONY: ers-kafka.local
 ers-kafka.local: kafka.local erspostgres.local
 	@echo "installing ers-kafka"
@@ -106,13 +88,13 @@ ers-kafka.local: kafka.local erspostgres.local
 	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/dunedaqers/ers-aspcore.yaml ||:
 
 
-.PHONY: dqm-kafka.local
-dqm-kafka.local: kafka.local dqmpostgres.local
-	@echo "installing dqm-kafka"
-
-	$(KUBECTL) apply -f manifests/dqm/dqmplatform.yaml ||:
-
-	@echo "installing opmon"
+.PHONY: dqm.local
+dqm.local:
+	@echo "installing dqm backend"
+	$(KUBECTL) -n dqm create secret generic dqm-secrets \
+	--from-literal=USERNAME=admin \
+	--from-literal=PASSWORD=admin 
+	$(KUBECTL) apply -f manifests/dqm-django/dqm-backend.yaml ||:
 
 .PHONY: daqconfig.local
 daqconfig.local: daqconfig-mongo.local
@@ -189,8 +171,7 @@ endif
 ifeq ($(DQM_ENABLED),0)
 	@echo -e "\e[33mskipping installation of DQM\e[0m"
 else
-	@$(MAKE) --no-print-directory dqm-kafka.local
-	@$(MAKE) --no-print-directory dqm-topic
+	@$(MAKE) --no-print-directory dqm.local
 endif
 
 ifeq ($(DAQCONFIG_ENABLED),0)
@@ -274,14 +255,6 @@ images.kafka: ## build kafka image
 .PHONY: images.ers
 images.ers: ## build ers image
 	docker buildx build -t dunedaq/pocket-ers:v1.0.0 images/aspcore-ers
-
-.PHONY: images.dqmplatform
-images.dqmplatform: ## build aspcore-ers image
-	docker buildx build -t dunedaq/pocket-dqmplatform:latest images/aspcore-dqm
-
-.PHONY: images.dqmanalysis
-images.dqmanalysis: ## build aspcore-ers image
-	docker buildx build -t dunedaq/pocket-dqmanalysis:latest images/dqmanalysis
 
 ##
 ### Dependencies

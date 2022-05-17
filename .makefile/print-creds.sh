@@ -113,11 +113,6 @@ function dqmpostgres_creds() {
 	echo -n "	address (in-cluster): postgres-svc.dqm:"
         ${KUBECTL} -n dqm get service postgres-svc -ojsonpath='{.spec.ports[0].targetPort}'; echo
 	echo -n "	User: "
-	${KUBECTL} get -n dqm secret postgres-secrets -o=jsonpath='{.data.POSTGRES_USER}' | base64 --decode;
-	echo -n "	Password: "
-	${KUBECTL} get -n dqm secret postgres-secrets -o=jsonpath='{.data.POSTGRES_PASSWORD}' | base64 --decode; echo
-	echo -n "	ASP Password: "
-	${KUBECTL} get -n dqm secret aspcore-secrets -o=jsonpath='{.data.DOTNETPOSTGRES_PASSWORD}' | base64 --decode; echo
 }
 
 function ers_creds() {
@@ -144,8 +139,6 @@ function dqm_creds() {
 	${KUBECTL} -n dqm get service dqm-svc -ojsonpath='{.spec.ports[0].targetPort}'; echo
 	echo -n "	address (out-cluster): ${NODEPORT_IP}:"
 	${KUBECTL} -n dqm get service dqm-svc -ojsonpath='{.spec.ports[0].nodePort}'; echo
-	echo -n "	ASP Password: "
-	${KUBECTL} get -n dqm secret aspcore-secrets -o=jsonpath='{.data.DOTNETPOSTGRES_PASSWORD}' | base64 --decode; echo
 }
 
 function daqconfig_creds() {
