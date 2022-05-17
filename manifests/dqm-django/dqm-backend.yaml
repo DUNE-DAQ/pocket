@@ -1,0 +1,87 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dqmbackend
+  namespace: dqm
+spec:
+  selector:
+    matchLabels:
+      app: dqmbackend
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: dqmbackend
+    spec:
+      volumes:
+        - name: dqm-db
+          emptyDir: {}
+        - name: dqm-results
+          emptyDir: {}
+      containers:
+      - name: dqmbackend
+        image: dunedaq/pocket-dqmdjango:0.3.4
+        ports:
+        - containerPort: 8000
+        env:
+        - name: USERNAME
+          value: "admin"
+        - name: PASSWORD
+          value: "admin" 
+        - name: ALLOWED_HOSTS
+          value: "10."
+        - name: PATH_DATABASE
+          value: "/mnt/data/Database"
+        - name: PATH_DATABASE_RESULTS
+          value: "/mnt/data/Database-results"
+        volumeMounts:
+        - mountPath: "/mnt/data/Database"
+          name: dqm-db
+        - mountPath: "/mnt/data/Database-results"
+          name: dqm-results
+        command:
+        - sh 
+        - /entrypoint.sh
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dqmredis
+  namespace: dqm
+spec:
+  selector:
+    matchLabels:
+      app: dqmredis
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: dqmredis
+    spec:
+      volumes:
+        - name: dqm-shared
+          emptyDir: {}
+      containers:
+      - name: dqmredis
+        image: redis:4
+        ports:
+        - containerPort: 6379
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: dqm-svc
+  labels:
+    app: dqmbackend
+  namespace: dqm
+spec:
+  type: NodePort
+  ports:
+  - port: 8000
+    protocol: TCP
+    targetPort: 8000
+    nodePort: 30081
+  selector:
+    app: dqmbackend
