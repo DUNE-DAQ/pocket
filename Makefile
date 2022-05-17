@@ -66,16 +66,16 @@ kafka.local: dependency.docker kind kubectl external-manifests namespaces.local
 erspostgres.local: kind kubectl external-manifests namespaces.local
 	@echo "installing postgres"
 
-	$(KUBECTL) -n ers create secret generic postgres-secrets \
+	@>/dev/null 2>&1 $(KUBECTL) -n ers create secret generic postgres-secrets \
 	--from-literal=POSTGRES_USER="admin" \
-	--from-literal=POSTGRES_PASSWORD="$(PGPASS)"
+	--from-literal=POSTGRES_PASSWORD="$(PGPASS)" ||:
 
-	$(KUBECTL) -n monitoring create secret generic postgres-secrets \
+	@>/dev/null 2>&1 $(KUBECTL) -n monitoring create secret generic postgres-secrets \
 	--from-literal=POSTGRES_USER="admin" \
-	--from-literal=POSTGRES_PASSWORD="$(PGPASS)"
+	--from-literal=POSTGRES_PASSWORD="$(PGPASS)" ||:
 
-	$(KUBECTL) -n ers create secret generic aspcore-secrets \
-	--from-literal=DOTNETPOSTGRES_PASSWORD="Password=$(PGPASS);"
+	@>/dev/null 2>&1 $(KUBECTL) -n ers create secret generic aspcore-secrets \
+	--from-literal=DOTNETPOSTGRES_PASSWORD="Password=$(PGPASS);" ||:
 
 	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/dunedaqers/ers-postgres.yaml ||:
 	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/dunedaqers/ers-postgres-svc.yaml ||:
@@ -172,17 +172,10 @@ kubectl-apply: kubectl external-manifests namespaces.local ## apply files in `ma
 	@echo "installing basic services"
 	@>/dev/null $(KUBECTL) apply -f manifests
 
-# ifeq ($(CVMFS_ENABLED),0)
-# 	@echo -e "\e[33mskipping installation of CVMFS stack\e[0m"
-# else
-# 	@echo -e "\e[33mInstalling CVMFS stack\e[0m"
-# 	@>/dev/null $(KUBECTL) apply -f manifests/cvmfs
-# endif
 
 ifeq ($(ERS_ENABLED),0)
 	@echo -e "\e[33mskipping installation of Kafka-ERS\e[0m"
 else
-	@echo -e "\e[33mInstalling Kafka-ERS stack\e[0m"
 	@$(MAKE) --no-print-directory ers-kafka.local
 	@$(MAKE) --no-print-directory ers-topic
 endif
@@ -190,14 +183,12 @@ endif
 ifeq ($(OPMON_ENABLED),0)
 	@echo -e "\e[33mskipping installation of opmon\e[0m"
 else
-	@echo -e "\e[33mInstalling Opmon stack\e[0m"
 	@$(MAKE) --no-print-directory opmon.local
 endif
 
 ifeq ($(DQM_ENABLED),0)
 	@echo -e "\e[33mskipping installation of DQM\e[0m"
 else
-	@echo -e "\e[33mInstalling DQM stack\e[0m"
 	@$(MAKE) --no-print-directory dqm-kafka.local
 	@$(MAKE) --no-print-directory dqm-topic
 endif
@@ -205,7 +196,6 @@ endif
 ifeq ($(DAQCONFIG_ENABLED),0)
 	@echo -e "\e[33mskipping installation of DAQConfig\e[0m"
 else
-	@echo -e "\e[33mInstalling DAQConfig stack\e[0m"
 	@$(MAKE) --no-print-directory daqconfig.local
 endif
 
