@@ -1,0 +1,31 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  namespace: ers
+  name: erspostgres-data
+spec:
+  storageClassName: ""
+  accessModes:
+    - ReadWriteOnce
+  capacity:
+    storage: 1Gi
+  hostPath:
+    path: /tmp/ers-postgres
+
+---
+apiVersion: v1
+
+kind: PersistentVolumeClaim
+metadata:
+  name: erspostgres-data
+  namespace: ers
+  labels:
+    type: local
+spec:
+  storageClassName: ""
+  accessModes:
+    - ReadWriteOnce 
+  volumeName: erspostgres-data
+  resources:
+    requests:
+      storage: 1Gi

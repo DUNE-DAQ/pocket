@@ -43,9 +43,9 @@ setup.openstack: on-cern-network check_openstack_login terraform ansible depende
 namespaces.local: kind kubectl external-manifests
 	@echo "setting up namespaces"
 	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/cvmfs/ns-cvmfs.yaml ||:
-	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/dunedaqers/ns-kafka-kraft.yaml ||:
+	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/ers/ns-kafka-kraft.yaml ||:
 	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/opmon/ns-monitoring.yaml ||:
-	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/dunedaqers/ns-ers.yaml ||:
+	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/ers/ns-ers.yaml ||:
 	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/dqm-django/ns-dqm.yaml ||:
 	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/daqconfig/ns-daqconfig.yaml ||:
 
@@ -58,8 +58,8 @@ kafka.local: dependency.docker kind kubectl external-manifests namespaces.local
 	@>/dev/null 2>&1 $(KUBECTL) -n kafka-kraft create secret generic kafka-secrets \
 	--from-literal=EXTERNAL_LISTENER="$(call node_ip)" ||:
 
-	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/dunedaqers/kafka.yaml ||:
-	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/dunedaqers/kafka-svc.yaml ||:
+	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/ers/kafka.yaml ||:
+	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/ers/kafka-svc.yaml ||:
 
 
 .PHONY: erspostgres.local
@@ -77,15 +77,16 @@ erspostgres.local: kind kubectl external-manifests namespaces.local
 	@>/dev/null 2>&1 $(KUBECTL) -n ers create secret generic aspcore-secrets \
 	--from-literal=DOTNETPOSTGRES_PASSWORD="Password=$(PGPASS);" ||:
 
-	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/dunedaqers/ers-postgres.yaml ||:
-	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/dunedaqers/ers-postgres-svc.yaml ||:
-	@>/dev/null 2>&1 $(KUBECTL) -n ers create configmap ers-sql --from-file manifests/dunedaqers/sql/ApplicationDbErrorReporting.sql
+	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/ers/ers-postgres-pv.yaml ||:
+	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/ers/ers-postgres.yaml ||:
+	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/ers/ers-postgres-svc.yaml ||:
+	@>/dev/null 2>&1 $(KUBECTL) -n ers create configmap ers-sql --from-file manifests/ers/sql/ApplicationDbErrorReporting.sql
 
 .PHONY: ers-kafka.local
 ers-kafka.local: kafka.local erspostgres.local
 	@echo "installing ers-kafka"
 
-	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/dunedaqers/ers-aspcore.yaml ||:
+	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/ers/ers-aspcore.yaml ||:
 
 
 .PHONY: dqm.local

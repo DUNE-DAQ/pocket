@@ -1,31 +1,7 @@
-#apiVersion: v1
-#kind: ConfigMap
-#metadata:
-#  name: postgresql-config
-#  namespace: ers
-#data:
-#  POSTGRES_DB: postgres
-#  POSTGRES_USER: postgres
-#  POSTGRES_PASSWORD: example
-
----
-apiVersion: v1
-kind: PersistentVolume
-metadata:
-  name: postgresql-pv-volume
-  namespace: ers
-  labels:
-    type: local
-spec:
-  storageClassName: manual
-  accessModes: ["ReadWriteOnce"]
-  capacity:
-    storage: 2Gi
-  hostPath:
-    path: '/mnt/data'
-
 ---
 
+apiVersion: apps/v1
+kind: Deployment
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -42,7 +18,7 @@ spec:
     spec:
       storageClassName: 
       containers:
-      - name: postgresql-pv-volume
+      - name: postgresql
         image: postgres:12.8
         ports:
         - containerPort: 5432
@@ -57,7 +33,12 @@ spec:
         volumeMounts:
           - mountPath: /docker-entrypoint-initdb.d/
             name: ers-sql
+          - name: erspostgres-data-dir
+            mountPath: /var/lib/postgresql/data
       volumes:
         - name: ers-sql
           configMap:
             name: ers-sql
+        - name: erspostgres-data-dir
+          persistentVolumeClaim:
+            claimName: erspostgres-data
