@@ -51,6 +51,7 @@ spec:
           ports:
             - containerPort: 30092
             - containerPort: 9092
+            - containerPort: 7075
           env:
             - name: REPLICAS
               value: '1'
