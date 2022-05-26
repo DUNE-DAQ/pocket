@@ -45,16 +45,13 @@ spec:
       labels:
         app: kafka-app
     spec:
-      volumes:
-        - name: kafka-storage
-          persistentVolumeClaim:
-            claimName: kafka-pv-claim
       containers:
         - name: kafka-container
           image: dunedaq/pocket-kafka:1.0
           ports:
             - containerPort: 30092
             - containerPort: 9092
+            - containerPort: 7075
           env:
             - name: REPLICAS
               value: '1'
@@ -64,12 +61,35 @@ spec:
               value: kafka-kraft
             - name: SHARE_DIR
               value: /mnt/kafka
+            - name: KAFKA_OPTS
+              value: ' -javaagent:/opt/kafka/libs/dune-daq-monitor.jar=7075:/opt/kafka/config/dune-daq-exporter.yml'
             - name: EXTERNAL_LISTENER
               valueFrom: 
                   secretKeyRef:
                     name: kafka-secrets
                     key: EXTERNAL_LISTENER
-
           volumeMounts:
             - name: kafka-storage
               mountPath: /mnt/kafka
+            - name: dune-kafka-libs
+              mountPath: /opt/kafka/libs/dune-daq-monitor.jar
+              subPath: dune-daq-monitor.jar
+            - name: dune-kafka-config
+              mountPath: /opt/kafka/config/dune-daq-exporter.yml
+              subPath: dune-daq-exporter.yml
+      volumes:
+        - name: kafka-storage
+          persistentVolumeClaim:
+            claimName: kafka-pv-claim
+        - name: dune-kafka-libs
+          configMap:
+            name: dune-kafka-libs
+            items:
+            - key: jmx_prometheus_javaagent-0.16.1.jar
+              path: dune-daq-monitor.jar
+        - name: dune-kafka-config
+          configMap:
+            name: dune-kafka-config
+            items:
+            - key: sample_jmx_exporter.yml
+              path: dune-daq-exporter.yml
