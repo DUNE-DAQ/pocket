@@ -46,7 +46,8 @@ namespaces.local: kind kubectl external-manifests
 	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/dunedaqers/ns-kafka-kraft.yaml ||:
 	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/opmon/ns-monitoring.yaml ||:
 	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/dunedaqers/ns-ers.yaml ||:
-	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/dqm/ns-dqm.yaml ||:
+	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/dqm-django/ns-dqm.yaml ||:
+	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/daqconfig/ns-daqconfig.yaml ||:
 
 
 .PHONY: kafka.local
@@ -79,27 +80,9 @@ erspostgres.local: kind kubectl external-manifests namespaces.local
 	@>/dev/null 2>&1 $(KUBECTL) -n ers create secret generic aspcore-secrets \
 	--from-literal=DOTNETPOSTGRES_PASSWORD="Password=$(PGPASS);" ||:
 
-	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/dunedaqers/ers-postgres.yaml ||: 
+	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/dunedaqers/ers-postgres.yaml ||:
 	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/dunedaqers/ers-postgres-svc.yaml ||:
 	@>/dev/null 2>&1 $(KUBECTL) -n ers create configmap ers-sql --from-file manifests/dunedaqers/sql/ApplicationDbErrorReporting.sql
-
-
-.PHONY: dqmpostgres.local
-dqmpostgres.local: kind kubectl external-manifests namespaces.local
-	@echo "installing postgres"
-
-	@>/dev/null 2>&1 $(KUBECTL) -n dqm create secret generic postgres-secrets \
-	--from-literal=POSTGRES_USER="admin" \
-	--from-literal=POSTGRES_PASSWORD="$(PGPASS)" ||:
-
-	@>/dev/null 2>&1 $(KUBECTL) -n dqm create secret generic aspcore-secrets \
-	--from-literal=DOTNETPOSTGRES_PASSWORD="Password=$(PGPASS);" ||:
-
-	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/dqm/dqm-postgres.yaml ||: 
-	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/dqm/dqm-postgres-svc.yaml ||:
-
-	$(KUBECTL) -n dqm create configmap dqm-sql --from-file manifests/dqm/sql/create_databases.sh --from-file manifests/dqm/sql/MonitoringDb.sql --from-file manifests/dqm/sql/MonitoringUserDb.sql
-
 
 .PHONY: ers-kafka.local
 ers-kafka.local: kafka.local erspostgres.local
@@ -108,14 +91,42 @@ ers-kafka.local: kafka.local erspostgres.local
 	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/dunedaqers/ers-aspcore.yaml ||:
 
 
-.PHONY: dqm-kafka.local
-dqm-kafka.local: kafka.local dqmpostgres.local
-	@echo "installing dqm-kafka"
+.PHONY: dqm.local
+dqm.local:
+	@echo "installing dqm backend"
+	$(KUBECTL) -n dqm create secret generic dqm-secrets \
+	--from-literal=USERNAME=admin \
+	--from-literal=PASSWORD=admin 
+	$(KUBECTL) apply -f manifests/dqm-django/dqm-backend.yaml ||:
 
-	$(KUBECTL) apply -f manifests/dqm/dqmplatform.yaml ||:
+.PHONY: daqconfig.local
+daqconfig.local: daqconfig-mongo.local
+	@echo "installing config service"
+	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/daqconfig/daqconfig-svc.yaml ||:
 
-	@echo "installing opmon"
 
+.PHONY: daqconfig-mongo.local
+daqconfig-mongo.local: kind kubectl external-manifests namespaces.local
+	@echo "installing mongodb"
+	@>/dev/null 2>&1 $(KUBECTL) -n daqconfig create secret generic mongodb-root --from-literal=password="${MONGOPASS}" --from-literal=user="mongo_user" ||:
+	@>/dev/null 2>&1 $(KUBECTL) create -f manifests/daqconfig/volume-claim.yaml ||:
+	@>/dev/null 2>&1 $(KUBECTL) create -f manifests/daqconfig/persistent-volume-claim.yaml ||:
+	@>/dev/null 2>&1 $(KUBECTL) create -f manifests/daqconfig/mongodb-statefulset.yaml ||:
+	@>/dev/null 2>&1 $(KUBECTL) create -f manifests/daqconfig/mongodb-nodeport-svc.yaml ||:
+	@>/dev/null 2>&1 $(KUBECTL) create -f manifests/daqconfig/mongo-express-deployment.yaml ||:
+
+
+# @>/dev/null 2>&1 $(KUBECTL) -n daqconfig create secret generic mongodb-daqconfig-admin-password \
+# --from-literal=password="${MONGOPASS}_ADMIN" ||:
+# @>/dev/null 2>&1 $(KUBECTL) apply -f manifests/daqconfig/mongodbcommunity.mongodb.com_mongodbcommunity.yaml ||:
+# @echo "Now waiting for the MongoDB operator to be up"
+# @>/dev/null 2>&1 $(KUBECTL) wait -n daqconfig --for=condition=Ready pod/mongodb-daqconfig-operator ||:
+# @echo "MongoDB operator is up!"
+# @>/dev/null 2>&1 $(KUBECTL) apply -k manifests/daqconfig/rbac/ ||:
+# @>/dev/null 2>&1 $(KUBECTL) create -f manifests/daqconfig/manager.yaml ||:
+# @>/dev/null 2>&1 $(KUBECTL) apply -f manifests/daqconfig/mongodb.com_v1_mongodbcommunity_cr.yaml ||:
+# @>/dev/null 2>&1 $(KUBECTL) apply -f manifests/daqconfig/mongodb-user.yaml ||:
+#$(KUBECTL) apply -f manifests/daqconfig/mongodb-client.yaml
 
 .PHONY: opmon.local
 opmon.local: erspostgres.local
@@ -146,11 +157,6 @@ kubectl-apply: kubectl external-manifests namespaces.local ## apply files in `ma
 	@echo "installing basic services"
 	@>/dev/null $(KUBECTL) apply -f manifests
 
-ifeq ($(CVMFS_ENABLED),0) 
-	@echo -e "\e[33mskipping installation of CVMFS stack\e[0m"
-else
-	@>/dev/null $(KUBECTL) apply -f manifests/cvmfs
-endif
 
 ifeq ($(ERS_ENABLED),0)
 	@echo -e "\e[33mskipping installation of Kafka-ERS\e[0m"
@@ -168,8 +174,13 @@ endif
 ifeq ($(DQM_ENABLED),0)
 	@echo -e "\e[33mskipping installation of DQM\e[0m"
 else
-	@$(MAKE) --no-print-directory dqm-kafka.local
-	@$(MAKE) --no-print-directory dqm-topic
+	@$(MAKE) --no-print-directory dqm.local
+endif
+
+ifeq ($(DAQCONFIG_ENABLED),0)
+	@echo -e "\e[33mskipping installation of DAQConfig\e[0m"
+else
+	@$(MAKE) --no-print-directory daqconfig.local
 endif
 
 
@@ -247,14 +258,6 @@ images.kafka: ## build kafka image
 .PHONY: images.ers
 images.ers: ## build ers image
 	docker buildx build -t dunedaq/pocket-ers:v1.0.0 images/aspcore-ers
-
-.PHONY: images.dqmplatform
-images.dqmplatform: ## build aspcore-ers image
-	docker buildx build -t dunedaq/pocket-dqmplatform:latest images/aspcore-dqm
-
-.PHONY: images.dqmanalysis
-images.dqmanalysis: ## build aspcore-ers image
-	docker buildx build -t dunedaq/pocket-dqmanalysis:latest images/dqmanalysis
 
 ##
 ### Dependencies

@@ -1,8 +1,8 @@
 apiVersion: kind.x-k8s.io/v1alpha4
 kind: Cluster
 name: pocketdune
-featureGates:
-  ServiceAppProtocol: true
+# featureGates:
+  # ServiceAppProtocol: true
 nodes:
 - role: control-plane
   # very strange sporadic slowdowns on certain hosts on kind images > 1.18.6
@@ -13,12 +13,17 @@ nodes:
   # yum install -y http://ecsft.cern.ch/dist/cvmfs/cvmfs-release/cvmfs-release-latest.noarch.rpm
   # yum install -y cvmfs (this will take forever)
   # mkdir -p /cvmfs/cvmfs-config.cern.ch && mount -t cvmfs cvmfs-config.cern.ch /cvmfs/cvmfs-config.cern.ch (takes forever)
-  image: kindest/node:v1.18.6
+  # image: kindest/node:v1.18.6
   # image: kindest/node:v1.21.2
-  # image: kindest/node:v1.22.1
+  # image: kindest/node:v1.22.7
+  image: kindest/node:v1.23.5
   extraMounts:
   - hostPath: ./share
     containerPath: /pocket
+  - hostPath: /cvmfs/dunedaq.opensciencegrid.org
+    containerPath: /cvmfs/dunedaq.opensciencegrid.org
+  - hostPath: /cvmfs/dunedaq-development.opensciencegrid.org
+    containerPath: /cvmfs/dunedaq-development.opensciencegrid.org
   extraPortMappings:
   - # proxy server
     containerPort: 31000
@@ -56,3 +61,12 @@ nodes:
   - # example-server
     containerPort: 32080
     hostPort: 32080
+  - # daqconfig-mongodb
+    containerPort: 31007
+    hostPort: 31007
+  - # daqconfig-service
+    containerPort: 31011
+    hostPort: 31011
+  - # mongo-express for the daqconfig-mongodb
+    containerPort: 31012
+    hostPort: 31012

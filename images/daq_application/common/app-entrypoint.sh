@@ -1,5 +1,5 @@
 #!/usr/bin/bash
 
 cd /dunedaq/run
-source run_env.sh
+source daq_app_rte.sh
 daq_application $@

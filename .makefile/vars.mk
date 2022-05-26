@@ -8,11 +8,11 @@ TERRAFORM_VERSION ?= 0.15.3
 TERRAFORM_NOVER := $(EXTERNALS_BIN_FOLDER)/terraform
 TERRAFORM := $(TERRAFORM_NOVER)-$(TERRAFORM_VERSION)
 
-KIND_VERSION ?= 0.11.1
+KIND_VERSION ?= 0.12.0
 KIND_NOVER := $(EXTERNALS_BIN_FOLDER)/kind
 KIND := $(KIND_NOVER)-$(KIND_VERSION)
 
-KUBECTL_VERSION ?= 1.21.1
+KUBECTL_VERSION ?= 1.23.5
 KUBECTL_NOVER := $(EXTERNALS_BIN_FOLDER)/kubectl
 KUBECTL := $(KUBECTL_NOVER)-$(KUBECTL_VERSION)
 
@@ -44,6 +44,12 @@ ifeq ($(findstring dqm,$(SERVICES)),)
 	DQM_ENABLED=0
 else
 	DQM_ENABLED=1
+endif
+
+ifeq ($(findstring daqconfig,$(SERVICES)),)
+	DAQCONFIG_ENABLED=0
+else
+	DAQCONFIG_ENABLED=1
 endif
 
 ##
@@ -104,11 +110,13 @@ ifeq ($(RANDOM_PWDS),1)
 	INFLUXDB_USER_PASSWORD := $(call random_password)
 	INFLUXDB_ADMIN_USER_PASSWORD :=$(call random_password)
 	PGPASS :=$(call random_password)
+	MONGOPASS :=$(call random_password)
 else	
 	GF_SECURITY_SECRET_KEY := "01234567890"
 	GF_SECURITY_ADMIN_PASSWORD := "run4evah"
 	INFLUXDB_USER_PASSWORD := "dunedaq"
 	INFLUXDB_ADMIN_USER_PASSWORD := "run4evah"
 	PGPASS := "run4evah"
+	MONGOPASS := "run4evah"
 endif
 

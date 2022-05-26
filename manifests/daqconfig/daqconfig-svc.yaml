@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: config-utility
+  name: config-utility
+  namespace: daqconfig
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: config-utility
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: config-utility
+    spec:
+      containers:
+      - image: plaso/daqconfig-service:latest
+        name: daqconfig-service
+        env:
+        - name: MONGO_HOST
+          value: "mongodb-svc-ext"
+        - name: MONGO_PORT
+          value: "27017"
+        - name: MONGO_USER
+          valueFrom:
+            secretKeyRef:
+              name: mongodb-root
+              key: user
+        - name: MONGO_PASS
+          valueFrom:
+            secretKeyRef:
+              name: mongodb-root
+              key: password
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: daqconfig
+  name: daqconfig-svc-ext
+  labels:
+    app: daqconfig-service
+spec:
+  type: NodePort
+  ports:
+    - port: 5003
+      targetPort: 5003
+      name: external
+      protocol: TCP
+      nodePort: 31011
+  selector:
+    app: config-utility
+
