@@ -57,6 +57,9 @@ kafka.local: dependency.docker kind kubectl external-manifests namespaces.local
 	@>/dev/null 2>&1 $(KUBECTL) -n kafka-kraft create secret generic kafka-secrets \
 	--from-literal=EXTERNAL_LISTENER="$(call node_ip)" ||:
 
+	@>/dev/null 2>&1 $(KUBECTL) -n kafka-kraft create configmap dune-kafka-libs --from-file images/kafka/jmx_prometheus_javaagent-0.16.1.jar ||:
+	@>/dev/null 2>&1 $(KUBECTL) -n kafka-kraft create configmap dune-kafka-config --from-file images/kafka/sample_jmx_exporter.yml
+
 	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/dunedaqers/kafka.yaml ||:
 	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/dunedaqers/kafka-svc.yaml ||:
 
