@@ -135,6 +135,7 @@ These are printed out after a successful setup or by running `make print-access-
 |Kibana|31005|
 |Opmonlib Proxy|31006|
 |Kafka External|30092|
+|Kafka monitoring|30075|
 |Error Reporting System|30080|
 |DQM Platform|30081|
 
