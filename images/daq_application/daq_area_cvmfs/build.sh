@@ -55,6 +55,11 @@ docker run ${DOCKER_OPTS}\
     "export PATH=\"/dunedaq/bin/:$PATH\"; rebuild_work_area.sh /dunedaq/run"
 
 echo "------------------------------------------"
+echo "Adding frames.bin"
+echo "------------------------------------------"
+curl -o ./image/frames.bin -O https://cernbox.cern.ch/index.php/s/7qNnuxD8igDOVJT/download
+
+echo "------------------------------------------"
 echo "Building $DKR_TAG:$DKR_VERSION docker image"
 echo "------------------------------------------"
 
