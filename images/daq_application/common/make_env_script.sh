@@ -10,4 +10,4 @@ echo "export PATH=$PATH" >> ${SCRIPT_NAME}
 echo "export READOUT_SHARE=$READOUT_SHARE" >> ${SCRIPT_NAME}
 echo "export TIMING_SHARE=$TIMING_SHARE" >> ${SCRIPT_NAME}
 echo "export TRACE_BIN=$TRACE_BIN" >> ${SCRIPT_NAME}
-echo "export TRACE_FILE=$TRACE_FILE" >> ${SCRIPT_NAME}
+#echo "export TRACE_FILE=$TRACE_FILE" >> ${SCRIPT_NAME}
