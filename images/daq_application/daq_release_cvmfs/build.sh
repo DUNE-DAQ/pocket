@@ -33,6 +33,11 @@ echo "Bringing common scripts in view of docker build"
 echo "------------------------------------------"
 cp -a $DKR_BUILD_HERE/../common .
 
+echo "------------------------------------------"
+echo "Adding frames.bin"
+echo "------------------------------------------"
+curl -o ./image/frames.bin -O https://cernbox.cern.ch/index.php/s/7qNnuxD8igDOVJT/download
+
 
 echo "------------------------------------------"
 echo "Building $DKR_TAG:$DKR_VERSION docker image"
