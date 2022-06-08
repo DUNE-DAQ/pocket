@@ -10,5 +10,6 @@ ADD ./image /dunedaq/run
 COPY ./common/app-entrypoint.sh /dunedaq/run
 
 RUN chmod 755 /dunedaq/run/app-entrypoint.sh
+RUN chmod ug+w /dunedaq/run
 
 ENTRYPOINT [ "/dunedaq/run/app-entrypoint.sh" ]
