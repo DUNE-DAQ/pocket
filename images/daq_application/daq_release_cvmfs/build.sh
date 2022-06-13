@@ -36,7 +36,7 @@ cp -a $DKR_BUILD_HERE/../common .
 echo "------------------------------------------"
 echo "Adding frames.bin"
 echo "------------------------------------------"
-curl -o ./image/frames.bin -O https://cernbox.cern.ch/index.php/s/7qNnuxD8igDOVJT/download
+curl -o ./image/frames.bin -O https://cernbox.cern.ch/index.php/s/0XzhExSIMQJUsp0/download
 
 
 echo "------------------------------------------"
