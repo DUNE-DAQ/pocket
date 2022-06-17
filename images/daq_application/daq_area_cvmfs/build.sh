@@ -3,7 +3,10 @@
 SH_SOURCE=${BASH_SOURCE[0]:-${(%):-%x}}
 DKR_BUILD_HERE=$(cd $(dirname ${SH_SOURCE}) && pwd)
 
-DKR_TAG=pocket-daq-area-cvmfs
+SRC_AREA=$DBT_AREA_ROOT
+DST_AREA="${DKR_BUILD_HERE}/image"
+
+DKR_TAG=${1}
 DKR_BASE_IMG=dunedaq/c8-minimal:latest
 
 if [[ $# -ne 1 ]]; then
@@ -12,13 +15,11 @@ if [[ $# -ne 1 ]]; then
 fi
 
 
-if [[ ! -d $1 && ( -L $1 && ! -d "$(readlink $1)" ) ]]; then
-    echo "$1 is not a directory"
+if [[ ! -d $SRC_AREA && ( -L $SRC_AREA && ! -d "$(readlink $SRC_AREA)" ) ]]; then
+    echo "$SRC_AREA is not a directory"
     exit 2
 fi
 
-SRC_AREA=$(cd $1 && pwd)
-DST_AREA="${DKR_BUILD_HERE}/image"
 
 rm -rf ${DST_AREA}
 
@@ -33,8 +34,8 @@ DOCKER_OPTS="--user $(id -u):$(id -g) \
     -it \
     -v /etc/passwd:/etc/passwd:ro -v /etc/group:/etc/group:ro \
     -v /cvmfs/dunedaq.opensciencegrid.org:/cvmfs/dunedaq.opensciencegrid.org:ro \
+    -v ${HOME}/.spack:${HOME}/.spack \
     -v /cvmfs/dunedaq-development.opensciencegrid.org:/cvmfs/dunedaq-development.opensciencegrid.org:ro"
-
 
 docker run ${DOCKER_OPTS}\
     -v ${DST_AREA}:/dunedaq/run:z \
@@ -63,12 +64,7 @@ echo "------------------------------------------"
 echo "Building $DKR_TAG:$DKR_VERSION docker image"
 echo "------------------------------------------"
 
-DKR_TAG=pocket-daq-area-cvmfs
 DKR_VERSION=$(bash -c "source $DKR_BUILD_HERE/image/dbt-settings; echo \$DUNE_DAQ_BASE_RELEASE | sed 's/dunedaq-\([^-]*\).*/\1/'")
 
 cp -a $DKR_BUILD_HERE/../common $DKR_BUILD_HERE
-docker buildx build --tag ${DKR_TAG}:${DKR_VERSION} $DKR_BUILD_HERE 
-
-
-
-
+docker buildx build --tag ${DKR_TAG}:${DKR_VERSION} $DKR_BUILD_HERE
