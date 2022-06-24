@@ -20,7 +20,8 @@ spec:
           emptyDir: {}
       containers:
       - name: dqmbackend
-        image: dunedaq/pocket-dqmdjango:0.3.4
+        #image: dunedaq/pocket-dqmdjango:0.3.4
+        image: np04docker.cern.ch/dunedaq-local/pipdqm:1.9 
         ports:
         - containerPort: 8000
         env:
@@ -29,11 +30,14 @@ spec:
         - name: PASSWORD
           value: "admin" 
         - name: ALLOWED_HOSTS
-          value: "10."
+          value: "np04-srv-016.cern.ch"
+          #value: "10."
         - name: PATH_DATABASE
           value: "/mnt/data/Database"
         - name: PATH_DATABASE_RESULTS
           value: "/mnt/data/Database-results"
+        - name: REDIS_HOST
+          value: "dqm-redis-svc.dqm"
         volumeMounts:
         - mountPath: "/mnt/data/Database"
           name: dqm-db
@@ -42,31 +46,6 @@ spec:
         command:
         - sh 
         - /entrypoint.sh
-
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: dqmredis
-  namespace: dqm
-spec:
-  selector:
-    matchLabels:
-      app: dqmredis
-  replicas: 1
-  template:
-    metadata:
-      labels:
-        app: dqmredis
-    spec:
-      volumes:
-        - name: dqm-shared
-          emptyDir: {}
-      containers:
-      - name: dqmredis
-        image: redis:4
-        ports:
-        - containerPort: 6379
 
 ---
 apiVersion: v1
