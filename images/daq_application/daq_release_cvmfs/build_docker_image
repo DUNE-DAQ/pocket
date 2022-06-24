@@ -3,10 +3,28 @@
 SH_SOURCE=${BASH_SOURCE[0]:-${(%):-%x}}
 DKR_BUILD_HERE=$(cd $(dirname ${SH_SOURCE}) && pwd)
 
+DUNEDAQ_RELEASE=$1
 
-DUNEDAQ_RELEASE="v2.10.2"
+set -e
+usage () {
+    echo "This utility builds docker images containing the necessary code for DAQ applications from a release."
+    echo "./build_docker_image RELEASE"
+    echo "(for example ./build_docker_image v3.0.0)"
+}
 
-DKR_TAG=pocket-daq-release-cvmfs
+if [[ $# -ne 1 ]]; then
+    echo "ERROR: Wrong number of arguments: 1 expected, $# found."
+    usage
+    exit 2
+fi
+
+if [ "$1" = "-h" ] || [ "$1" = "--help" ]
+then
+    usage
+    exit 0
+fi
+
+DKR_TAG=daq-release
 DKR_VERSION=${DUNEDAQ_RELEASE}
 DKR_BASE_IMG=dunedaq/c8-minimal:latest
 
@@ -17,6 +35,7 @@ mkdir -p ${DST_AREA}
 
 DOCKER_OPTS="--user $(id -u):$(id -g) \
     -it \
+    -v ${HOME}/.spack:${HOME}/.spack \
     -v /etc/passwd:/etc/passwd:ro -v /etc/group:/etc/group:ro \
     -v /cvmfs/dunedaq.opensciencegrid.org:/cvmfs/dunedaq.opensciencegrid.org \
     -v /cvmfs/dunedaq-development.opensciencegrid.org:/cvmfs/dunedaq-development.opensciencegrid.org"
@@ -43,3 +62,7 @@ echo "------------------------------------------"
 echo "Building $DKR_TAG:$DKR_VERSION docker image"
 echo "------------------------------------------"
 docker buildx build --tag $DKR_TAG:$DKR_VERSION $DKR_BUILD_HERE 
+
+echo "------------------------------------------"
+echo "Image $DKR_TAG:$DKR_VERSION built!"
+echo "------------------------------------------"
