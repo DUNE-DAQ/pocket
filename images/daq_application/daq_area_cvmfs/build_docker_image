@@ -10,7 +10,7 @@ DKR_TAG=${1}
 DKR_BASE_IMG=dunedaq/c8-minimal:latest
 set -e
 usage () {
-    echo "This utility builds docker images containing the necessary code for DAQ applications"
+    echo "This utility builds docker images containing the necessary code for DAQ applications from your source area \$\{DBT_AREA_ROOT\}=${DBT_AREA_ROOT}"
     echo "./build_docker_image image_name"
 }
 
