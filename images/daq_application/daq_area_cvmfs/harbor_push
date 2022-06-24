@@ -1,8 +1,20 @@
 #!/bin/bash
+set -e
+usage () {
+    echo "This utility pushes the image to harbor"
+    echo "./harbor_push image_name"
+}
 
 if [[ $# -ne 1 ]]; then
     echo "ERROR: Wrong number of arguments: 1 expected, $# found."
+    usage
     exit 2
+fi
+
+if [ "$1" = "-h" ] || [ "$1" = "--help" ]
+then
+    usage
+    exit 0
 fi
 
 DOCKER_REPO="np04docker.cern.ch/dunedaq-local"
