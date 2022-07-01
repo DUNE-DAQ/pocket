@@ -201,6 +201,18 @@ spec:
         envFrom:
         - secretRef:
             name: influxdb-secrets
+        volumeMounts:
+        - mountPath: /etc/influxdb/influxdb.conf
+          name: influxdb-config
+          subPath: influxdb.conf
+          readOnly: true
+        env:
+        - name: INFLUXDB_DB
+          value: "telegraf; CREATE DATABASE influxdb; CREATE DATABASE influxv3"
+      volumes:
+        - name: influxdb-config
+          configMap:
+            name: influxdb-config
 ---
 apiVersion: v1  
 kind: Service  
