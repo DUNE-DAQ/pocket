@@ -113,7 +113,7 @@ data:
         "influxdb.*.*.*.users.*.* measurement.test.injector.simulation.measurement.request.field"
       ]
 
-[[graphite]]
+    [[graphite]]
       enabled = true
       bind-address = ":2004"
       database = "influxv3"
