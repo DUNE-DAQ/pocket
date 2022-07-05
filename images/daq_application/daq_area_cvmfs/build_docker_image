@@ -8,10 +8,22 @@ DST_AREA="${DKR_BUILD_HERE}/image"
 
 DKR_TAG=${1}
 DKR_BASE_IMG=dunedaq/c8-minimal:latest
+set -e
+usage () {
+    echo "This utility builds docker images containing the necessary code for DAQ applications from your source area \$\{DBT_AREA_ROOT\}=${DBT_AREA_ROOT}"
+    echo "./build_docker_image image_name"
+}
 
 if [[ $# -ne 1 ]]; then
-    echo "ERROR: Wrong number of arguments: 1 expecgted, $# found."
+    echo "ERROR: Wrong number of arguments: 1 expected, $# found."
+    usage
     exit 2
+fi
+
+if [ "$1" = "-h" ] || [ "$1" = "--help" ]
+then
+    usage
+    exit 0
 fi
 
 
@@ -68,3 +80,7 @@ DKR_VERSION=$(bash -c "source $DKR_BUILD_HERE/image/dbt-settings; echo \$DUNE_DA
 
 cp -a $DKR_BUILD_HERE/../common $DKR_BUILD_HERE
 docker buildx build --tag ${DKR_TAG}:${DKR_VERSION} $DKR_BUILD_HERE
+
+echo "------------------------------------------"
+echo "Image $DKR_TAG:$DKR_VERSION built!"
+echo "------------------------------------------"

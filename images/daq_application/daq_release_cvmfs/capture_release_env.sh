@@ -18,7 +18,7 @@ setup_dbt dunedaq-${DUNEDAQ_RELEASE}
 echo "------------------------------------------"
 echo "Loading daq-release environment"
 echo "------------------------------------------"
-dbt-setup-release  dunedaq-${DUNEDAQ_RELEASE}-cs8
+dbt-setup-release  dunedaq-${DUNEDAQ_RELEASE}
 
 echo "------------------------------------------"
 echo "Capturing runtime environment"

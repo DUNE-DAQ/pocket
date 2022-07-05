@@ -19,7 +19,7 @@ echo "------------------------------------------"
 cd $DBT_AREA
 source ./dbt-env.sh
 dbt-workarea-env
-dbt-build.py -c
+dbt-build -c
 rm -rf build
 make_env_script.sh
 echo "------------------------------------------"
