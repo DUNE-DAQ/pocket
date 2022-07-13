@@ -1,0 +1,18 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kafka2influx
+  namespace: monitoring
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kakfa2influxdb
+  template:
+    metadata:
+      labels:
+        app: kafka2influxdb
+    spec:
+      containers:
+      - image: np04docker.cern.ch/dunedaq-local/maroda/opmon_microservice
+        name: kafka2influxdb
