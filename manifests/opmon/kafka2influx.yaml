@@ -7,12 +7,12 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      app: kakfa2influxdb
+      app: influxdb
   template:
     metadata:
       labels:
-        app: kafka2influxdb
+        app: influxdb
     spec:
       containers:
       - image: np04docker.cern.ch/dunedaq-local/maroda/opmon_microservice
-        name: kafka2influxdb
+        name: kafka2influx
