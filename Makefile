@@ -136,6 +136,12 @@ opmon.local: erspostgres.local
 	--from-literal=GF_SECURITY_SECRET_KEY="${GF_SECURITY_SECRET_KEY}" \
 	--from-literal=GF_SECURITY_ADMIN_PASSWORD="${GF_SECURITY_ADMIN_PASSWORD}" ||:
 
+	@>/dev/null $(KUBECTL) -n monitoring create configmap grafana-datasources \
+	--from-file=manifests/opmon/grafana/grafana-provisioning/
+
+	@>/dev/null $(KUBECTL) -n monitoring create configmap grafana-dashboards \
+	--from-file=manifests/opmon/grafana/grafana-dashboards-develop/
+
 	@>/dev/null 2>&1 $(KUBECTL) -n monitoring create secret generic influxdb-secrets \
 	--from-literal=INFLUXDB_CONFIG_PATH=/etc/influxdb/influxdb.conf \
 	--from-literal=INFLUXDB_DB=influxdb \

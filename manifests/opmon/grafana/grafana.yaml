@@ -63,8 +63,8 @@ spec:
           name: grafana-dashboards
         name: grafana-dashboards
       - configMap:
-          name: datasources
-        name: datasources
+          name: grafana-datasources
+        name: grafana-datasources
 
 ---
 apiVersion: v1
