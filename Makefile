@@ -150,6 +150,7 @@ opmon.local: erspostgres.local
 	--from-literal=INFLUXDB_HTTP_AUTH_ENABLED=false ||:
 
 	@>/dev/null $(KUBECTL) apply -f manifests/opmon
+	@>/dev/null $(KUBECTL) apply -f manifests/opmon/grafana
 
 
 .PHONY: kubectl-apply
