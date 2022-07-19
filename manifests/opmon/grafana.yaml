@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: grafana
-        image: dunedaq/pocket-grafana:1.0.2
+        image: grafana/grafana:8.1.8
         imagePullPolicy: Always
         ports:
         - containerPort: 3000
@@ -51,6 +51,15 @@ spec:
             name: influxdb-secrets
         - secretRef:
             name: postgres-secrets
+        volumeMounts:
+        - mountPath: /opt/grafana/dashboards
+          name: grafana-dashboards
+          readOnly: false
+      volumes:
+      - configMap:
+          name: grafana-dashboards
+        name: grafana-dashboards
+
 ---
 apiVersion: v1
 kind: Service
