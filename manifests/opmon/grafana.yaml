@@ -52,13 +52,19 @@ spec:
         - secretRef:
             name: postgres-secrets
         volumeMounts:
-        - mountPath: /opt/grafana/dashboards
+        - mountPath: /etc/grafana/provisioning/dashboards
           name: grafana-dashboards
+          readOnly: false
+        - mountPath: /etc/grafana/provisioning/datasources
+          name: grafana-datasources
           readOnly: false
       volumes:
       - configMap:
           name: grafana-dashboards
         name: grafana-dashboards
+      - configMap:
+          name: grafana-datasources
+        name: grafana-datasources
 
 ---
 apiVersion: v1
@@ -83,7 +89,7 @@ metadata:
   name: grafana-datasources
   namespace: monitoring
 data:
-  prometheus.yaml: |-
+  prometheus.json: |-
     {
         "apiVersion": 1,
         "datasources": [
@@ -97,30 +103,30 @@ data:
                 "version": 1
             },
             {
-                "name": "ERS"
-                "type": "postgres"
-                "url": "postgres-svc.ers"
-                "database": "ApplicationDbErrorReporting"
-                "isDefault": "true"
-                "editable": "false"
-                "user": "admin"
+                "name": "ERS",
+                "type": "postgres",
+                "url": "postgres-svc.ers",
+                "database": "ApplicationDbErrorReporting",
+                "isDefault": "true",
+                "editable": "false",
+                "user": "admin",
                 "secureJsonData":
-                  "password": "${POSTGRES_PASSWORD}"
+                  "password": "${POSTGRES_PASSWORD}",
                 "jsonData":
                   "sslmode": 'disable'
             },
             {
-                "name": "influxdb"
-                "orgId": 1
-                "type": "influxdb"
-                "access": "proxy"
-                "url": "http://influxdb.monitoring:8086"
-                "database": "influxdb"
-                "isDefault": "false"
-                "version": 1
-                "editable": "false"
-                "basicAuth": "true"
-                "basicAuthUser": "readonly"
+                "name": "influxdb",
+                "orgId": 1,
+                "type": "influxdb",
+                "access": "proxy",
+                "url": "http://influxdb.monitoring:8086",
+                "database": "influxdb",
+                "isDefault": "false",
+                "version": 1,
+                "editable": "false",
+                "basicAuth": "true",
+                "basicAuthUser": "readonly",
                 "basicAuthPassword": "readonly"
             }
         ]
