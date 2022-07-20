@@ -21,23 +21,13 @@ spec:
       containers:
       - name: dqmbackend
         #image: dunedaq/pocket-dqmdjango:0.3.4
-        image: np04docker.cern.ch/dunedaq-local/pipdqm:1.9 
+        image: np04docker.cern.ch/dunedaq-local/pipdqm:1.9
+        #image: piphamilton/pipdqm:1.9
         ports:
         - containerPort: 8000
-        env:
-        - name: USERNAME
-          value: "admin"
-        - name: PASSWORD
-          value: "admin" 
-        - name: ALLOWED_HOSTS
-          value: "np04-srv-016.cern.ch"
-          #value: "10."
-        - name: PATH_DATABASE
-          value: "/mnt/data/Database"
-        - name: PATH_DATABASE_RESULTS
-          value: "/mnt/data/Database-results"
-        - name: REDIS_HOST
-          value: "dqm-redis-svc.dqm"
+        envFrom:
+        - secretRef:
+            name: dqm-secrets
         volumeMounts:
         - mountPath: "/mnt/data/Database"
           name: dqm-db

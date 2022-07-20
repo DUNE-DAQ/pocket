@@ -96,7 +96,12 @@ dqm.local:
 	@echo "installing dqm backend"
 	$(KUBECTL) -n dqm create secret generic dqm-secrets \
 	--from-literal=USERNAME=admin \
-	--from-literal=PASSWORD=admin 
+	--from-literal=PASSWORD=admin \
+	--from-literal=ALLOWED_HOSTS=np04-srv-018\
+	--from-literal=PATH_DATABASE=/mnt/data/Database \
+	--from-literal=PATH_DATABASE_RESULTS=/mnt/data/Database-results \
+	--from-literal=REDIS_HOST=dqm-redis-svc.dqm ||:
+	$(KUBECTL) apply -f manifests/dqm-django/dqm-redis-backend.yaml ||:
 	$(KUBECTL) apply -f manifests/dqm-django/dqm-backend.yaml ||:
 
 .PHONY: daqconfig.local
