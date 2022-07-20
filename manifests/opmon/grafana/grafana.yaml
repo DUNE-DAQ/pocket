@@ -52,11 +52,14 @@ spec:
         - secretRef:
             name: postgres-secrets
         volumeMounts:
-        - mountPath: /etc/grafana/conf/dashboards
+        - mountPath: /opt/grafana/dashboards
           name: grafana-dashboards
           readOnly: false
         - mountPath: /etc/grafana/provisioning/datasources
-          name: datasources
+          name: grafana-datasources
+          readOnly: false
+        - mountPath: /etc/grafana/provisioning/dashboards
+          name: dashboard-provisioning
           readOnly: false
       volumes:
       - configMap:
@@ -65,6 +68,9 @@ spec:
       - configMap:
           name: grafana-datasources
         name: grafana-datasources
+      - configMap:
+          name: dashboard-provisioning
+        name: dashboard-provisioning
 
 ---
 apiVersion: v1
