@@ -6,7 +6,7 @@ datasources:
     access: proxy
     orgId: 1
     uid: 'prometheus'
-    url:  "http://prometheus-service.monitoring.svc:8080"
+    url:  "http://prometheus-service.monitoring:8080"
     version: 1
 
   - name: 'ERS'
@@ -16,6 +16,7 @@ datasources:
     uid: 'ERS'
     url:  "postgres-svc.ers"
     database: "ApplicationDbErrorReporting"
+    user: "admin"
     secureJsonData:
       password: "${POSTGRES_PASSWORD}"
     jsonData: 
@@ -27,10 +28,11 @@ datasources:
     access: proxy
     orgId: 1
     uid: 'influxdb'
-    url:  "postgres-svc.ers"
+    url:  "http://influxdb.monitoring:8086/"
     database: "influxdb"
     basicAuth: "true"
     basicAuthUser: "readonly"
     basicAuthPassword: "readonly"
+    editable: "true"
     version: 1
 
