@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: runnumber-rest
+  namespace: microservices
+spec:
+  selector:
+    matchLabels:
+      app: runnumber-rest
+  minReadySeconds: 5
+  template:
+    metadata:
+      labels:
+        app: runnumber-rest
+    spec:
+      containers:
+      - image: dunedaq/pocket-runnumber-rest:0.1
+        name: runnumber-rest
+        envFrom:
+        - secretRef:
+            name: runnumber-rest-secrets
