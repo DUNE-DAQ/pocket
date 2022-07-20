@@ -32,7 +32,7 @@ datasources:
     database: "influxdb"
     basicAuth: "true"
     basicAuthUser: "readonly"
-    basicAuthPassword: "readonly"
+    basicAuthPassword: "$INFLUXDB_USER_PASSWORD"
     editable: "true"
     version: 1
 
