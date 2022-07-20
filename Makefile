@@ -50,6 +50,13 @@ namespaces.local: kind kubectl external-manifests
 	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/daqconfig/ns-daqconfig.yaml ||:
 
 
+.PHONY: kafka2opmon
+kafka2opmon: kafka.local  opmon.local
+	@echo "Connecting kafka to influxdb"
+
+	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/opmon/kafka2influx.yaml ||:
+
+
 .PHONY: kafka.local
 kafka.local: dependency.docker kind kubectl external-manifests namespaces.local
 	@echo "installing kafka"
