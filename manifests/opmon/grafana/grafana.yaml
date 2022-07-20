@@ -52,11 +52,14 @@ spec:
         - secretRef:
             name: postgres-secrets
         volumeMounts:
-        - mountPath: /etc/grafana/provisioning/dashboards
+        - mountPath: /opt/grafana/dashboards
           name: grafana-dashboards
           readOnly: false
         - mountPath: /etc/grafana/provisioning/datasources
           name: grafana-datasources
+          readOnly: false
+        - mountPath: /etc/grafana/provisioning/dashboards
+          name: dashboard-provisioning
           readOnly: false
       volumes:
       - configMap:
@@ -65,6 +68,9 @@ spec:
       - configMap:
           name: grafana-datasources
         name: grafana-datasources
+      - configMap:
+          name: dashboard-provisioning
+        name: dashboard-provisioning
 
 ---
 apiVersion: v1
@@ -82,53 +88,3 @@ spec:
   selector:
     app: grafana
   sessionAffinity: None
----
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: grafana-datasources
-  namespace: monitoring
-data:
-  prometheus.json: |-
-    {
-        "apiVersion": 1,
-        "datasources": [
-            {
-                "access":"proxy",
-                "editable": true,
-                "name": "prometheus",
-                "orgId": 1,
-                "type": "prometheus",
-                "url": "http://prometheus-service.monitoring.svc:8080",
-                "version": 1
-            },
-            {
-                "name": "ERS",
-                "type": "postgres",
-                "url": "postgres-svc.ers",
-                "database": "ApplicationDbErrorReporting",
-                "isDefault": "true",
-                "editable": "false",
-                "user": "admin",
-                "secureJsonData":
-                  "password": "${POSTGRES_PASSWORD}",
-                "jsonData":
-                  "sslmode": 'disable'
-            },
-            {
-                "name": "influxdb",
-                "orgId": 1,
-                "type": "influxdb",
-                "access": "proxy",
-                "url": "http://influxdb.monitoring:8086",
-                "database": "influxdb",
-                "isDefault": "false",
-                "version": 1,
-                "editable": "false",
-                "basicAuth": "true",
-                "basicAuthUser": "readonly",
-                "basicAuthPassword": "readonly"
-            }
-        ]
-    }
-  

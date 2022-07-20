@@ -1,0 +1,38 @@
+apiVersion: 1
+
+datasources:
+  - name: 'prometheus'
+    type: 'prometheus'
+    access: proxy
+    orgId: 1
+    uid: 'prometheus'
+    url:  "http://prometheus-service.monitoring:8080"
+    version: 1
+
+  - name: 'ERS'
+    type: 'postgres'
+    access: proxy
+    orgId: 1
+    uid: 'ERS'
+    url:  "postgres-svc.ers"
+    database: "ApplicationDbErrorReporting"
+    user: "admin"
+    secureJsonData:
+      password: "${POSTGRES_PASSWORD}"
+    jsonData: 
+      sslmode: 'disable'
+    version: 1
+
+  - name: 'influxdb'
+    type: 'influxdb'
+    access: proxy
+    orgId: 1
+    uid: 'influxdb'
+    url:  "http://influxdb.monitoring:8086/"
+    database: "influxdb"
+    basicAuth: "true"
+    basicAuthUser: "readonly"
+    basicAuthPassword: "readonly"
+    editable: "true"
+    version: 1
+
