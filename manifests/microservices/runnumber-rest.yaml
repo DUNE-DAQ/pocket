@@ -19,3 +19,10 @@ spec:
         envFrom:
         - secretRef:
             name: runnumber-rest-secrets
+        ports:
+        - containerPort: 5000
+          protocol: TCP
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+
