@@ -52,6 +52,12 @@ else
 	DAQCONFIG_ENABLED=1
 endif
 
+ifeq ($(findstring microservices,$(SERVICES)),)
+	MICROSERVICES_ENABLED=0
+else
+	MICROSERVICES__ENABLED=1
+endif
+
 ##
 ## Helper variables so we download the right binaries for your machine
 ##

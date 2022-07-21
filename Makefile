@@ -123,6 +123,9 @@ opmon: erspostgres
 	@>/dev/null $(KUBECTL) apply -f manifests/opmon
 	@>/dev/null $(KUBECTL) apply -f manifests/opmon/grafana
 
+.PHONY: microservices
+microservices:
+	@>/dev/null 2>&1 $(KUBECTL) create -f manifests/microservices/ ||:
 
 .PHONY: kubectl-apply
 kubectl-apply: kubectl external-manifests namespaces ## apply files in `manifests` using kubectl
