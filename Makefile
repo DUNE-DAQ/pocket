@@ -23,27 +23,6 @@ setup.local: dependency.docker kind kubectl share/ ## start local setup
 	@echo ""
 	@$(MAKE) --no-print-directory print-access-creds
 
-.PHONY: setup.openstack
-setup.openstack: on-cern-network check_openstack_login terraform ansible dependency.ssh ## create a setup in your openstack account
-	cd openstack/terraform && \
-	$(TERRAFORM) init -upgrade && \
-	TF_VAR_cluster_name=${OS_USERNAME}-pocketdune $(TERRAFORM) apply
-
-	cd openstack/ansible && \
-	ansible-playbook -i hosts.yaml playbook.yaml
-
-	cat $(shell find openstack/ansible/admin.conf -type f -name admin.conf) | sed 's|kubernetes-admin@kubernetes|admin@pocketdune|g' | sed 's|kubernetes-admin|pocketdune-admin|g' | sed 's|kubernetes|pocketdune|g' > /tmp/kubeconfig-pocketdune
-	KUBECONFIG=~/.kube/config:/tmp/kubeconfig-pocketdune $(KUBECTL) config view --flatten > /tmp/kubeconfig
-	cp /tmp/kubeconfig ~/.kube/config
-	$(KUBECTL) config use-context 'admin@pocketdune'
-	-$(KUBECTL) taint nodes --all node-role.kubernetes.io/master-
-	$(MAKE) --no-print-directory kubectl-apply
-	$(MAKE) --no-print-directory print-access-creds
-	@echo -n "Proxy server available at: socks5"
-	@cat ~/.kube/config | grep -Eo '://[a-zA-Z0-9-]*-pocketdune.cern.ch:' | tr -d '\012\015'
-	@echo "31000"
-
-
 .PHONY: namespaces.local
 namespaces.local: kind kubectl external-manifests
 	@echo "setting up namespaces"
@@ -203,15 +182,6 @@ endif
 destroy.local: kind ## undo the setup made by `setup.local`
 	@$(KIND) delete cluster --name $(shell cat local/kind.config.yml | grep 'name: ' | cut -d ":" -f2)
 
-.PHONY: destroy.openstack
-destroy.openstack: check_openstack_login terraform ## undo the setup made by `setup.openstack`
-	cd openstack/terraform && \
-	$(TERRAFORM) init -upgrade && \
-	TF_VAR_cluster_name=${OS_USERNAME}-pocketdune $(TERRAFORM) destroy
-	$(KUBECTL) config delete-context 'admin@pocketdune'
-	$(KUBECTL) config delete-cluster pocketdune
-	$(KUBECTL) config delete-user pocketdune-admin
-
 ##
 ### Helper commands
 ##
@@ -219,16 +189,6 @@ destroy.openstack: check_openstack_login terraform ## undo the setup made by `se
 .PHONY: env
 env: kubectl ## use `eval $(make env)` to get access to dependency binaries such as kubectl
 	@echo "PATH=\"$(EXTERNALS_BIN_FOLDER):$(shell echo $$PATH)\""
-
-.PHONY: check_openstack_login
-check_openstack_login:
-ifndef OS_PASSWORD
-	@echo -e "\e[31mOpenStack credentials file is not sourced\e[0m"
-	@echo "Please source your openstack credentials file before running me (\`source my-openstack-rc.sh\`)"
-	@echo "Download your RC file at https://openstack.cern.ch > Tools (button on the top right) > OpenStack RC File"
-	@echo ""
-	@exit 1
-endif
 
 print-access-creds: kubectl ## retrieve and print access data for provided services
 	@KUBECTL=$(KUBECTL) .makefile/print-creds.sh
