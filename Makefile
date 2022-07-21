@@ -18,6 +18,11 @@ setup.local: dependency.docker kind kubectl share/ ## start local setup
 	@echo ""
 	@$(MAKE) --no-print-directory print-access-creds
 
+.PHONY: setup.multinode
+	@$(MAKE) --no-print-directory kubectl-apply
+	@echo ""
+	@$(MAKE) --no-print-directory print-access-creds
+
 .PHONY: setup.openstack
 setup.openstack: on-cern-network check_openstack_login terraform ansible dependency.ssh ## create a setup in your openstack account
 	cd openstack/terraform && \
@@ -169,7 +174,6 @@ ifeq ($(ERS_ENABLED),0)
 	@echo -e "\e[33mskipping installation of Kafka-ERS\e[0m"
 else
 	@$(MAKE) --no-print-directory ers-kafka.local
-	@$(MAKE) --no-print-directory ers-topic
 endif
 
 ifeq ($(OPMON_ENABLED),0)
@@ -215,23 +219,6 @@ destroy.openstack: check_openstack_login terraform ## undo the setup made by `se
 .PHONY: env
 env: kubectl ## use `eval $(make env)` to get access to dependency binaries such as kubectl
 	@echo "PATH=\"$(EXTERNALS_BIN_FOLDER):$(shell echo $$PATH)\""
-
-.PHONY: ers-topic
-ers-topic: env
-	@echo "Configuring Kafka Topic erskafka-reporting"
-	@>/dev/null 2>&1 $(KUBECTL) -n kafka-kraft exec --stdin --tty kafka-0 -- kafka-topics.sh --create --bootstrap-server kafka-svc.kafka-kraft:9092 --partitions 1 --topic erskafka-reporting ||:
-
-.PHONY: dqm-topic
-dqm-topic: env
-	@echo "Configuring topics for DQM"
-	@>/dev/null 2>&1 $(KUBECTL) -n kafka-kraft exec --stdin --tty kafka-0 -- kafka-topics.sh --create --bootstrap-server kafka-svc.kafka-kraft:9092 --partitions 1 --topic testdunedqm ||:
-	@>/dev/null 2>&1 $(KUBECTL) -n kafka-kraft exec --stdin --tty kafka-0 -- kafka-topics.sh --create --bootstrap-server kafka-svc.kafka-kraft:9092 --partitions 1 --topic kafkaopmon-reporting ||:
-	@>/dev/null 2>&1 $(KUBECTL) -n kafka-kraft exec --stdin --tty kafka-0 -- kafka-topics.sh --create --bootstrap-server kafka-svc.kafka-kraft:9092 --partitions 1 --topic dune-dqm-messenger ||:
-	@>/dev/null 2>&1 $(KUBECTL) -n kafka-kraft exec --stdin --tty kafka-0 -- kafka-topics.sh --create --bootstrap-server kafka-svc.kafka-kraft:9092 --partitions 1 --topic dune-dqm-messages ||:
-	@>/dev/null 2>&1 $(KUBECTL) -n kafka-kraft exec --stdin --tty kafka-0 -- kafka-topics.sh --create --bootstrap-server kafka-svc.kafka-kraft:9092 --partitions 1 --topic dunedqm-incommingchannel1 ||:
-	@>/dev/null 2>&1 $(KUBECTL) -n kafka-kraft exec --stdin --tty kafka-0 -- kafka-topics.sh --create --bootstrap-server kafka-svc.kafka-kraft:9092 --partitions 1 --topic dunedqm-incommingchannel2 ||:
-	@>/dev/null 2>&1 $(KUBECTL) -n kafka-kraft exec --stdin --tty kafka-0 -- kafka-topics.sh --create --bootstrap-server kafka-svc.kafka-kraft:9092 --partitions 1 --topic dunedqm-platforminputs ||:
-	@>/dev/null 2>&1 $(KUBECTL) -n kafka-kraft exec --stdin --tty kafka-0 -- kafka-topics.sh --create --bootstrap-server kafka-svc.kafka-kraft:9092 --partitions 1 --topic dunedqm-processedchannel1 ||:
 
 .PHONY: check_openstack_login
 check_openstack_login:
