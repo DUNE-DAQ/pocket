@@ -23,8 +23,8 @@ setup.local: dependency.docker kind kubectl share/ ## start local setup
 	@echo ""
 	@$(MAKE) --no-print-directory print-access-creds
 
-.PHONY: namespaces.local
-namespaces.local: kind kubectl external-manifests
+.PHONY: namespaces
+namespaces: kind kubectl external-manifests
 	@echo "setting up namespaces"
 	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/cvmfs/ns-cvmfs.yaml ||:
 	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/dunedaqers/ns-kafka-kraft.yaml ||:
@@ -34,8 +34,8 @@ namespaces.local: kind kubectl external-manifests
 	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/daqconfig/ns-daqconfig.yaml ||:
 
 
-.PHONY: kafka.local
-kafka.local: dependency.docker kind kubectl external-manifests namespaces.local
+.PHONY: kafka
+kafka: dependency.docker kind kubectl external-manifests namespaces
 	@echo "installing kafka"
 	@echo -n "setting advertised listener to "
 	@echo "$(call node_ip)"
@@ -49,8 +49,8 @@ kafka.local: dependency.docker kind kubectl external-manifests namespaces.local
 	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/dunedaqers/kafka-svc.yaml ||:
 
 
-.PHONY: erspostgres.local
-erspostgres.local: kind kubectl external-manifests namespaces.local
+.PHONY: erspostgres
+erspostgres: kind kubectl external-manifests namespaces
 	@echo "installing postgres"
 
 	@>/dev/null 2>&1 $(KUBECTL) -n ers create secret generic postgres-secrets \
@@ -68,29 +68,23 @@ erspostgres.local: kind kubectl external-manifests namespaces.local
 	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/dunedaqers/ers-postgres-svc.yaml ||:
 	@>/dev/null 2>&1 $(KUBECTL) -n ers create configmap ers-sql --from-file manifests/dunedaqers/sql/ApplicationDbErrorReporting.sql
 
-.PHONY: ers-kafka.local
-ers-kafka.local: kafka.local erspostgres.local
-	@echo "installing ers-kafka"
 
-	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/dunedaqers/ers-aspcore.yaml ||:
-
-
-.PHONY: dqm.local
-dqm.local:
+.PHONY: dqm
+dqm:
 	@echo "installing dqm backend"
 	$(KUBECTL) -n dqm create secret generic dqm-secrets \
 	--from-literal=USERNAME=admin \
 	--from-literal=PASSWORD=admin 
 	$(KUBECTL) apply -f manifests/dqm-django/dqm-backend.yaml ||:
 
-.PHONY: daqconfig.local
-daqconfig.local: daqconfig-mongo.local
+.PHONY: daqconfig
+daqconfig: daqconfig-mongo
 	@echo "installing config service"
 	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/daqconfig/daqconfig-svc.yaml ||:
 
 
 .PHONY: daqconfig-mongo.local
-daqconfig-mongo.local: kind kubectl external-manifests namespaces.local
+daqconfig-mongo: kind kubectl external-manifests namespaces
 	@echo "installing mongodb"
 	@>/dev/null 2>&1 $(KUBECTL) -n daqconfig create secret generic mongodb-root --from-literal=password="${MONGOPASS}" --from-literal=user="mongo_user" ||:
 	@>/dev/null 2>&1 $(KUBECTL) create -f manifests/daqconfig/volume-claim.yaml ||:
@@ -99,21 +93,8 @@ daqconfig-mongo.local: kind kubectl external-manifests namespaces.local
 	@>/dev/null 2>&1 $(KUBECTL) create -f manifests/daqconfig/mongodb-nodeport-svc.yaml ||:
 	@>/dev/null 2>&1 $(KUBECTL) create -f manifests/daqconfig/mongo-express-deployment.yaml ||:
 
-
-# @>/dev/null 2>&1 $(KUBECTL) -n daqconfig create secret generic mongodb-daqconfig-admin-password \
-# --from-literal=password="${MONGOPASS}_ADMIN" ||:
-# @>/dev/null 2>&1 $(KUBECTL) apply -f manifests/daqconfig/mongodbcommunity.mongodb.com_mongodbcommunity.yaml ||:
-# @echo "Now waiting for the MongoDB operator to be up"
-# @>/dev/null 2>&1 $(KUBECTL) wait -n daqconfig --for=condition=Ready pod/mongodb-daqconfig-operator ||:
-# @echo "MongoDB operator is up!"
-# @>/dev/null 2>&1 $(KUBECTL) apply -k manifests/daqconfig/rbac/ ||:
-# @>/dev/null 2>&1 $(KUBECTL) create -f manifests/daqconfig/manager.yaml ||:
-# @>/dev/null 2>&1 $(KUBECTL) apply -f manifests/daqconfig/mongodb.com_v1_mongodbcommunity_cr.yaml ||:
-# @>/dev/null 2>&1 $(KUBECTL) apply -f manifests/daqconfig/mongodb-user.yaml ||:
-#$(KUBECTL) apply -f manifests/daqconfig/mongodb-client.yaml
-
-.PHONY: opmon.local
-opmon.local: erspostgres.local
+.PHONY: opmon
+opmon: erspostgres
 	@echo "installing opmon"
 
 	@>/dev/null 2>&1 $(KUBECTL) -n monitoring create secret generic grafana-secrets \
@@ -144,7 +125,7 @@ opmon.local: erspostgres.local
 
 
 .PHONY: kubectl-apply
-kubectl-apply: kubectl external-manifests namespaces.local ## apply files in `manifests` using kubectl
+kubectl-apply: kubectl external-manifests namespaces ## apply files in `manifests` using kubectl
 	@echo "installing basic services"
 	@>/dev/null $(KUBECTL) apply -f manifests
 
@@ -152,27 +133,33 @@ kubectl-apply: kubectl external-manifests namespaces.local ## apply files in `ma
 ifeq ($(ERS_ENABLED),0)
 	@echo -e "\e[33mskipping installation of Kafka-ERS\e[0m"
 else
-	@$(MAKE) --no-print-directory ers-kafka.local
+	@$(MAKE) --no-print-directory ers-kafka
 endif
 
 ifeq ($(OPMON_ENABLED),0)
 	@echo -e "\e[33mskipping installation of opmon\e[0m"
 else
-	@$(MAKE) --no-print-directory opmon.local
+	@$(MAKE) --no-print-directory opmon
 endif
 
 ifeq ($(DQM_ENABLED),0)
 	@echo -e "\e[33mskipping installation of DQM\e[0m"
 else
-	@$(MAKE) --no-print-directory dqm.local
+	@$(MAKE) --no-print-directory dqm
 endif
 
 ifeq ($(DAQCONFIG_ENABLED),0)
 	@echo -e "\e[33mskipping installation of DAQConfig\e[0m"
 else
-	@$(MAKE) --no-print-directory daqconfig.local
+	@$(MAKE) --no-print-directory daqconfig
 endif
 
+
+ifeq ($(MICROSERVICES_ENABLED),0)
+	@echo -e "\e[33mskipping installation of DAQConfig\e[0m"
+else
+	@$(MAKE) --no-print-directory microservices
+endif
 
 ##
 ### Destroy any created setups
