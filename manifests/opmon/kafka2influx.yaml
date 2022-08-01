@@ -14,5 +14,5 @@ spec:
         app: influxdb
     spec:
       containers:
-      - image: np04docker.cern.ch/dunedaq-local/maroda/opmon_microservice
+      - image: dunedaq/pocket-opmon-microservice:1.0
         name: kafka2influx
