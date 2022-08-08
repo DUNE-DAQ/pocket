@@ -16,3 +16,6 @@ spec:
       containers:
       - image: jmcarcell/ers-dbwriter:latest
         name: erskafka
+        envFrom:
+        - secretRef:
+            name: ers-secret
