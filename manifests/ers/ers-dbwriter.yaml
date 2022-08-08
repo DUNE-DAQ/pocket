@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: erskafka
+  namespace: monitoring
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: erskafka
+  template:
+    metadata:
+      labels:
+        app: erskafka
+    spec:
+      containers:
+      - image: jmcarcell/ers-dbwriter:latest
+        name: erskafka
+        envFrom:
+        - secretRef:
+            name: ers-secret
