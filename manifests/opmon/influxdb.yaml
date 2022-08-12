@@ -184,18 +184,3 @@ spec:
         envFrom:
         - secretRef:
             name: influxdb-secrets
----
-apiVersion: v1  
-kind: Service  
-metadata:  
-  name: influxdb
-  namespace: monitoring
-spec:
-  type: NodePort
-  selector:  
-    app: influxdb  
-  ports:  
-  - protocol: TCP  
-    port: 8086  
-    targetPort: 8086
-    nodePort: 31002

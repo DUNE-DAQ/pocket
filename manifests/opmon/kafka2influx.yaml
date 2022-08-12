@@ -7,12 +7,14 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      app: influxdb
+      app: kafka2influx
   template:
     metadata:
       labels:
-        app: influxdb
+        app: kafka2influx
     spec:
       containers:
       - image: dunedaq/pocket-opmon-microservice:1.0
         name: kafka2influx
+        command: ["/bin/bash"]
+        args: ["-c", "python3 /kafka-to-influx.py"]
