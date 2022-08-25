@@ -20,11 +20,16 @@ spec:
           emptyDir: {}
       containers:
       - name: dqmbackend
-        #image: dunedaq/pocket-dqmdjango:0.3.4
-        image: np04docker.cern.ch/dunedaq-local/pipdqm:1.9
-        #image: piphamilton/pipdqm:1.9
+        image: dunedaq/pipdqm:2.4
         ports:
         - containerPort: 8000
+          #env:
+          #- name: ALLOWED_HOSTS
+          #  valueFrom:
+          #    secretKeyRef:
+          #      name: dqm-secrets
+          #      key: ALLOWED_HOSTS
+          #      optional: false
         envFrom:
         - secretRef:
             name: dqm-secrets
