@@ -12,7 +12,7 @@ spec:
   accessModes:
     - ReadWriteOnce
   hostPath:
-    path: '/mnt/data'
+    path: '/scratch/kube/kafka'
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -47,7 +47,7 @@ spec:
     spec:
       containers:
         - name: kafka-container
-          image: dunedaq/pocket-kafka:1.0
+          image: dunedaq/pocket-kafka:1.1
           ports:
             - containerPort: 30092
             - containerPort: 9092
