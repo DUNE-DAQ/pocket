@@ -14,10 +14,16 @@ spec:
         app: dqmbackend
     spec:
       volumes:
-        - name: dqm-db
-          emptyDir: {}
-        - name: dqm-results
-          emptyDir: {}
+        - name: "dqm-db-dir"
+          persistentVolumeClaim:
+            claimName: "dqm-db"
+        - name: "dqm-results-dir"
+          persistentVolumeClaim:
+            claimName: "dqm-results"
+        #- name: dqm-db
+        #  emptyDir: {}
+        #- name: dqm-results
+        #  emptyDir: {}
       containers:
       - name: dqmbackend
         image: dunedaq/pipdqm:2.4
@@ -34,10 +40,15 @@ spec:
         - secretRef:
             name: dqm-secrets
         volumeMounts:
-        - mountPath: "/mnt/data/Database"
-          name: dqm-db
-        - mountPath: "/mnt/data/Database-results"
-          name: dqm-results
+        - name: "dqm-db-dir"
+          mountPath: "/mnt/data/Database"
+        - name: "dqm-results-dir"
+          mountPath: "/mnt/data/Database-results"
+        #volumeMounts:
+        #- mountPath: "/mnt/data/Database"
+        #  name: dqm-db
+        #- mountPath: "/mnt/data/Database-results"
+        #  name: dqm-results
         command:
         - sh 
         - /entrypoint.sh

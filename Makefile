@@ -101,6 +101,8 @@ dqm.local:
 	--from-literal=PATH_DATABASE=/mnt/data/Database/ \
 	--from-literal=PATH_DATABASE_RESULTS=/mnt/data/Database-results/ \
 	--from-literal=REDIS_HOST=dqm-redis-svc.dqm ||:
+	$(KUBECTL) apply -f manifests/dqm-django/dqm-pv.yaml ||:
+	$(KUBECTL) apply -f manifests/dqm-django/dqm-pv-claim.yaml ||:
 	$(KUBECTL) apply -f manifests/dqm-django/dqm-redis-backend.yaml ||:
 	$(KUBECTL) apply -f manifests/dqm-django/dqm-backend.yaml ||:
 
