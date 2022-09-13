@@ -97,7 +97,7 @@ dqm.local:
 	$(KUBECTL) -n dqm create secret generic dqm-secrets \
 	--from-literal=USERNAME=admin \
 	--from-literal=PASSWORD=admin \
-	--from-literal=ALLOWED_HOSTS=np04-srv-018 \
+	--from-literal=ALLOWED_HOSTS=$(call node_ip) \
 	--from-literal=PATH_DATABASE=/mnt/data/Database/ \
 	--from-literal=PATH_DATABASE_RESULTS=/mnt/data/Database-results/ \
 	--from-literal=REDIS_HOST=dqm-redis-svc.dqm ||:
