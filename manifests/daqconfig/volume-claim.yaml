@@ -8,4 +8,4 @@ spec:
   capacity:
     storage: 1Gi
   hostPath:
-    path: /pocket/daqconfig-mongodb
+    path: /scratch/kube/daqconfig-mongodb
