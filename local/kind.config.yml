@@ -18,8 +18,10 @@ nodes:
   # image: kindest/node:v1.22.7
   image: kindest/node:v1.23.5
   extraMounts:
-  - hostPath: ./share
-    containerPath: /pocket
+  #- hostPath: ./share
+  #  containerPath: /pocket
+  - hostPath: ./share/dqm
+    containerPath: /scratch/dqm-db
   - hostPath: /cvmfs/dunedaq.opensciencegrid.org
     containerPath: /cvmfs/dunedaq.opensciencegrid.org
   - hostPath: /cvmfs/dunedaq-development.opensciencegrid.org
