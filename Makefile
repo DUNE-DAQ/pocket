@@ -76,20 +76,20 @@ kafka.local: dependency.docker kind kubectl external-manifests namespaces.local
 erspostgres.local: kind kubectl external-manifests namespaces.local
 	@echo "installing postgres"
 
-	@>/dev/null 2>&1 $(KUBECTL) -n ers create secret generic postgres-secrets \
+	$(KUBECTL) -n ers create secret generic postgres-secrets \
 	--from-literal=POSTGRES_USER="admin" \
 	--from-literal=POSTGRES_PASSWORD="$(PGPASS)" ||:
 
-	@>/dev/null 2>&1 $(KUBECTL) -n monitoring create secret generic postgres-secrets \
+	$(KUBECTL) -n monitoring create secret generic postgres-secrets \
 	--from-literal=POSTGRES_USER="admin" \
 	--from-literal=POSTGRES_PASSWORD="$(PGPASS)" ||:
 
-	@>/dev/null 2>&1 $(KUBECTL) -n ers create secret generic aspcore-secrets \
+	$(KUBECTL) -n ers create secret generic aspcore-secrets \
 	--from-literal=DOTNETPOSTGRES_PASSWORD="Password=$(PGPASS);" ||:
 
-	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/dunedaqers/ers-postgres.yaml ||:
-	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/dunedaqers/ers-postgres-svc.yaml ||:
-	@>/dev/null 2>&1 $(KUBECTL) -n ers create configmap ers-sql --from-file manifests/dunedaqers/sql/ApplicationDbErrorReporting.sql
+	$(KUBECTL) apply -f manifests/dunedaqers/ers-postgres.yaml ||:
+	$(KUBECTL) apply -f manifests/dunedaqers/ers-postgres-svc.yaml ||:
+	@>/dev/null 2>&1$(KUBECTL) -n ers create configmap ers-sql --from-file manifests/dunedaqers/sql/ApplicationDbErrorReporting.sql ||:
 
 .PHONY: ers-kafka.local
 ers-kafka.local: kafka.local erspostgres.local
@@ -146,14 +146,14 @@ daqconfig-mongo.local: kind kubectl external-manifests namespaces.local
 opmon.local: erspostgres.local
 	@echo "installing opmon"
 
-	@>/dev/null 2>&1 $(KUBECTL) -n monitoring create secret generic grafana-secrets \
+	$(KUBECTL) -n monitoring create secret generic grafana-secrets \
 	--from-literal=GF_SECURITY_SECRET_KEY="${GF_SECURITY_SECRET_KEY}" \
 	--from-literal=GF_SECURITY_ADMIN_PASSWORD="${GF_SECURITY_ADMIN_PASSWORD}" ||:
 
-	@>/dev/null $(KUBECTL) -n monitoring create configmap grafana-datasources \
-	--from-file=manifests/opmon/grafana/grafana-provisioning/
+	$(KUBECTL) -n monitoring create configmap grafana-datasources \
+	--from-file=manifests/opmon/grafana/provisioning/
 
-	@>/dev/null $(KUBECTL) -n monitoring create configmap grafana-dashboards \
+	$(KUBECTL) -n monitoring create configmap grafana-dashboards \
 	--from-file=manifests/opmon/grafana/grafana-dashboards-develop/
 
 	@>/dev/null 2>&1 $(KUBECTL) -n monitoring create secret generic influxdb-secrets \
