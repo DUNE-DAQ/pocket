@@ -70,7 +70,7 @@ function opmon_creds() {
 	${KUBECTL} -n monitoring get service influxdb-svc -ojsonpath='{.spec.ports[0].port}'; echo
 
 	echo -n "	URL (out-cluster): http://${NODEPORT_IP}:"
-	${KUBECTL} -n monitoring get service influxdb -ojsonpath='{.spec.ports[0].nodePort}'; echo
+	${KUBECTL} -n monitoring get service influxdb-svc -ojsonpath='{.spec.ports[0].nodePort}'; echo
 
 	echo -n "	User: "
 	${KUBECTL} get -n monitoring secret influxdb-secrets -o=jsonpath='{.data.INFLUXDB_READ_USER}' | base64 --decode;
