@@ -89,7 +89,7 @@ erspostgres.local: kind kubectl external-manifests namespaces.local
 
 	$(KUBECTL) apply -f manifests/dunedaqers/ers-postgres.yaml ||:
 	$(KUBECTL) apply -f manifests/dunedaqers/ers-postgres-svc.yaml ||:
-	@>/dev/null 2>&1$(KUBECTL) -n ers create configmap ers-sql --from-file manifests/dunedaqers/sql/ApplicationDbErrorReporting.sql ||:
+	@>/dev/null 2>&1 $(KUBECTL) -n ers create configmap ers-sql --from-file manifests/dunedaqers/sql/ApplicationDbErrorReporting.sql ||:
 
 .PHONY: ers-kafka.local
 ers-kafka.local: kafka.local erspostgres.local
