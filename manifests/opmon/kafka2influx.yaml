@@ -17,4 +17,4 @@ spec:
       - image: dunedaq/pocket-opmon-microservice:1.0
         name: kafka2influx
         command: ["/bin/bash"]
-        args: ["-c", "python3 /kafka-to-influx.py"]
+        args: ["-c", "python3 /kafka-to-influx.py --kafka-address kafka-svc.kafka-kraft --kafka-port 9092 --influxdb-address influxdb-svc.monitoring --influxdb-port 8086"]
