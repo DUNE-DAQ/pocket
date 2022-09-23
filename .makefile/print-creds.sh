@@ -66,11 +66,11 @@ function opmon_creds() {
 	${KUBECTL} get -n monitoring secret grafana-secrets -o=jsonpath='{.data.GF_SECURITY_ADMIN_PASSWORD}' | base64 --decode; echo
 
 	echo -e "\e[34mInfluxDB\e[0m"
-	echo -n "	URL (in-cluster): http://influxdb.monitoring:"
-	${KUBECTL} -n monitoring get service influxdb -ojsonpath='{.spec.ports[0].port}'; echo
+	echo -n "	URL (in-cluster): http://influxdb-svc.monitoring:"
+	${KUBECTL} -n monitoring get service influxdb-svc -ojsonpath='{.spec.ports[0].port}'; echo
 
 	echo -n "	URL (out-cluster): http://${NODEPORT_IP}:"
-	${KUBECTL} -n monitoring get service influxdb -ojsonpath='{.spec.ports[0].nodePort}'; echo
+	${KUBECTL} -n monitoring get service influxdb-svc -ojsonpath='{.spec.ports[0].nodePort}'; echo
 
 	echo -n "	User: "
 	${KUBECTL} get -n monitoring secret influxdb-secrets -o=jsonpath='{.data.INFLUXDB_READ_USER}' | base64 --decode;

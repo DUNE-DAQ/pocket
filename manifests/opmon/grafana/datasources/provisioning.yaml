@@ -28,7 +28,7 @@ datasources:
     access: proxy
     orgId: 1
     uid: 'influxdb'
-    url:  "http://influxdb.monitoring:8086/"
+    url:  "http://influxdb-svc.monitoring:8086/"
     database: "influxdb"
     basicAuth: "true"
     basicAuthUser: "readonly"
