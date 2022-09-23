@@ -14,7 +14,7 @@ spec:
         app: runregistry-rest
     spec:
       containers:
-      - image: egamberini/runregistry-rest
+      - image: dunedaq/pocket-runregistry-rest:0.2
         name: runregistry-rest
         envFrom:
         - secretRef:
