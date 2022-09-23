@@ -14,7 +14,7 @@ spec:
         app: runnumber-rest
     spec:
       containers:
-      - image: dunedaq/pocket-runnumber-rest:0.1
+      - image: dunedaq/pocket-runnumber-rest:0.2
         name: runnumber-rest
         envFrom:
         - secretRef:
