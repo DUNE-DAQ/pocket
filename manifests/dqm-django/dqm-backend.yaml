@@ -29,13 +29,6 @@ spec:
         image: dunedaq/pipdqm:2.4
         ports:
         - containerPort: 8000
-          #env:
-          #- name: ALLOWED_HOSTS
-          #  valueFrom:
-          #    secretKeyRef:
-          #      name: dqm-secrets
-          #      key: ALLOWED_HOSTS
-          #      optional: false
         envFrom:
         - secretRef:
             name: dqm-secrets
@@ -44,14 +37,23 @@ spec:
           mountPath: "/mnt/data/Database"
         - name: "dqm-results-dir"
           mountPath: "/mnt/data/Database-results"
-        #volumeMounts:
-        #- mountPath: "/mnt/data/Database"
-        #  name: dqm-db
-        #- mountPath: "/mnt/data/Database-results"
-        #  name: dqm-results
         command:
         - sh 
         - /entrypoint.sh
+      - name: dqmbackend-consumer
+        image: dunedaq/pipdqm:2.4
+        envFrom:
+        - secretRef:
+            name: dqm-secrets
+        command:
+        - python3
+        args:
+        - /src/dqm-backend/dqm/scripts/consumer.py
+        volumeMounts:
+        - name: "dqm-db-dir"
+          mountPath: "/mnt/data/Database"
+        - name: "dqm-results-dir"
+          mountPath: "/mnt/data/Database-results"
 
 ---
 apiVersion: v1
