@@ -41,14 +41,13 @@ spec:
         - sh 
         - /entrypoint.sh
       - name: dqmbackend-consumer
-        image: dunedaq/pipdqm:2.4
+        image: eflumerf/pocket-dqmdjango:0.6
         envFrom:
         - secretRef:
             name: dqm-secrets
         command:
-        - python3
-        args:
-        - /src/dqm-backend/dqm/scripts/consumer.py
+        - sh
+        - /consumer.sh
         volumeMounts:
         - name: "dqm-db-dir"
           mountPath: "/mnt/data/Database"
