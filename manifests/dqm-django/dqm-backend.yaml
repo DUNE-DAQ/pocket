@@ -26,7 +26,7 @@ spec:
         #  emptyDir: {}
       containers:
       - name: dqmbackend
-        image: dunedaq/pipdqm:2.4
+        image: dunedaq/pipdqm:2.5
         ports:
         - containerPort: 8000
           #env:
