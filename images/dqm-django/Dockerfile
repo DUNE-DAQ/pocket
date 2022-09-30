@@ -10,7 +10,7 @@ ENV https_proxy=http://np04-web-proxy.cern.ch:3128
 RUN dnf clean expire-cache ; dnf -y install python3-pip python3-devel git; dnf clean all
 
 WORKDIR /src
-RUN git clone https://github.com/eflumerf/dqm-backend.git
+RUN git clone https://github.com/DUNE-DAQ/dqm-backend.git -b pahamilt/dockerdev
 
 WORKDIR /src/dqm-backend/dqm
 RUN pwd; ls
