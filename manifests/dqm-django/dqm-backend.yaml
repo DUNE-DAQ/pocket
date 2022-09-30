@@ -41,7 +41,7 @@ spec:
         - sh 
         - /entrypoint.sh
       - name: dqmbackend-consumer
-        image: eflumerf/pocket-dqmdjango:0.6
+        image: dunedaq/pipdqm:2.6
         envFrom:
         - secretRef:
             name: dqm-secrets
