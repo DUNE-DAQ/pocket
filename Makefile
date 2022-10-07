@@ -107,7 +107,9 @@ dqm.local:
 	--from-literal=ALLOWED_HOSTS=$(call node_ip) \
 	--from-literal=PATH_DATABASE=/mnt/data/Database/ \
 	--from-literal=PATH_DATABASE_RESULTS=/mnt/data/Database-results/ \
-	--from-literal=REDIS_HOST=dqm-redis-svc.dqm ||:
+	--from-literal=REDIS_HOST=dqm-redis-svc.dqm \
+	--from-literal=KAFKA_HOST=kafka-svc.kafka-kraft \
+	--from-literal=KAFKA_PORT=9092 ||:
 	$(KUBECTL) apply -f manifests/dqm-django/dqm-pv.yaml ||:
 	$(KUBECTL) apply -f manifests/dqm-django/dqm-pv-claim.yaml ||:
 	$(KUBECTL) apply -f manifests/dqm-django/dqm-redis-backend.yaml ||:

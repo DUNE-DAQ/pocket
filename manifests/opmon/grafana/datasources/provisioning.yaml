@@ -29,7 +29,7 @@ datasources:
     orgId: 1
     uid: 'influxdb'
     url:  "http://influxdb-svc.monitoring:8086/"
-    database: "influxdb"
+    database: "influxv3"
     basicAuth: "true"
     basicAuthUser: "readonly"
     basicAuthPassword: "$INFLUXDB_USER_PASSWORD"

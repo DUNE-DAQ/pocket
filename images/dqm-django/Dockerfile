@@ -18,4 +18,6 @@ RUN pip3 install --upgrade pip
 RUN pip3 install -r ./requirements.txt
 
 COPY ./entrypoint.sh /
+COPY ./consumer.sh /
 RUN ["chmod", "+x", "/entrypoint.sh"]
+RUN ["chmod", "+x", "/consumer.sh"]
