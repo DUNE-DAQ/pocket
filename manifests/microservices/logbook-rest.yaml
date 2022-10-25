@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: logbook-rest
+  namespace: microservices
+spec:
+  selector:
+    matchLabels:
+      app: logbook-rest
+  minReadySeconds: 5
+  template:
+    metadata:
+      labels:
+        app: logbook-rest
+    spec:
+      containers:
+      - image: dunedaq/logbook:v1
+        name: logbook-rest
+        volumeMounts:
+        - name: keytab
+          mountPath: "/kerb/np04daq.keytab"
+          readOnly: true
+        ports:
+        - containerPort: 5010
+          protocol: TCP
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+      volumes:
+      - name: keytab
+        secret:
+          secretName: logbook-secret
+          optional: false # logbook-secret must exist
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: microservices
+  name: logbook-svc-ext
+  labels:
+    app: logbook-rest
+spec:
+  type: NodePort
+  ports:
+    - port: 5010
+      targetPort: 5010
+      name: external
+      protocol: TCP
+      nodePort: 31012
+  selector:
+    app: logbook-rest
+
