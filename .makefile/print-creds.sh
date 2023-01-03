@@ -17,7 +17,7 @@ KUBECTL_SERVER=$(${KUBECTL} config view --minify -o=jsonpath='{.clusters[0].clus
 NODEPORT_IP=${KUBECTL_SERVER}
 if [[ "${NODEPORT_IP}" == "127.0.0.1" ]]; then
   # if it's a local setup, use local ip (that is connected to the default gateway)
-  NODEPORT_IP=$(ip -4 addr show dev "$(awk '$2 == 00000000 { print $1 }' /proc/net/route)" | awk '$1 ~ /^inet/ { sub("/.*", "", $2); print $2 }' | head -1)
+  NODEPORT_IP=$(ip -4 addr show dev "$(awk '$2 == 00000000 { print $1 }' /proc/net/route|head -1)" | awk '$1 ~ /^inet/ { sub("/.*", "", $2); print $2 }' | head -1)
 fi
 
 function eck_creds() {
