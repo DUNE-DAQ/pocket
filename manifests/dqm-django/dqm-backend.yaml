@@ -26,7 +26,7 @@ spec:
         #  emptyDir: {}
       containers:
       - name: dqmbackend
-        image: dunedaq/pocket-dqmdjango:0.5
+        image: dunedaq/pocket-dqmdjango:1.0
         ports:
         - containerPort: 8000
         envFrom:
@@ -41,7 +41,7 @@ spec:
         - sh 
         - /entrypoint.sh
       - name: dqmbackend-consumer
-        image: dunedaq/pocket-dqmdjango:0.5
+        image: dunedaq/pocket-dqmdjango:1.0
         envFrom:
         - secretRef:
             name: dqm-secrets
