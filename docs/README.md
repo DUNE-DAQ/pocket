@@ -73,18 +73,6 @@ Set the SERVICES variables and run `make`:
 ```bash
 SERVICES=opmon,ers make setup.local
 ```
-### Access the Error Reporting System
-
-The setup scripts will print the internal (to the cluster) and external addresses for the web application:
-
-To use the interal DNS names, you need to configure the SOCKS5 proxy in your browser:
-
-```
-Error Reporting System
-	address (in-cluster): aspcore-svc.ers:80
-	address (out-cluster): <server's external IP>:30080
-	ASP Password: Password=passsssword;
-```
 
 ### Access Grafana
 
