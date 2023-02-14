@@ -1,0 +1,31 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: postgres-backup
+  namespace: ers
+spec:
+  # Backup the database every day at 2AM
+  schedule: "* 2 * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: postgres-backup
+            image: postgres:12
+            command: ["/bin/sh"]
+            args: ["-c", 'echo $POSTGRES_PASSWORD; export PGPASSWORD=$POSTGRES_PASSWORD; pg_dump -U admin -w -h postgres-svc.ers ApplicationDbErrorReporting > /var/backups/backup-$(date +"%m-%d-%Y-%H-%M").sql']
+            envFrom:
+            - secretRef:
+                name: postgres-secrets
+            volumeMounts:
+            - mountPath: /var/backups
+              name: postgres-storage
+          restartPolicy: Never
+          volumes:
+          - name: postgres-storage
+            hostPath:
+            # Ensure the file directory is created.
+              path: /scratch/kube/postgres-backups
+              type: DirectoryOrCreate
+
