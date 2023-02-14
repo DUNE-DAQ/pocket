@@ -84,9 +84,6 @@ erspostgres.local: kind kubectl external-manifests namespaces.local
 	--from-literal=POSTGRES_USER="admin" \
 	--from-literal=POSTGRES_PASSWORD="$(PGPASS)" ||:
 
-	$(KUBECTL) -n ers create secret generic aspcore-secrets \
-	--from-literal=DOTNETPOSTGRES_PASSWORD="Password=$(PGPASS);" ||:
-
 	$(KUBECTL) apply -f manifests/dunedaqers/ers-postgres.yaml ||:
 	$(KUBECTL) apply -f manifests/dunedaqers/ers-postgres-svc.yaml ||:
 	@>/dev/null 2>&1 $(KUBECTL) -n ers create configmap ers-sql --from-file manifests/dunedaqers/sql/ApplicationDbErrorReporting.sql ||:
@@ -94,9 +91,6 @@ erspostgres.local: kind kubectl external-manifests namespaces.local
 .PHONY: ers-kafka.local
 ers-kafka.local: kafka.local erspostgres.local
 	@echo "installing ers-kafka"
-
-	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/dunedaqers/ers-aspcore.yaml ||:
-
 
 .PHONY: dqm.local
 dqm.local:
@@ -280,10 +274,6 @@ images.grafana: ## build Grafana image
 .PHONY: images.kafka
 images.kafka: ## build kafka image
 	docker buildx build -t dunedaq/pocket-kraft:1.0 images/kafka
-
-.PHONY: images.ers
-images.ers: ## build ers image
-	docker buildx build -t dunedaq/pocket-ers:v1.0.0 images/aspcore-ers
 
 ##
 ### Dependencies

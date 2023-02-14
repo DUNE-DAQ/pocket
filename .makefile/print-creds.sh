@@ -104,9 +104,6 @@ function erspostgres_creds() {
 	${KUBECTL} get -n ers secret postgres-secrets -o=jsonpath='{.data.POSTGRES_USER}' | base64 --decode;
 	echo -n "	Password: "
 	${KUBECTL} get -n ers secret postgres-secrets -o=jsonpath='{.data.POSTGRES_PASSWORD}' | base64 --decode; echo
-	echo -n "	ASP Password: "
-	${KUBECTL} get -n ers secret aspcore-secrets -o=jsonpath='{.data.DOTNETPOSTGRES_PASSWORD}' | base64 --decode; echo
-}
 
 function dqmpostgres_creds() {
   echo -e "\e[34mDQM Postgres\e[0m"
@@ -121,8 +118,6 @@ function ers_creds() {
 	${KUBECTL} -n ers get service ers-svc -ojsonpath='{.spec.ports[0].targetPort}'; echo
 	echo -n "	address (out-cluster): ${NODEPORT_IP}:"
 	${KUBECTL} -n ers get service ers-svc -ojsonpath='{.spec.ports[0].nodePort}'; echo
-	echo -n "	ASP Password: "
-	${KUBECTL} get -n ers secret aspcore-secrets -o=jsonpath='{.data.DOTNETPOSTGRES_PASSWORD}' | base64 --decode; echo
 }
 
 function dashboard_creds() {
