@@ -39,7 +39,7 @@ spec:
           mountPath: "/mnt/data/Database-results"
         command:
         - sh 
-        - /entrypoint.sh
+        - /web_application.sh
       - name: dqmbackend-consumer
         image: dunedaq/pocket-dqmdjango:1.0
         envFrom:
