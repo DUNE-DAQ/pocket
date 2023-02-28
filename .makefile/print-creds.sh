@@ -104,6 +104,7 @@ function erspostgres_creds() {
 	${KUBECTL} get -n ers secret postgres-secrets -o=jsonpath='{.data.POSTGRES_USER}' | base64 --decode;
 	echo -n "	Password: "
 	${KUBECTL} get -n ers secret postgres-secrets -o=jsonpath='{.data.POSTGRES_PASSWORD}' | base64 --decode; echo
+}
 
 function dqmpostgres_creds() {
   echo -e "\e[34mDQM Postgres\e[0m"
