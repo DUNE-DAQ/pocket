@@ -27,6 +27,7 @@ spec:
       containers:
       - name: dqmbackend
         image: dunedaq/pocket-dqmdjango:1.0
+        imagePullPolicy: Always
         ports:
         - containerPort: 8000
         envFrom:
@@ -39,9 +40,10 @@ spec:
           mountPath: "/mnt/data/Database-results"
         command:
         - sh 
-        - /entrypoint.sh
+        - /web_application.sh
       - name: dqmbackend-consumer
         image: dunedaq/pocket-dqmdjango:1.0
+        imagePullPolicy: Always
         envFrom:
         - secretRef:
             name: dqm-secrets
