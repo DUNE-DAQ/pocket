@@ -43,8 +43,8 @@ Clone this git repository to a location of your choice.
 
 For a cluster with all built-in services enabled:
 ```bash
-make setup.local
-# equivalent to
+make setup.local # This will only give you namespaces
+# OR
 # SERVICES=opmon make setup.local
 ```
 

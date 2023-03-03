@@ -139,7 +139,7 @@ daqconfig-mongo.local: kind kubectl external-manifests namespaces.local
 #$(KUBECTL) apply -f manifests/daqconfig/mongodb-client.yaml
 
 .PHONY: opmon.local
-opmon.local: erspostgres.local
+opmon.local: erspostgres.local kafka.local ers-kafka.local
 	@echo "installing opmon"
 
 	$(KUBECTL) -n monitoring create secret generic grafana-secrets \
