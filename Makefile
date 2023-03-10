@@ -43,15 +43,15 @@ setup.openstack: on-cern-network check_openstack_login terraform ansible depende
 namespaces.local: kind kubectl external-manifests
 	@echo "setting up namespaces"
 	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/cvmfs/ns-cvmfs.yaml ||:
-	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/kafka/ns-kafka-kraft.yaml ||:
+	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/dunedaqers/ns-kafka-kraft.yaml ||:
 	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/opmon/ns-monitoring.yaml ||:
-	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/postgres/ns-ers.yaml ||:
+	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/dunedaqers/ns-ers.yaml ||:
 	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/dqm-django/ns-dqm.yaml ||:
 	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/daqconfig/ns-daqconfig.yaml ||:
 
 
-.PHONY: kafka2opmon
-kafka2opmon: kafka.local  opmon.local
+.PHONY: kafka2influx.local
+kafka2influx.local: kafka.local influx.local
 	@echo "Connecting kafka to influxdb"
 
 	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/opmon/kafka2influx.yaml ||:
@@ -65,11 +65,11 @@ kafka.local: dependency.docker kind kubectl external-manifests namespaces.local
 	@>/dev/null 2>&1 $(KUBECTL) -n kafka-kraft create secret generic kafka-secrets \
 	--from-literal=EXTERNAL_LISTENER="$(call node_ip)" ||:
 
-	$(KUBECTL) -n kafka-kraft create configmap dune-kafka-libs --from-file images/kafka/jmx_prometheus_javaagent-0.16.1.jar ||:
-	$(KUBECTL) -n kafka-kraft create configmap dune-kafka-config --from-file images/kafka/sample_jmx_exporter.yml ||:
+	@>/dev/null 2>&1 $(KUBECTL) -n kafka-kraft create configmap dune-kafka-libs --from-file images/kafka/jmx_prometheus_javaagent-0.16.1.jar ||:
+	@>/dev/null 2>&1 $(KUBECTL) -n kafka-kraft create configmap dune-kafka-config --from-file images/kafka/sample_jmx_exporter.yml
 
-	$(KUBECTL) apply -f manifests/kafka/kafka.yaml ||:
-	$(KUBECTL) apply -f manifests/kafka/kafka-svc.yaml ||:
+	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/dunedaqers/kafka.yaml ||:
+	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/dunedaqers/kafka-svc.yaml ||:
 
 
 .PHONY: erspostgres.local
@@ -84,15 +84,19 @@ erspostgres.local: kind kubectl external-manifests namespaces.local
 	--from-literal=POSTGRES_USER="admin" \
 	--from-literal=POSTGRES_PASSWORD="$(PGPASS)" ||:
 
-	@>/dev/null 2>&1 $(KUBECTL) -n ers create configmap ers-sql --from-file manifests/postgres/sql/ApplicationDbErrorReporting.sql ||:
-	$(KUBECTL) apply -f manifests/postgres/postgres-pv.yaml ||:
-	$(KUBECTL) apply -f manifests/postgres/postgres-pvc.yaml ||:
-	$(KUBECTL) apply -f manifests/postgres/ers-postgres.yaml ||:
-	$(KUBECTL) apply -f manifests/postgres/ers-postgres-svc.yaml ||:
+	$(KUBECTL) -n ers create secret generic aspcore-secrets \
+	--from-literal=DOTNETPOSTGRES_PASSWORD="Password=$(PGPASS);" ||:
 
-.PHONY: ers-kafka.local
-ers-kafka.local: kafka.local erspostgres.local
+	$(KUBECTL) apply -f manifests/dunedaqers/ers-postgres.yaml ||:
+	$(KUBECTL) apply -f manifests/dunedaqers/ers-postgres-svc.yaml ||:
+	@>/dev/null 2>&1 $(KUBECTL) -n ers create configmap ers-sql --from-file manifests/dunedaqers/sql/ApplicationDbErrorReporting.sql ||:
+
+.PHONY: ers.local
+ers.local: kafka.local erspostgres.local grafana.local
 	@echo "installing ers-kafka"
+
+	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/dunedaqers/ers-aspcore.yaml ||:
+
 
 .PHONY: dqm.local
 dqm.local:
@@ -103,9 +107,7 @@ dqm.local:
 	--from-literal=ALLOWED_HOSTS=$(call node_ip) \
 	--from-literal=PATH_DATABASE=/mnt/data/Database/ \
 	--from-literal=PATH_DATABASE_RESULTS=/mnt/data/Database-results/ \
-	--from-literal=REDIS_HOST=dqm-redis-svc.dqm \
-	--from-literal=KAFKA_HOST=kafka-svc.kafka-kraft \
-	--from-literal=KAFKA_PORT=9092 ||:
+	--from-literal=REDIS_HOST=dqm-redis-svc.dqm ||:
 	$(KUBECTL) apply -f manifests/dqm-django/dqm-pv.yaml ||:
 	$(KUBECTL) apply -f manifests/dqm-django/dqm-pv-claim.yaml ||:
 	$(KUBECTL) apply -f manifests/dqm-django/dqm-redis-backend.yaml ||:
@@ -127,8 +129,21 @@ daqconfig-mongo.local: kind kubectl external-manifests namespaces.local
 	@>/dev/null 2>&1 $(KUBECTL) create -f manifests/daqconfig/mongodb-nodeport-svc.yaml ||:
 	@>/dev/null 2>&1 $(KUBECTL) create -f manifests/daqconfig/mongo-express-deployment.yaml ||:
 
-.PHONY: opmon.local
-opmon.local: erspostgres.local kafka.local ers-kafka.local
+
+# @>/dev/null 2>&1 $(KUBECTL) -n daqconfig create secret generic mongodb-daqconfig-admin-password \
+# --from-literal=password="${MONGOPASS}_ADMIN" ||:
+# @>/dev/null 2>&1 $(KUBECTL) apply -f manifests/daqconfig/mongodbcommunity.mongodb.com_mongodbcommunity.yaml ||:
+# @echo "Now waiting for the MongoDB operator to be up"
+# @>/dev/null 2>&1 $(KUBECTL) wait -n daqconfig --for=condition=Ready pod/mongodb-daqconfig-operator ||:
+# @echo "MongoDB operator is up!"
+# @>/dev/null 2>&1 $(KUBECTL) apply -k manifests/daqconfig/rbac/ ||:
+# @>/dev/null 2>&1 $(KUBECTL) create -f manifests/daqconfig/manager.yaml ||:
+# @>/dev/null 2>&1 $(KUBECTL) apply -f manifests/daqconfig/mongodb.com_v1_mongodbcommunity_cr.yaml ||:
+# @>/dev/null 2>&1 $(KUBECTL) apply -f manifests/daqconfig/mongodb-user.yaml ||:
+#$(KUBECTL) apply -f manifests/daqconfig/mongodb-client.yaml
+
+.PHONY: grafana.local
+grafana.local: dependency.docker kind kubectl external-manifests namespaces.local
 	@echo "installing opmon"
 
 	$(KUBECTL) -n monitoring create secret generic grafana-secrets \
@@ -144,6 +159,11 @@ opmon.local: erspostgres.local kafka.local ers-kafka.local
 	$(KUBECTL) -n monitoring create configmap dashboard-provisioning \
 	--from-file=manifests/opmon/grafana/provisioning/
 
+
+.PHONY: influx.local
+influx.local: 
+	@echo "installing influx"
+
 	@>/dev/null 2>&1 $(KUBECTL) -n monitoring create secret generic influxdb-secrets \
 	--from-literal=INFLUXDB_CONFIG_PATH=/etc/influxdb/influxdb.conf \
 	--from-literal=INFLUXDB_DB=influxdb \
@@ -157,6 +177,8 @@ opmon.local: erspostgres.local kafka.local ers-kafka.local
 	--from-literal=INFLUXDB_HOST=influxdb.monitoring  \
 	--from-literal=INFLUXDB_HTTP_AUTH_ENABLED=false ||:
 
+.PHONY: opmon.local
+opmon.local: kafka.local influx.local grafana.local kafka2influx.local
 	@>/dev/null $(KUBECTL) apply -f manifests/opmon
 	@>/dev/null $(KUBECTL) apply -f manifests/opmon/grafana
 
@@ -264,6 +286,10 @@ images.grafana: ## build Grafana image
 images.kafka: ## build kafka image
 	docker buildx build -t dunedaq/pocket-kraft:1.0 images/kafka
 
+.PHONY: images.ers
+images.ers: ## build ers image
+	docker buildx build -t dunedaq/pocket-ers:v1.0.0 images/aspcore-ers
+
 ##
 ### Dependencies
 ##
@@ -342,3 +368,4 @@ share/:
 	@mkdir -p $@
 
 include .makefile/help.mk
+
