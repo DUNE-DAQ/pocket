@@ -192,7 +192,7 @@ kubectl-apply: kubectl external-manifests namespaces.local ## apply files in `ma
 ifeq ($(ERS_ENABLED),0)
 	@echo -e "\e[33mskipping installation of Kafka-ERS\e[0m"
 else
-	@$(MAKE) --no-print-directory ers-kafka.local
+	@$(MAKE) --no-print-directory ers.local
 	@$(MAKE) --no-print-directory ers-topic
 endif
 
