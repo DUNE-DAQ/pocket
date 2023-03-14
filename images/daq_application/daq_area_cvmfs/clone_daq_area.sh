@@ -27,7 +27,7 @@ cd ${SRC_AREA}
 echo "------------------------------------------"
 echo "Loading dbt environment"
 echo "------------------------------------------"
-source dbt-env.sh
+source env.sh
 dbt-workarea-env -s systems
 
 echo "------------------------------------------"
