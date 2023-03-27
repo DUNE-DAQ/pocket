@@ -45,7 +45,7 @@ namespaces.local: kind kubectl external-manifests
 	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/cvmfs/ns-cvmfs.yaml ||:
 	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/kafka/ns-kafka-kraft.yaml ||:
 	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/opmon/ns-monitoring.yaml ||:
-	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/kafka/ns-ers.yaml ||:
+	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/postgres/ns-ers.yaml ||:
 	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/dqm-django/ns-dqm.yaml ||:
 	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/daqconfig/ns-daqconfig.yaml ||:
 
@@ -92,7 +92,7 @@ erspostgres.local: kind kubectl external-manifests namespaces.local
 
 
 .PHONY: ers.local
-ers.local: kafka.local erspostgres.local grafana.local
+ers.local: kafka.local erspostgres.local #grafana.local
 	@echo "installing ers-kafka"
 
 	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/dunedaqers/ers-aspcore.yaml ||:
@@ -133,7 +133,7 @@ daqconfig-mongo.local: kind kubectl external-manifests namespaces.local
 
 .PHONY: grafana.local
 grafana.local: dependency.docker kind kubectl external-manifests namespaces.local
-	@echo "installing opmon"
+	@echo "installing grafana"
 
 	$(KUBECTL) -n monitoring create secret generic grafana-secrets \
 	--from-literal=GF_SECURITY_SECRET_KEY="${GF_SECURITY_SECRET_KEY}" \
@@ -167,13 +167,16 @@ influx.local:
 	--from-literal=INFLUXDB_HTTP_AUTH_ENABLED=false ||:
 
 .PHONY: opmon.local
-opmon.local: kafka.local influx.local grafana.local kafka2influx.local
+opmon.local: kafka.local influx.local kafka2influx.local #grafana.local
+	@echo "installing opmon"
+
 	@>/dev/null $(KUBECTL) apply -f manifests/opmon
 	@>/dev/null $(KUBECTL) apply -f manifests/opmon/grafana
 
 
 .PHONY: kubectl-apply
 kubectl-apply: kubectl external-manifests namespaces.local ## apply files in `manifests` using kubectl
+
 	@echo "installing basic services"
 	@>/dev/null $(KUBECTL) apply -f manifests
 
