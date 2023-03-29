@@ -16,6 +16,9 @@ KUBECTL_VERSION ?= 1.23.5
 KUBECTL_NOVER := $(EXTERNALS_BIN_FOLDER)/kubectl
 KUBECTL := $(KUBECTL_NOVER)-$(KUBECTL_VERSION)
 
+HELM_VERSION ?= 3.11.0
+HELM_NOVER := $(EXTERNALS_BIN_FOLDER)/helm
+HELM := $(HELM_NOVER)-$(HELM_VERSION)
 
 ##
 ## Services to install
@@ -31,7 +34,7 @@ endif
 ifeq ($(findstring opmon,$(SERVICES)),)
 	OPMON_ENABLED=0
 else
-	OPMON_ENABLED=1
+	PMON_ENABLED=1
 endif
 
 ifeq ($(findstring ers,$(SERVICES)),)

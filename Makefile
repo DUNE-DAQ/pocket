@@ -128,7 +128,7 @@ daqconfig-mongo.local: kind kubectl external-manifests namespaces.local
 	@>/dev/null 2>&1 $(KUBECTL) create -f manifests/daqconfig/mongo-express-deployment.yaml ||:
 
 .PHONY: opmon.local
-opmon.local: erspostgres.local kafka.local ers-kafka.local
+opmon.local: erspostgres.local kafka.local ers-kafka.local helm
 	@echo "installing opmon"
 
 	$(KUBECTL) -n monitoring create secret generic grafana-secrets \
@@ -328,6 +328,19 @@ ifneq ($(MAKECMDGOALS),env)
 endif
 	@curl -Lo $(KUBECTL) --fail --silent https://dl.k8s.io/release/v$(KUBECTL_VERSION)/bin/${uname_s}/${COMMON_ARCH}/kubectl
 	@chmod +x $(KUBECTL)
+
+.PHONY: helm
+helm: $(HELM) ## fetch helm binary
+	@$(call symlink,$(HELM),$(HELM_NOVER))
+$(HELM):
+# do not print to stdout when user runs `make env`
+ifneq ($(MAKECMDGOALS),env)
+	@echo "downloading helm $(HELM_VERSION)"
+endif
+	@mkdir ${EXTERNALS_BIN_FOLDER}/helm_temp
+	@curl -Lo ${EXTERNALS_BIN_FOLDER}/helm_temp/helm-v${HELM_VERSION}-linux-amd64.tar.gz https://get.helm.sh/helm-v${HELM_VERSION}-linux-amd64.tar.gz 
+	@tar xf ${EXTERNALS_BIN_FOLDER}/helm_temp/helm-v${HELM_VERSION}-linux-amd64.tar.gz -C ${EXTERNALS_BIN_FOLDER}/helm_temp
+	@mv ${EXTERNALS_BIN_FOLDER}/helm_temp/linux-amd64/helm ${HELM}
 
 .PHONY: external-manifests
 external-manifests: manifests/kubernetes-dashboard-recommended.yaml manifests/cvmfs/deploy.yaml
