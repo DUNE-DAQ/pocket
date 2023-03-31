@@ -136,13 +136,13 @@ opmon.local: erspostgres.local kafka.local ers-kafka.local helm
 	--from-literal=GF_SECURITY_ADMIN_PASSWORD="${GF_SECURITY_ADMIN_PASSWORD}" ||:
 
 	$(KUBECTL) -n monitoring create configmap grafana-datasources \
-	--from-file=manifests/opmon/grafana/datasources/
+		--from-file=manifests/opmon/grafana/datasources/ ||:
 
 	$(KUBECTL) -n monitoring create configmap grafana-dashboards \
-	--from-file=manifests/opmon/grafana/grafana-dashboards-develop/
+		--from-file=manifests/opmon/grafana/grafana-dashboards/dashboards ||:
 
 	$(KUBECTL) -n monitoring create configmap dashboard-provisioning \
-	--from-file=manifests/opmon/grafana/provisioning/
+		--from-file=manifests/opmon/grafana/provisioning/ ||:
 
 	@>/dev/null 2>&1 $(KUBECTL) -n monitoring create secret generic influxdb-secrets \
 	--from-literal=INFLUXDB_CONFIG_PATH=/etc/influxdb/influxdb.conf \
@@ -157,8 +157,10 @@ opmon.local: erspostgres.local kafka.local ers-kafka.local helm
 	--from-literal=INFLUXDB_HOST=influxdb.monitoring  \
 	--from-literal=INFLUXDB_HTTP_AUTH_ENABLED=false ||:
 
-	@>/dev/null $(KUBECTL) apply -f manifests/opmon
-	@>/dev/null $(KUBECTL) apply -f manifests/opmon/grafana
+#	@>/dev/null $(KUBECTL) apply -f manifests/opmon
+	@>/dev/null $(KUBECTL) apply -f manifests/opmon/grafana/grafana.yaml
+	@>/dev/null $(KUBECTL) apply -f manifests/opmon/influx/
+	@>/dev/null $(KUBECTL) apply -f manifests/opmon/kafka2influx.yaml
 
 
 .PHONY: kubectl-apply
