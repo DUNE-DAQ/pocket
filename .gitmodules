@@ -1,0 +1,3 @@
+[submodule "manifests/opmon/grafana/grafana-dashboards"]
+	path = manifests/opmon/grafana/grafana-dashboards
+	url = https://github.com/DUNE-DAQ/grafana-dashboards.git
