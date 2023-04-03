@@ -34,7 +34,7 @@ endif
 ifeq ($(findstring opmon,$(SERVICES)),)
 	OPMON_ENABLED=0
 else
-	PMON_ENABLED=1
+	OPMON_ENABLED=1
 endif
 
 ifeq ($(findstring ers,$(SERVICES)),)
