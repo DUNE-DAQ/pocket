@@ -144,6 +144,9 @@ opmon.local: erspostgres.local kafka.local ers-kafka.local helm
 	$(KUBECTL) -n monitoring create configmap dashboard-provisioning \
 	--from-file=manifests/opmon/grafana/provisioning/
 
+#	For Future when we have Grafana working
+#	$(HELM) -n monitoring install grafana grafana/grafana -f manifests/grafana-dashboards/values.yaml
+
 	@>/dev/null 2>&1 $(KUBECTL) -n monitoring create secret generic influxdb-secrets \
 	--from-literal=INFLUXDB_CONFIG_PATH=/etc/influxdb/influxdb.conf \
 	--from-literal=INFLUXDB_DB=influxdb \
