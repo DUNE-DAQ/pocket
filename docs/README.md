@@ -1,5 +1,10 @@
 # Pocket
 
+If you want to clone this repo : 
+```bash
+git clone --recurse-submodules git@github.com:DUNE-DAQ/pocket.git
+```
+
 A set of scripts designed to help create a portable, 'production-like' DUNE DAQ environment in a variety of setups.
 
 Pocket is based on [(Linux) containers](docker.io) and [Kubernetes](kubernetes.io).
