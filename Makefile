@@ -50,8 +50,8 @@ namespaces.local: kind kubectl external-manifests
 	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/daqconfig/ns-daqconfig.yaml ||:
 
 
-.PHONY: kafka2opmon
-kafka2opmon: kafka.local  opmon.local
+.PHONY: kafka2influx.local
+kafka2influx.local: kafka.local influx.local
 	@echo "Connecting kafka to influxdb"
 
 	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/opmon/kafka2influx.yaml ||:
@@ -68,8 +68,8 @@ kafka.local: dependency.docker kind kubectl external-manifests namespaces.local
 	$(KUBECTL) -n kafka-kraft create configmap dune-kafka-libs --from-file images/kafka/jmx_prometheus_javaagent-0.16.1.jar ||:
 	$(KUBECTL) -n kafka-kraft create configmap dune-kafka-config --from-file images/kafka/sample_jmx_exporter.yml ||:
 
-	$(KUBECTL) apply -f manifests/kafka/kafka.yaml ||:
-	$(KUBECTL) apply -f manifests/kafka/kafka-svc.yaml ||:
+	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/kafka/kafka.yaml ||:
+	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/kafka/kafka-svc.yaml ||:
 
 
 .PHONY: erspostgres.local
@@ -90,9 +90,13 @@ erspostgres.local: kind kubectl external-manifests namespaces.local
 	$(KUBECTL) apply -f manifests/postgres/ers-postgres.yaml ||:
 	$(KUBECTL) apply -f manifests/postgres/ers-postgres-svc.yaml ||:
 
-.PHONY: ers-kafka.local
-ers-kafka.local: kafka.local erspostgres.local
+
+.PHONY: ers.local
+ers.local: kafka.local erspostgres.local #grafana.local
 	@echo "installing ers-kafka"
+
+	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/dunedaqers/ers-aspcore.yaml ||:
+
 
 .PHONY: dqm.local
 dqm.local:
@@ -127,9 +131,10 @@ daqconfig-mongo.local: kind kubectl external-manifests namespaces.local
 	@>/dev/null 2>&1 $(KUBECTL) create -f manifests/daqconfig/mongodb-nodeport-svc.yaml ||:
 	@>/dev/null 2>&1 $(KUBECTL) create -f manifests/daqconfig/mongo-express-deployment.yaml ||:
 
-.PHONY: opmon.local
-opmon.local: erspostgres.local kafka.local ers-kafka.local helm
-	@echo "installing opmon"
+
+.PHONY: grafana.local
+grafana.local: dependency.docker kind kubectl external-manifests namespaces.local helm
+	@echo "installing grafana"
 
 	$(KUBECTL) -n monitoring create secret generic grafana-secrets \
 	--from-literal=GF_SECURITY_SECRET_KEY="${GF_SECURITY_SECRET_KEY}" \
@@ -147,6 +152,13 @@ opmon.local: erspostgres.local kafka.local ers-kafka.local helm
 #	For Future when we have Grafana working
 #	$(HELM) -n monitoring install grafana grafana/grafana -f manifests/grafana-dashboards/values.yaml
 
+	@>/dev/null $(KUBECTL) apply -f manifests/opmon/grafana/grafana.yaml
+
+
+.PHONY: influx.local
+influx.local: dependency.docker kind kubectl 
+	@echo "installing influx"
+
 	@>/dev/null 2>&1 $(KUBECTL) -n monitoring create secret generic influxdb-secrets \
 	--from-literal=INFLUXDB_CONFIG_PATH=/etc/influxdb/influxdb.conf \
 	--from-literal=INFLUXDB_DB=influxdb \
@@ -160,14 +172,15 @@ opmon.local: erspostgres.local kafka.local ers-kafka.local helm
 	--from-literal=INFLUXDB_HOST=influxdb.monitoring  \
 	--from-literal=INFLUXDB_HTTP_AUTH_ENABLED=false ||:
 
-#	@>/dev/null $(KUBECTL) apply -f manifests/opmon
-	@>/dev/null $(KUBECTL) apply -f manifests/opmon/grafana/grafana.yaml
 	@>/dev/null $(KUBECTL) apply -f manifests/opmon/influx/
-	@>/dev/null $(KUBECTL) apply -f manifests/opmon/kafka2influx.yaml
 
+.PHONY: opmon.local
+opmon.local: kafka.local influx.local kafka2influx.local grafana.local
+	@echo "installing opmon"
 
 .PHONY: kubectl-apply
 kubectl-apply: kubectl external-manifests namespaces.local ## apply files in `manifests` using kubectl
+
 	@echo "installing basic services"
 	@>/dev/null $(KUBECTL) apply -f manifests
 
@@ -175,7 +188,7 @@ kubectl-apply: kubectl external-manifests namespaces.local ## apply files in `ma
 ifeq ($(ERS_ENABLED),0)
 	@echo -e "\e[33mskipping installation of Kafka-ERS\e[0m"
 else
-	@$(MAKE) --no-print-directory ers-kafka.local
+	@$(MAKE) --no-print-directory ers.local
 	@$(MAKE) --no-print-directory ers-topic
 endif
 
@@ -360,3 +373,4 @@ share/:
 	@mkdir -p $@
 
 include .makefile/help.mk
+
