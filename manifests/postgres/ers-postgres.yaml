@@ -37,4 +37,4 @@ spec:
             name: ers-sql
         - name: "postgresql-pv-volume"
           persistentVolumeClaim:
-            claimName: "postgresql-pv-volume"
+            claimName: "postgresql-pv-claim"
