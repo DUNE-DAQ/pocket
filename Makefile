@@ -144,7 +144,7 @@ grafana.local: dependency.docker kind kubectl external-manifests namespaces.loca
 		--from-file=manifests/opmon/grafana/datasources/ ||:
 
 	$(KUBECTL) -n monitoring create configmap grafana-dashboards \
-		--from-file=manifests/opmon/grafana/grafana-dashboards/dashboards/pocket-dashbaords ||:
+		--from-file=manifests/opmon/grafana/grafana-dashboards/dashboards/pocket-dashboards ||:
 
 	$(KUBECTL) -n monitoring create configmap dashboard-provisioning \
 		--from-file=manifests/opmon/grafana/provisioning/ ||:
