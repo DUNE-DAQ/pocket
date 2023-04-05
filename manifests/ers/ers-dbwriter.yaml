@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: erskafka
-  namespace: monitoring
+  namespace: ers 
 spec:
   replicas: 1
   selector:
