@@ -14,7 +14,7 @@ spec:
         app: erskafka
     spec:
       containers:
-      - image: jmcarcell/ers-dbwriter:latest
+      - image: plaso/ers-db-writer
         name: erskafka
         envFrom:
         - secretRef:
