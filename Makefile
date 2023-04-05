@@ -91,9 +91,9 @@ erspostgres.local: kind kubectl external-manifests namespaces.local
 	$(KUBECTL) apply -f manifests/postgres/ers-postgres-svc.yaml ||:
 
 
-.PHONY: ers.local
-ers.local: kafka.local erspostgres.local #grafana.local
-	@echo "installing ers-kafka"
+.PHONY: ers2kafka.local
+ers2kafka.local: kafka.local erspostgres.local 
+	@echo "installing ers2kafka"
 
 	@>/dev/null 2>&1 $(KUBECTL) -n monitoring create secret generic ers-secret \
 	--from-literal=ERS_DBWRITER_KAFKA_HOST=kafka-svc.kafka-kraft \
@@ -104,6 +104,11 @@ ers.local: kafka.local erspostgres.local #grafana.local
 	--from-literal=ERS_DBWRITER_PASS="$(PGPASS)" \
 	--from-literal=ERS_DBWRITER_NAME="ApplicationDbErrorReporting" ||:
 	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/ers/ers-dbwriter.yaml ||:
+
+.PHONY: ers.local
+ers.local: kafka.local erspostgres.local ers2kafka.local grafana.local
+	@echo "installing ers"
+
 
 
 .PHONY: dqm.local
