@@ -140,7 +140,7 @@ daqconfig-mongo.local: kind kubectl external-manifests namespaces.local
 
 
 .PHONY: grafana.local
-grafana.local: dependency.docker kind kubectl external-manifests namespaces.local helm
+grafana.local: dependency.docker kind kubectl external-manifests namespaces.local 
 	@echo "installing grafana"
 
 	$(KUBECTL) -n monitoring create secret generic grafana-secrets \
@@ -354,24 +354,18 @@ endif
 	@curl -Lo $(KUBECTL) --fail --silent https://dl.k8s.io/release/v$(KUBECTL_VERSION)/bin/${uname_s}/${COMMON_ARCH}/kubectl
 	@chmod +x $(KUBECTL)
 
-.PHONY: helm
-helm:
-	@echo "HELM isn't needed for anything yet, so not downloading. Uncomment the line below in the Makefile to have it"
-$(HELM):
-	@echo "HELM isn't needed for anything yet, so not downloading. Uncomment the line below in the Makefile to have it"
-
-# .PHONY: helm
-# helm: $(HELM) ## fetch helm binary
-# 	@$(call symlink,$(HELM),$(HELM_NOVER))
-# $(HELM):
-# # do not print to stdout when user runs `make env`
-# ifneq ($(MAKECMDGOALS),env)
-# 	@echo "downloading helm $(HELM_VERSION)"
-# endif
-# 	@mkdir ${EXTERNALS_BIN_FOLDER}/helm_temp
-# 	@curl -Lo ${EXTERNALS_BIN_FOLDER}/helm_temp/helm-v${HELM_VERSION}-linux-amd64.tar.gz https://get.helm.sh/helm-v${HELM_VERSION}-linux-amd64.tar.gz 
-# 	@tar xf ${EXTERNALS_BIN_FOLDER}/helm_temp/helm-v${HELM_VERSION}-linux-amd64.tar.gz -C ${EXTERNALS_BIN_FOLDER}/helm_temp
-# 	@mv ${EXTERNALS_BIN_FOLDER}/helm_temp/linux-amd64/helm ${HELM}
+#.PHONY: helm
+#helm: $(HELM) ## fetch helm binary
+#	@$(call symlink,$(HELM),$(HELM_NOVER))
+#$(HELM):
+# do not print to stdout when user runs `make env`
+#ifneq ($(MAKECMDGOALS),env)
+#	@echo "downloading helm $(HELM_VERSION)"
+#endif
+#	@mkdir ${EXTERNALS_BIN_FOLDER}/helm_temp
+#	@curl -Lo ${EXTERNALS_BIN_FOLDER}/helm_temp/helm-v${HELM_VERSION}-linux-amd64.tar.gz https://get.helm.sh/helm-v${HELM_VERSION}-linux-amd64.tar.gz 
+#	@tar xf ${EXTERNALS_BIN_FOLDER}/helm_temp/helm-v${HELM_VERSION}-linux-amd64.tar.gz -C ${EXTERNALS_BIN_FOLDER}/helm_temp
+#	@mv ${EXTERNALS_BIN_FOLDER}/helm_temp/linux-amd64/helm ${HELM}
 
 .PHONY: external-manifests
 external-manifests: manifests/kubernetes-dashboard-recommended.yaml manifests/cvmfs/deploy.yaml
