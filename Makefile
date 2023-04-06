@@ -348,17 +348,23 @@ endif
 	@chmod +x $(KUBECTL)
 
 .PHONY: helm
-helm: $(HELM) ## fetch helm binary
-	@$(call symlink,$(HELM),$(HELM_NOVER))
+helm:
+	@echo "HELM isn't needed for anything yet, so not downloading. Uncomment the line below in the Makefile to have it"
 $(HELM):
-# do not print to stdout when user runs `make env`
-ifneq ($(MAKECMDGOALS),env)
-	@echo "downloading helm $(HELM_VERSION)"
-endif
-	@mkdir ${EXTERNALS_BIN_FOLDER}/helm_temp
-	@curl -Lo ${EXTERNALS_BIN_FOLDER}/helm_temp/helm-v${HELM_VERSION}-linux-amd64.tar.gz https://get.helm.sh/helm-v${HELM_VERSION}-linux-amd64.tar.gz 
-	@tar xf ${EXTERNALS_BIN_FOLDER}/helm_temp/helm-v${HELM_VERSION}-linux-amd64.tar.gz -C ${EXTERNALS_BIN_FOLDER}/helm_temp
-	@mv ${EXTERNALS_BIN_FOLDER}/helm_temp/linux-amd64/helm ${HELM}
+	@echo "HELM isn't needed for anything yet, so not downloading. Uncomment the line below in the Makefile to have it"
+
+# .PHONY: helm
+# helm: $(HELM) ## fetch helm binary
+# 	@$(call symlink,$(HELM),$(HELM_NOVER))
+# $(HELM):
+# # do not print to stdout when user runs `make env`
+# ifneq ($(MAKECMDGOALS),env)
+# 	@echo "downloading helm $(HELM_VERSION)"
+# endif
+# 	@mkdir ${EXTERNALS_BIN_FOLDER}/helm_temp
+# 	@curl -Lo ${EXTERNALS_BIN_FOLDER}/helm_temp/helm-v${HELM_VERSION}-linux-amd64.tar.gz https://get.helm.sh/helm-v${HELM_VERSION}-linux-amd64.tar.gz 
+# 	@tar xf ${EXTERNALS_BIN_FOLDER}/helm_temp/helm-v${HELM_VERSION}-linux-amd64.tar.gz -C ${EXTERNALS_BIN_FOLDER}/helm_temp
+# 	@mv ${EXTERNALS_BIN_FOLDER}/helm_temp/linux-amd64/helm ${HELM}
 
 .PHONY: external-manifests
 external-manifests: manifests/kubernetes-dashboard-recommended.yaml manifests/cvmfs/deploy.yaml
