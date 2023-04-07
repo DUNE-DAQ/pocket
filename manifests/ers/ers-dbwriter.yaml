@@ -14,7 +14,7 @@ spec:
         app: erskafka
     spec:
       containers:
-              - image: ghcr.io/dune-daq/pocket-ersdbwriter:latest
+      - image: ghcr.io/dune-daq/pocket-ersdbwriter:latest
         name: erskafka
         envFrom:
         - secretRef:
