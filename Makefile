@@ -354,6 +354,8 @@ endif
 	@curl -Lo $(KUBECTL) --fail --silent https://dl.k8s.io/release/v$(KUBECTL_VERSION)/bin/${uname_s}/${COMMON_ARCH}/kubectl
 	@chmod +x $(KUBECTL)
 
+# HELM isn't needed for anything yet, so no point downloading. Uncomment the line below in the Makefile to have it
+#
 #.PHONY: helm
 #helm: $(HELM) ## fetch helm binary
 #	@$(call symlink,$(HELM),$(HELM_NOVER))

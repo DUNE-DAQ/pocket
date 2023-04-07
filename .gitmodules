@@ -1,4 +1,4 @@
 [submodule "manifests/opmon/grafana/grafana-dashboards"]
 	path = manifests/opmon/grafana/grafana-dashboards
-	url = git@github.com:DUNE-DAQ/grafana-dashboards.git 
+	url = ../grafana-dashboards.git 
 	branch = develop #Keep only until PR to develop gets accepted

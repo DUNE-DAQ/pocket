@@ -3,8 +3,11 @@
 If you want to clone this repo : 
 ```bash
 git clone --recurse-submodules git@github.com:DUNE-DAQ/pocket.git
+cd pocket
 git submodule init
 git submodule update
+cd manifests/opmon/grafana/grafana-dashboards/
+git checkout develop
 ```
 
 A set of scripts designed to help create a portable, 'production-like' DUNE DAQ environment in a variety of setups.
