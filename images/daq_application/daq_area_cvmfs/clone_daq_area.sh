@@ -16,7 +16,7 @@ DST_AREA=$2
 echo "------------------------------------------"
 echo "Rsync'ing daq area to $DST_AREA"
 echo "------------------------------------------"
-rsync -av --info=progress2 --info=name0 --exclude build --exclude install --exclude dbt-pyvenv ${SRC_AREA}/ ${DST_AREA}/
+rsync -av --info=progress2 --info=name0 --exclude build --exclude install --exclude .venv ${SRC_AREA}/ ${DST_AREA}/
 
 echo "------------------------------------------"
 echo "Recreating 'build/'"
@@ -27,10 +27,10 @@ cd ${SRC_AREA}
 echo "------------------------------------------"
 echo "Loading dbt environment"
 echo "------------------------------------------"
-source dbt-env.sh
+source env.sh
 dbt-workarea-env -s systems
 
 echo "------------------------------------------"
 echo "Cloning python venv"
 echo "------------------------------------------"
-clonevirtualenv.py ${SRC_AREA}/dbt-pyvenv ${DST_AREA}/dbt-pyvenv
+clonevirtualenv.py ${SRC_AREA}/.venv ${DST_AREA}/.venv

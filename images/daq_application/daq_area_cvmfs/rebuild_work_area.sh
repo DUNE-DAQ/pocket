@@ -17,7 +17,7 @@ echo "------------------------------------------"
 echo "Rebuilding dbt work area in $DBT_AREA"
 echo "------------------------------------------"
 cd $DBT_AREA
-source ./dbt-env.sh
+source ./env.sh
 dbt-workarea-env
 dbt-build -c
 rm -rf build

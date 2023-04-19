@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: erskafka
-  namespace: monitoring
+  namespace: ers 
 spec:
   replicas: 1
   selector:
@@ -14,7 +14,7 @@ spec:
         app: erskafka
     spec:
       containers:
-      - image: jmcarcell/ers-dbwriter:latest
+      - image: ghcr.io/dune-daq/pocket-ersdbwriter:latest
         name: erskafka
         envFrom:
         - secretRef:

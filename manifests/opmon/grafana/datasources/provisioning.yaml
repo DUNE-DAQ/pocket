@@ -23,11 +23,11 @@ datasources:
       sslmode: 'disable'
     version: 1
 
-  - name: 'influxdb'
+  - name: 'InfluxKafka'
     type: 'influxdb'
     access: proxy
     orgId: 1
-    uid: 'influxdb'
+    uid: 'InfluxKafka'
     url:  "http://influxdb-svc.monitoring:8086/"
     database: "influxv3"
     basicAuth: "true"
