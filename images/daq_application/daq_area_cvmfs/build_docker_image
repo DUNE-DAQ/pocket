@@ -32,7 +32,6 @@ if [[ ! -d $SRC_AREA && ( -L $SRC_AREA && ! -d "$(readlink $SRC_AREA)" ) ]]; the
     exit 2
 fi
 
-
 rm -rf ${DST_AREA}
 
 # # Re-create build
@@ -73,6 +72,25 @@ echo "Building $DKR_TAG:$DKR_VERSION docker image"
 echo "------------------------------------------"
 
 DKR_VERSION=$(bash -c "source $DKR_BUILD_HERE/image/dbt-settings; echo \$DUNE_DAQ_BASE_RELEASE | sed 's/dunedaq-\([^-]*\).*/\1/'")
+DKR_VERSION="${DKR_VERSION}-00"
+
+docker_image_exist () {
+    st=$(docker image ls $1|wc -l)
+    if [ "$st" -eq 1 ];
+    then
+        echo 0
+        return 0
+    fi
+    echo 1
+}
+
+while [ $(docker_image_exist ${DKR_TAG}:${DKR_VERSION}) -eq "1" ];
+do
+    init_sub_tag=${DKR_VERSION: -2}
+    new_sub_tag=$((init_sub_tag+1))
+    printf -v new_sub_tag "%02d" $new_sub_tag
+    DKR_VERSION=${DKR_VERSION/"$init_sub_tag"/"$new_sub_tag"}
+done
 
 cp -a $DKR_BUILD_HERE/../common $DKR_BUILD_HERE
 docker buildx build --tag ${DKR_TAG}:${DKR_VERSION} $DKR_BUILD_HERE
