@@ -48,7 +48,15 @@ namespaces.local: kind kubectl external-manifests
 	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/postgres/ns-ers.yaml ||:
 	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/dqm-django/ns-dqm.yaml ||:
 	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/daqconfig/ns-daqconfig.yaml ||:
+	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/microservices/ns-microservices.yaml ||:
 
+.PHONY: runregistry.local
+runregistry.local: 
+	@echo "setting up run-registry"
+	$(KUBECTL) -n microservices create secret generic runregistry-rest-secrets \
+	--from-literal=RGURI=postgres-svc.ers --from-literal=RGUSER=admin \
+	--from-literal=RGPASS=$(PGPASS) --from-literal=RGDB=postgres --from-literal=RGPORT='5432' ||:
+	$(KUBECTL) apply -f manifests/microservices/runregistry-rest.yaml
 
 .PHONY: kafka2influx.local
 kafka2influx.local: kafka.local influx.local
