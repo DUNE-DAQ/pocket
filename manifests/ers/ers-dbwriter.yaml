@@ -12,7 +12,11 @@ spec:
     metadata:
       labels:
         app: erskafka
-    spec:
+    speci:
+      initContainers:
+      - name: wait-for-kafka
+        image: busybox:1.28
+        command: ['sh','-c', 'until nslookup kafka-svc.kafka-kraft.svc.cluster.local; do echo waiting for kafka to run; sleep 1; done']
       containers:
       - image: ghcr.io/dune-daq/pocket-ersdbwriter:latest
         name: erskafka
