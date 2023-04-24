@@ -14,7 +14,7 @@ spec:
         app: runregistry-rest
     spec:
       containers:
-      - image: ghcr.io/dune-daq/pocket-runregistry-rest:0.4
+      - image: ghcr.io/dune-daq/pocket-runregistry-rest:0.7
         name: runregistry-rest
         envFrom:
         - secretRef:
@@ -25,8 +25,6 @@ spec:
         resources: {}
         terminationMessagePath: /dev/termination-log
         terminationMessagePolicy: File
-        #command: ["/bin/sh"]
-        #args: ["-c", "while true; do echo hello; sleep 1000;done"]
 ---
 apiVersion: v1
 kind: Service
