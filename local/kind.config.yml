@@ -72,3 +72,6 @@ nodes:
   - # mongo-express for the daqconfig-mongodb
     containerPort: 31012
     hostPort: 31012
+  - # run registry
+    containerPort: 30005
+    hostPort: 30005
