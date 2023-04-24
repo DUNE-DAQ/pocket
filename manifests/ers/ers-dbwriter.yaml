@@ -12,7 +12,7 @@ spec:
     metadata:
       labels:
         app: erskafka
-    speci:
+    spec:
       initContainers:
       - name: wait-for-kafka
         image: busybox:1.28

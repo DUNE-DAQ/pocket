@@ -13,11 +13,10 @@ spec:
       labels:
         app: kafka2influx
     spec:
-
       initContainers:
       - image: busybox:1.28
         name: wait-for-kafka2
-        command: ['sh', '-c', 'until nslookup kafka-svc.kafka-kraft.svc.cluster.local; do echo waiting for kafka; sleep 1, done']
+        command: ['sh', '-c', 'until nslookup kafka-svc.kafka-kraft.svc.cluster.local; do echo waiting for kafka; sleep 1; done']
       containers:
       - image: dunedaq/pocket-opmon-microservice:1.0
         name: kafka2influx
