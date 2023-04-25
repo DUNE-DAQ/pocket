@@ -14,7 +14,7 @@ spec:
         app: runnumber-rest
     spec:
       containers:
-      - image: ghcr.io/dune-daq/pocket-runnumber-rest:0.5
+      - image: ghcr.io/dune-daq/pocket-runnumber-rest:0.8
         name: runnumber-rest
         envFrom:
         - secretRef:
