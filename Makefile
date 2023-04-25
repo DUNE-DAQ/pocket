@@ -58,12 +58,12 @@ runregistry.local:
 	--from-literal=RGPASS=$(PGPASS) --from-literal=RGDB=postgres --from-literal=RGPORT='5432' ||:
 	$(KUBECTL) apply -f manifests/microservices/runregistry-rest.yaml
 
-.PHONY: runregistry.local
-runregistry.local: 
+.PHONY: runnumber.local
+runnumber.local: 
 	@echo "setting up run-number"
 	$(KUBECTL) -n microservices create secret generic runnumber-rest-secrets \
-	--from-literal=RGURI=postgres-svc.ers --from-literal=RGUSER=admin \
-	--from-literal=RGPASS=$(PGPASS) --from-literal=RGDB=postgres --from-literal=RGPORT='5432' ||:
+	--from-literal=RNURI=postgres-svc.ers --from-literal=RNUSER=admin \
+	--from-literal=RNPASS=$(PGPASS) --from-literal=RNDB=postgres --from-literal=RNPORT='5432' ||:
 	$(KUBECTL) apply -f manifests/microservices/runnumber-rest.yaml
 
 .PHONY: kafka2influx.local
