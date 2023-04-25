@@ -22,10 +22,8 @@ nodes:
   #  containerPath: /pocket
   - hostPath: ./share/dqm
     containerPath: /scratch/dqm-db
-  - hostPath: /cvmfs/dunedaq.opensciencegrid.org
-    containerPath: /cvmfs/dunedaq.opensciencegrid.org
-  - hostPath: /cvmfs/dunedaq-development.opensciencegrid.org
-    containerPath: /cvmfs/dunedaq-development.opensciencegrid.org
+  - hostPath: ./share/postgres
+    containerPath: /scratch/kube/postgres
   extraPortMappings:
   - # proxy server
     containerPort: 31000
