@@ -14,7 +14,7 @@ spec:
         app: runregistry-rest
     spec:
       containers:
-      - image: dunedaq/pocket-runregistry-rest:0.2
+      - image: ghcr.io/dune-daq/pocket-runregistry-rest:0.8
         name: runregistry-rest
         envFrom:
         - secretRef:
@@ -37,6 +37,23 @@ spec:
   type: ClusterIP
   ports:
   - port: 5005
+    protocol: TCP
+    targetPort: 5005
+  selector:
+    app: runregistry-rest
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: runregistry-rest-svc-ext
+  labels:
+    app: runregistry-rest
+  namespace: microservices
+spec:
+  type: ClusterIP
+  ports:
+  - port: 30005
     protocol: TCP
     targetPort: 5005
   selector:
