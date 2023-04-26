@@ -26,7 +26,7 @@ spec:
         #  emptyDir: {}
       containers:
       - name: dqmbackend
-        image: dunedaq/pocket-dqmdjango:1.0
+        image: ghcr.io/dune-daq/pocket-dqmdjango:1.1
         imagePullPolicy: Always
         ports:
         - containerPort: 8000
@@ -42,7 +42,7 @@ spec:
         - sh 
         - /web_application.sh
       - name: dqmbackend-consumer
-        image: dunedaq/pocket-dqmdjango:1.0
+        image: ghcr.io/dune-daq/pocket-dqmdjango:1.0
         imagePullPolicy: Always
         envFrom:
         - secretRef:
