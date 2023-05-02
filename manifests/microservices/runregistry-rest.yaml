@@ -51,10 +51,11 @@ metadata:
     app: runregistry-rest
   namespace: microservices
 spec:
-  type: ClusterIP
+  type: NodePort
   ports:
-  - port: 30005
+  - port: 5005
     protocol: TCP
     targetPort: 5005
+    nodePort: 30005
   selector:
     app: runregistry-rest

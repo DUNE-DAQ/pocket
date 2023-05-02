@@ -14,7 +14,7 @@ spec:
         app: runnumber-rest
     spec:
       containers:
-      - image: dunedaq/pocket-runnumber-rest:0.2
+      - image: ghcr.io/dune-daq/pocket-runnumber-rest:0.8
         name: runnumber-rest
         envFrom:
         - secretRef:
@@ -25,4 +25,38 @@ spec:
         resources: {}
         terminationMessagePath: /dev/termination-log
         terminationMessagePolicy: File
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: runnumber-rest-svc
+  labels:
+    app: runnumber-rest
+  namespace: microservices
+spec:
+  type: ClusterIP
+  ports:
+  - port: 5000
+    protocol: TCP
+    targetPort: 5000
+  selector:
+    app: runnumber-rest
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: runnumber-rest-svc-ext
+  labels:
+    app: runnumber-rest
+  namespace: microservices
+spec:
+  type: NodePort
+  ports:
+  - port: 5000
+    protocol: TCP
+    targetPort: 5000
+    nodePort: 30050
+  selector:
+    app: runnumber-rest
 
