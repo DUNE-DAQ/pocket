@@ -53,6 +53,7 @@ namespaces.local: kind kubectl external-manifests
 .PHONY: runregistry.local
 runregistry.local: 
 	@echo "setting up run-registry"
+
 	$(KUBECTL) -n microservices create secret generic runregistry-rest-secrets \
 	--from-literal=RGURI=postgres-svc.ers --from-literal=RGUSER=admin \
 	--from-literal=RGPASS=$(PGPASS) --from-literal=RGDB=postgres --from-literal=RGPORT='5432' ||:
@@ -61,10 +62,18 @@ runregistry.local:
 .PHONY: runnumber.local
 runnumber.local: 
 	@echo "setting up run-number"
+
 	$(KUBECTL) -n microservices create secret generic runnumber-rest-secrets \
 	--from-literal=RNURI=postgres-svc.ers --from-literal=RNUSER=admin \
 	--from-literal=RNPASS=$(PGPASS) --from-literal=RNDB=postgres --from-literal=RNPORT='5432' ||:
 	$(KUBECTL) apply -f manifests/microservices/runnumber-rest.yaml
+
+.PHONY: runservices.local
+runservices.local: runregistry.local runnumber.local
+	@echo "setting up all runservices"
+
+	$(KUBECTL) -n apply -f manifests/microservices/postgres-run-pv.yaml
+	$(KUBECTL) -n apply -f manifests/microservices/postgres-run-pvc.yaml
 
 .PHONY: kafka2influx.local
 kafka2influx.local: kafka.local influx.local
@@ -207,6 +216,11 @@ kubectl-apply: kubectl external-manifests namespaces.local ## apply files in `ma
 	@echo "installing basic services"
 	@>/dev/null $(KUBECTL) apply -f manifests
 
+ifeq ($(RUNSERV_ENABLED),0)
+        @echo -e "\e[33mskipping installation of run-services\e[0m"
+else
+        @$(MAKE) --no-print-directory runservices.local
+endif
 
 ifeq ($(ERS_ENABLED),0)
 	@echo -e "\e[33mskipping installation of Kafka-ERS\e[0m"
