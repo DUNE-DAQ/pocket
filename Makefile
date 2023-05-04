@@ -50,30 +50,42 @@ namespaces.local: kind kubectl external-manifests
 	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/daqconfig/ns-daqconfig.yaml ||:
 	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/microservices/ns-microservices.yaml ||:
 
+.PHONY: runpostgres.local
+runservices.local: 
+	@echo "setting up runservices postgres"
+
+        $(KUBECTL) apply -f manifests/postgres/postgres-run-pv.yaml ||:
+        $(KUBECTL) apply -f manifests/postgres/postgres-run-pvc.yaml ||:
+        $(KUBECTL) apply -f manifests/postgres/run-postgres.yaml ||:
+        $(KUBECTL) apply -f manifests/postgres/run-postgres-svc.yaml ||:
+
 .PHONY: runregistry.local
-runregistry.local: 
+runregistry.local: runpostgres.local
 	@echo "setting up run-registry"
 
 	$(KUBECTL) -n microservices create secret generic runregistry-rest-secrets \
-	--from-literal=RGURI=postgres-svc.ers --from-literal=RGUSER=admin \
-	--from-literal=RGPASS=$(PGPASS) --from-literal=RGDB=postgres --from-literal=RGPORT='5432' ||:
+	--from-literal=RGURI=postgres-run-svc.microservices \
+	--from-literal=RGUSER=admin \
+	--from-literal=RGPASS=$(PGPASS) \
+	--from-literal=RGDB=postgres \
+	--from-literal=RGPORT='5432' ||:
 	$(KUBECTL) apply -f manifests/microservices/runregistry-rest.yaml
 
 .PHONY: runnumber.local
-runnumber.local: 
+runnumber.local: runpostgres.local
 	@echo "setting up run-number"
 
 	$(KUBECTL) -n microservices create secret generic runnumber-rest-secrets \
-	--from-literal=RNURI=postgres-svc.ers --from-literal=RNUSER=admin \
-	--from-literal=RNPASS=$(PGPASS) --from-literal=RNDB=postgres --from-literal=RNPORT='5432' ||:
+	--from-literal=RNURI=postgres-run-svc.microservices \
+	--from-literal=RNUSER=admin \
+	--from-literal=RNPASS=$(PGPASS)\
+       	--from-literal=RNDB=postgres \
+	--from-literal=RNPORT='5432' ||:
 	$(KUBECTL) apply -f manifests/microservices/runnumber-rest.yaml
 
 .PHONY: runservices.local
-runservices.local: runregistry.local runnumber.local
+runservices.local: runpostgres.local runregistry.local runnumber.local
 	@echo "setting up all runservices"
-
-	$(KUBECTL) -n apply -f manifests/microservices/postgres-run-pv.yaml
-	$(KUBECTL) -n apply -f manifests/microservices/postgres-run-pvc.yaml
 
 .PHONY: kafka2influx.local
 kafka2influx.local: kafka.local influx.local
