@@ -3,20 +3,20 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: postgresql
+  name: run-postgresql
   namespace: microservices
 spec:
   selector:
     matchLabels:
-      app: postgresql
+      app: run-postgresql
   template:
     metadata:
       labels:
-        app: postgresql
+        app: run-postgresql
     spec:
       storageClassName:
       containers:
-      - name: postgresql
+      - name: run-postgresql
         image: postgres:12.8
         ports:
         - containerPort: 5432

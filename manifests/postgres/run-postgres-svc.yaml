@@ -4,7 +4,7 @@ kind: Service
 metadata:
   name: postgres-run-svc
   labels:
-    app: postgresql
+    app: run-postgresql
   namespace: microservices 
 spec:
   type: ClusterIP
@@ -13,4 +13,4 @@ spec:
     protocol: TCP
     targetPort: 5432
   selector:
-    app: postgresql
+    app: run-postgresql
