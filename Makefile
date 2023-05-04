@@ -51,7 +51,7 @@ namespaces.local: kind kubectl external-manifests
 	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/microservices/ns-microservices.yaml ||:
 
 .PHONY: runpostgres.local
-runservices.local: 
+runpostgres.local: 
 	@echo "setting up runservices postgres"
 
 	$(KUBECTL) apply -f manifests/postgres/postgres-run-pv.yaml ||:
