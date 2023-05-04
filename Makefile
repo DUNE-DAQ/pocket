@@ -54,10 +54,10 @@ namespaces.local: kind kubectl external-manifests
 runservices.local: 
 	@echo "setting up runservices postgres"
 
-        $(KUBECTL) apply -f manifests/postgres/postgres-run-pv.yaml ||:
-        $(KUBECTL) apply -f manifests/postgres/postgres-run-pvc.yaml ||:
-        $(KUBECTL) apply -f manifests/postgres/run-postgres.yaml ||:
-        $(KUBECTL) apply -f manifests/postgres/run-postgres-svc.yaml ||:
+	$(KUBECTL) apply -f manifests/postgres/postgres-run-pv.yaml ||:
+	$(KUBECTL) apply -f manifests/postgres/postgres-run-pvc.yaml ||:
+	$(KUBECTL) apply -f manifests/postgres/run-postgres.yaml ||:
+	$(KUBECTL) apply -f manifests/postgres/run-postgres-svc.yaml ||:
 
 .PHONY: runregistry.local
 runregistry.local: runpostgres.local
