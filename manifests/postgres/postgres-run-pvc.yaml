@@ -1,0 +1,17 @@
+apiVersion: v1
+
+kind: PersistentVolumeClaim
+metadata:
+  name: "postgresql-run-pv-claim"
+  namespace: microservices
+  labels:
+    type: local
+spec:
+  storageClassName: ""
+  accessModes:
+    - ReadWriteOnce
+  volumeName: "postgresql-run-pv-volume"
+  resources:
+    requests:
+      storage: 1Gi
+
