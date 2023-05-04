@@ -229,9 +229,9 @@ kubectl-apply: kubectl external-manifests namespaces.local ## apply files in `ma
 	@>/dev/null $(KUBECTL) apply -f manifests
 
 ifeq ($(RUNSERV_ENABLED),0)
-        @echo -e "\e[33mskipping installation of run-services\e[0m"
+	@echo -e "\e[33mskipping installation of run-services\e[0m"
 else
-        @$(MAKE) --no-print-directory runservices.local
+	@$(MAKE) --no-print-directory runservices.local
 endif
 
 ifeq ($(ERS_ENABLED),0)
