@@ -54,6 +54,7 @@ namespaces.local: kind kubectl external-manifests
 runpostgres.local: 
 	@echo "setting up runservices postgres"
 
+	@>/dev/null 2>&1 $(KUBECtl) -n microservices create configmap run-sql --from-file manifests/postgres/sql/pgschema.sql ||:
 	$(KUBECTL) apply -f manifests/postgres/postgres-run-pv.yaml ||:
 	$(KUBECTL) apply -f manifests/postgres/postgres-run-pvc.yaml ||:
 	$(KUBECTL) apply -f manifests/postgres/run-postgres.yaml ||:

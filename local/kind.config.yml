@@ -24,7 +24,9 @@ nodes:
     containerPath: /scratch/dqm-db
   - hostPath: ./share/postgres
     containerPath: /scratch/kube/postgres
-  extraPortMappings:
+  - hostPath: ./share/run-postgres
+    containerPath: /scratch/kube/run-postgres
+    extraPortMappings:
   - # proxy server
     containerPort: 31000
     hostPort: 31000

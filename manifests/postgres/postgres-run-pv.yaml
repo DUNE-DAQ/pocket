@@ -12,7 +12,7 @@ spec:
   capacity:
     storage: 2Gi
   hostPath:
-    path: '/scratch/kube/postgres'
+    path: '/scratch/kube/run-postgres'
   claimRef:
     name: "postgresql-run-pv-claim"
     namespace: microservices

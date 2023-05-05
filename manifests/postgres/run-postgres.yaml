@@ -23,8 +23,8 @@ spec:
           name: postgres
           protocol: TCP
         env:
-        - name: POSTGRES_DB
-          value: ApplicationDbErrorReporting
+        - name: RUN_POSTGRES_DB
+          value: pgschema
         envFrom:
         - secretRef:
             name: postgres-secrets
