@@ -26,7 +26,7 @@ nodes:
     containerPath: /scratch/kube/postgres
   - hostPath: ./share/run-postgres
     containerPath: /scratch/kube/run-postgres
-    extraPortMappings:
+  extraPortMappings:
   - # proxy server
     containerPort: 31000
     hostPort: 31000

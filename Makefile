@@ -54,6 +54,10 @@ namespaces.local: kind kubectl external-manifests
 runpostgres.local: 
 	@echo "setting up runservices postgres"
 
+	$(KUBECTL) -n microservices create secret generic postgres-secrets \
+        --from-literal=POSTGRES_USER="admin" \
+        --from-literal=POSTGRES_PASSWORD="$(PGPASS)" ||:
+
 	@>/dev/null 2>&1 $(KUBECtl) -n microservices create configmap run-sql --from-file manifests/postgres/sql/pgschema.sql ||:
 	$(KUBECTL) apply -f manifests/postgres/postgres-run-pv.yaml ||:
 	$(KUBECTL) apply -f manifests/postgres/postgres-run-pvc.yaml ||:
