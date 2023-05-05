@@ -58,7 +58,7 @@ runpostgres.local:
         --from-literal=POSTGRES_USER="admin" \
         --from-literal=POSTGRES_PASSWORD="$(PGPASS)" ||:
 
-	@>/dev/null 2>&1 $(KUBECtl) -n microservices create configmap run-sql --from-file manifests/postgres/sql/pgschema.sql ||:
+	@>/dev/null 2>&1 $(KUBECTL) -n microservices create configmap run-sql --from-file manifests/postgres/sql/pgschema.sql ||:
 	$(KUBECTL) apply -f manifests/postgres/postgres-run-pv.yaml ||:
 	$(KUBECTL) apply -f manifests/postgres/postgres-run-pvc.yaml ||:
 	$(KUBECTL) apply -f manifests/postgres/run-postgres.yaml ||:
