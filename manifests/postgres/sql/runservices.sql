@@ -18,3 +18,11 @@ CREATE TABLE RUN_REGISTRY_CONFIGS(
        REFERENCES RUN_REGISTRY_META(RUN_NUMBER)
 );
 
+-- This may need to be revised. This was artificially translated from DUNE-DAQ/microservices/runnumber-rest/runnum_table.sql
+
+CREATE TABLE RUN_NUMBER(
+    RUN_NUMBER INT NOT NULL,
+    START_TIME TIMESTAMP (6) NOT NULL,
+    FLAG INT DEFAULT 0 NOT NULL, 
+    STOP_TIME TIMESTAMP (6) NOT NULL
+);
