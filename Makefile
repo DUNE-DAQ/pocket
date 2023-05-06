@@ -159,9 +159,9 @@ grafana.local: dependency.docker kind kubectl external-manifests namespaces.loca
 	--from-literal=GF_SECURITY_SECRET_KEY="${GF_SECURITY_SECRET_KEY}" \
 	--from-literal=GF_SECURITY_ADMIN_PASSWORD="${GF_SECURITY_ADMIN_PASSWORD}" ||:
 
-        $(KUBECTL) -n monitoring create secret generic postgres-secrets \
-        --from-literal=POSTGRES_USER="admin" \
-        --from-literal=POSTGRES_PASSWORD="$(PGPASS)" ||:
+	$(KUBECTL) -n monitoring create secret generic postgres-secrets \
+	--from-literal=POSTGRES_USER="admin" \
+	--from-literal=POSTGRES_PASSWORD="$(PGPASS)" ||:
 
 	$(KUBECTL) -n monitoring create configmap grafana-datasources \
 		--from-file=manifests/opmon/grafana/datasources/ ||:
