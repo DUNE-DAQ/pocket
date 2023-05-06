@@ -92,7 +92,7 @@ kafka.local: dependency.docker kind kubectl external-manifests namespaces.local
 erspostgres.local: kind kubectl external-manifests namespaces.local
 	@echo "installing postgres"
 
-	$(KUBECTL) -n monitoring create secret generic postgres-secrets \
+	$(KUBECTL) -n ers create secret generic postgres-secrets \
 	--from-literal=POSTGRES_USER="admin" \
 	--from-literal=POSTGRES_PASSWORD="$(PGPASS)" ||:
 
@@ -164,13 +164,13 @@ grafana.local: dependency.docker kind kubectl external-manifests namespaces.loca
 	--from-literal=POSTGRES_PASSWORD="$(PGPASS)" ||:
 
 	$(KUBECTL) -n monitoring create configmap grafana-datasources \
-		--from-file=manifests/opmon/grafana/datasources/ ||:
+	--from-file=manifests/opmon/grafana/datasources/ ||:
 
 	$(KUBECTL) -n monitoring create configmap grafana-dashboards \
-		--from-file=manifests/opmon/grafana/grafana-dashboards/dashboards ||:
+	--from-file=manifests/opmon/grafana/grafana-dashboards/dashboards ||:
 
 	$(KUBECTL) -n monitoring create configmap dashboard-provisioning \
-		--from-file=manifests/opmon/grafana/provisioning/ ||:
+	--from-file=manifests/opmon/grafana/provisioning/ ||:
 
 #	For Future when we have Grafana working
 #	$(HELM) -n monitoring install grafana grafana/grafana -f manifests/grafana-dashboards/values.yaml
