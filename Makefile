@@ -96,10 +96,6 @@ erspostgres.local: kind kubectl external-manifests namespaces.local
 	--from-literal=POSTGRES_USER="admin" \
 	--from-literal=POSTGRES_PASSWORD="$(PGPASS)" ||:
 
-	$(KUBECTL) -n monitoring create secret generic postgres-secrets \
-	--from-literal=POSTGRES_USER="admin" \
-	--from-literal=POSTGRES_PASSWORD="$(PGPASS)" ||:
-
 	@>/dev/null 2>&1 $(KUBECTL) -n ers create configmap ers-sql --from-file manifests/postgres/sql/ApplicationDbErrorReporting.sql ||:
 	$(KUBECTL) apply -f manifests/postgres/postgres-pv.yaml ||:
 	$(KUBECTL) apply -f manifests/postgres/postgres-pvc.yaml ||:
@@ -163,14 +159,18 @@ grafana.local: dependency.docker kind kubectl external-manifests namespaces.loca
 	--from-literal=GF_SECURITY_SECRET_KEY="${GF_SECURITY_SECRET_KEY}" \
 	--from-literal=GF_SECURITY_ADMIN_PASSWORD="${GF_SECURITY_ADMIN_PASSWORD}" ||:
 
+	$(KUBECTL) -n monitoring create secret generic postgres-secrets \
+	--from-literal=POSTGRES_USER="admin" \
+	--from-literal=POSTGRES_PASSWORD="$(PGPASS)" ||:
+
 	$(KUBECTL) -n monitoring create configmap grafana-datasources \
-		--from-file=manifests/opmon/grafana/datasources/ ||:
+	--from-file=manifests/opmon/grafana/datasources/ ||:
 
 	$(KUBECTL) -n monitoring create configmap grafana-dashboards \
-		--from-file=manifests/opmon/grafana/grafana-dashboards/dashboards ||:
+	--from-file=manifests/opmon/grafana/grafana-dashboards/dashboards ||:
 
 	$(KUBECTL) -n monitoring create configmap dashboard-provisioning \
-		--from-file=manifests/opmon/grafana/provisioning/ ||:
+	--from-file=manifests/opmon/grafana/provisioning/ ||:
 
 #	For Future when we have Grafana working
 #	$(HELM) -n monitoring install grafana grafana/grafana -f manifests/grafana-dashboards/values.yaml
