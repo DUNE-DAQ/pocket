@@ -1,0 +1,16 @@
+apiVersion: v1
+
+kind: PersistentVolumeClaim
+metadata:
+  name: "postgresql-storage-claim"
+  namespace: default
+  labels:
+    type: local
+spec:
+  storageClassName: ""
+  accessModes:
+    - ReadWriteOnce 
+  volumeName: "postgresql-storage"
+  resources:
+    requests:
+      storage: 1Gi
