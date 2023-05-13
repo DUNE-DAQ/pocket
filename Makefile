@@ -51,7 +51,7 @@ namespaces.local: kind kubectl external-manifests
 	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/microservices/ns-microservices.yaml ||:
 
 .PHONY: runpostgres.local
-runpostgres.local: postgresbackup.local
+runpostgres.local:
 	@echo "setting up runservices postgres"
 
 	$(KUBECTL) -n microservices create secret generic postgres-secrets \
@@ -63,7 +63,10 @@ runpostgres.local: postgresbackup.local
 	$(KUBECTL) apply -f manifests/postgres/postgres-run-pvc.yaml ||:
 	$(KUBECTL) apply -f manifests/postgres/run-postgres.yaml ||:
 	$(KUBECTL) apply -f manifests/postgres/run-postgres-svc.yaml ||:
-	$(KUBECTL) apply -f manifests/postgres/run-postgresbackup.yml ||:
+	$(KUBECTL) apply -f manifests/postgres/postgres-run-backup-pv.yaml ||:
+	$(KUBECTL) apply -f manifests/postgres/postgres-run-backup-pvc.yaml ||:
+	$(KUBECTL) apply -f manifests/postgres/run-postgresbackup-depl.yaml ||:
+	$(KUBECTL) apply -f manifests/postgres/run-postgresbackupjob.yaml ||:
 
 .PHONY: runregistry.local
 runregistry.local: runpostgres.local
@@ -114,16 +117,9 @@ kafka.local: dependency.docker kind kubectl external-manifests namespaces.local
 	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/kafka/kafka.yaml ||:
 	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/kafka/kafka-svc.yaml ||:
 
-.PHONY: postgresbackup.local
-postgresbackup.local: 
-	@echo "Creating a Postgres back up"
-
-	$(KUBECTL) apply -f manifests/postgres/postgres-storage.yaml ||:
-	$(KUBECTL) apply -f manifests/postgres/postgres-storage-claim.yaml ||:
-
 
 .PHONY: erspostgres.local
-erspostgres.local: kind kubectl external-manifests namespaces.local postgresbackup.local
+erspostgres.local: kind kubectl external-manifests namespaces.local 
 	@echo "installing postgres"
 
 	$(KUBECTL) -n ers create secret generic postgres-secrets \
@@ -135,8 +131,10 @@ erspostgres.local: kind kubectl external-manifests namespaces.local postgresback
 	$(KUBECTL) apply -f manifests/postgres/postgres-pvc.yaml ||:
 	$(KUBECTL) apply -f manifests/postgres/ers-postgres.yaml ||:
 	$(KUBECTL) apply -f manifests/postgres/ers-postgres-svc.yaml ||:
-	$(KUBECTL) apply -f manifests/postgres/ers-postgresbackup.yaml ||:
-
+	$(KUBECTL) apply -f manifests/postgres/postgres-backup-pv.yaml ||:
+	$(KUBECTL) apply -f manifests/postgres/postgres-backup-pvc.yaml ||:
+	$(KUBECTL) apply -f manifests/postgres/ers-postgresbackup-depl.yaml ||:
+	$(KUBECTL) apply -f manifests/postgres/ers-postgresbackupjob.yaml ||:
 
 .PHONY: ers.local
 ers.local: kafka.local erspostgres.local #grafana.local

@@ -26,6 +26,6 @@ spec:
           - name: postgres-storage
             hostPath:
             # Ensure the file directory is created.
-              path: /scratch/kube/postgres-backups
+              path: /scratch/kube/postgres-backups/ers
               type: DirectoryOrCreate
 
