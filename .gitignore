@@ -1,5 +1,5 @@
-images/daq_application/cvmfs_import/common/
-images/daq_application/cvmfs_import/image/
+images/daq_application/daq_area_cvmfs/common/
+images/daq_application/daq_area_cvmfs/image/
 share/
 env
 *~

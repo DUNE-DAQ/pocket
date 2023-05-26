@@ -6,7 +6,7 @@ DKR_BUILD_HERE=$(cd $(dirname ${SH_SOURCE}) && pwd)
 SRC_AREA=$DBT_AREA_ROOT
 DST_AREA="${DKR_BUILD_HERE}/image"
 
-DKR_TAG=${1}
+DKR_NAME=${1}
 DKR_BASE_IMG=dunedaq/c8-minimal:latest
 set -e
 usage () {
@@ -68,33 +68,26 @@ docker run ${DOCKER_OPTS}\
 
 
 echo "------------------------------------------"
-echo "Building $DKR_TAG:$DKR_VERSION docker image"
+echo "Building $DKR_NAME:$DKR_TAG docker image"
 echo "------------------------------------------"
 
-DKR_VERSION=$(bash -c "source $DKR_BUILD_HERE/image/dbt-settings; echo \$DUNE_DAQ_BASE_RELEASE | sed 's/dunedaq-\([^-]*\).*/\1/'")
-DKR_VERSION="${DKR_VERSION}-00"
+DKR_TAG=$(bash -c "source ./image/env.sh >/dev/null 2>&1; echo \$DUNE_DAQ_BASE_RELEASE | sed 's/dunedaq-\([^-]*\).*/\1/'")
+DKR_BUILD="00"
 
-docker_image_exist () {
-    st=$(docker image ls $1|wc -l)
-    if [ "$st" -eq 1 ];
-    then
-        echo 0
-        return 0
-    fi
-    echo 1
-}
+LAST_TAG=$(docker image ls ${DKR_NAME}:${DKR_TAG} --format '{{json .Tag}}' | sort -r | head -n 1 | tr -d '"')
+if [ -n "$LAST_TAG" ]; then
+    LAST_SUB_TAG=${LAST_TAG:(-2)}
+    echo ${LAST_SUB_TAG##+(0)}
+    # NEW_SUB_TAG=$((LAST_SUB_TAG+1))
+    printf -v DKR_BUILD "%02d" $((${LAST_ST##+(0)}+1))
+fi 
 
-while [ $(docker_image_exist ${DKR_TAG}:${DKR_VERSION}) -eq "1" ];
-do
-    init_sub_tag=${DKR_VERSION: -2}
-    new_sub_tag=$((init_sub_tag+1))
-    printf -v new_sub_tag "%02d" $new_sub_tag
-    DKR_VERSION=${DKR_VERSION/"$init_sub_tag"/"$new_sub_tag"}
-done
+
+DKR_FULL_TAG=${DKR_NAME}:${DKR_TAG}-${DKR_BUILD}
 
 cp -a $DKR_BUILD_HERE/../common $DKR_BUILD_HERE
-docker buildx build --tag ${DKR_TAG}:${DKR_VERSION} $DKR_BUILD_HERE
+docker buildx build --tag ${DKR_FULL_TAG} $DKR_BUILD_HERE
 
 echo "------------------------------------------"
-echo "Image $DKR_TAG:$DKR_VERSION built!"
+echo "Image ${DKR_FULL_TAG} built!"
 echo "------------------------------------------"
