@@ -74,7 +74,7 @@ echo "------------------------------------------"
 DKR_TAG=$(bash -c "source ./image/env.sh >/dev/null 2>&1; echo \$DUNE_DAQ_BASE_RELEASE | sed 's/dunedaq-\([^-]*\).*/\1/'")
 DKR_BUILD="00"
 
-LAST_TAG=$(docker image ls ${DKR_NAME}:${DKR_TAG} --format '{{json .Tag}}' | sort -r | head -n 1 | tr -d '"')
+LAST_TAG=$(docker image ls ${DKR_NAME} --format '{{json .Tag}}' | sort -r | head -n 1 | tr -d '"')
 if [ -n "$LAST_TAG" ]; then
     LAST_SUB_TAG=${LAST_TAG:(-2)}
     echo ${LAST_SUB_TAG##+(0)}
