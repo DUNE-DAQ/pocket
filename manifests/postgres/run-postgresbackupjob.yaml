@@ -2,7 +2,7 @@ apiVersion: batch/v1
 kind: CronJob
 metadata:
   name: run-postgres-backup
-  namespace: monitoring
+  namespace: microservices
 spec:
   # Backup the database every day at 2AM
   schedule: "* 2 * * *"
