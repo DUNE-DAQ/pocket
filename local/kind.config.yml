@@ -75,6 +75,6 @@ nodes:
   - # run registry
     containerPort: 30005
     hostPort: 30005
-  - # run registry
+  - # run number
     containerPort: 30050
     hostPort: 30050
