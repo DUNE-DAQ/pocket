@@ -1,39 +1,28 @@
 # Pocket
 
-If you want to clone this repo : 
-```bash
-git clone --recurse-submodules git@github.com:DUNE-DAQ/pocket.git
-cd pocket
-git submodule init
-git submodule update
-cd manifests/opmon/grafana/grafana-dashboards/
-git checkout develop
-```
+## Introduction
 
-A set of scripts designed to help create a portable, 'production-like' DUNE DAQ environment in a variety of setups.
+Pocket is a way to package CCM-related facilities in a docker container, so that they can be available for developpers who are not at CERN on the neutrino platform.
+It also enables user to test workflows in kubernetes, as the container that is started holds a full kubernetes cluster on a single node.
 
-Pocket is based on [(Linux) containers](docker.io) and [Kubernetes](kubernetes.io).
+Pocket is based on [(Linux) containers](docker.io), [Kubernetes](kubernetes.io) and [KIND](https://kind.sigs.k8s.io).
 
-In the local setup, Pocket is configured to run in a one-node [KIND](https://kind.sigs.k8s.io) cluster.
+Here is a list of the facilities that are included in pocket:
+- Opmon,
+- ERS,
+- CVMFS (untested),
+- DQM (this hasn't been tested in a while),
+- MongoDB configuration,
+- Run services (not available yet).
 
-Some services can also be run in CERN OpenStack.
 
-## Security
+## Installation
 
-Pocket exposes most of its services on the host to the outside network. It should only be run in a protected environment!
-
-## Requirements
-- A git clone of this repository
+### Requirements
 - a functional docker installation
 - access to external network/Internet for git and dockerhub downloads
 
-Pocket is compatible with Linux, MacOS (intel based), and Windows (through WSL2).
-
-Note that while this covers a very large variety of setups, currently shared interactive nodes like lxplus are _not_ compatible for its lack of a docker installation.
-
-## Dependencies
-
-If your environment does not already provide a working Docker configuration, install Docker and run the daemon. 
+If your environment does not already provide a working Docker configuration, install Docker and run the daemon.
 
 More information about installing Docker is [here](https://docs.docker.com/engine/install/).
 
@@ -47,18 +36,48 @@ On CentOS/SL, as root:
 On Fedora you may need to set the kernel commandline parameter:
 ```systemd.unified_cgroup_hierarchy=0```
 
+### Cloning the repo
+
+If you want to clone this repo :
+```bash
+git clone --recurse-submodules git@github.com:DUNE-DAQ/pocket.git
+cd pocket
+#should you want the latest and greatest grafana dashboards:
+cd manifests/opmon/grafana/grafana-dashboards/
+git checkout develop
+```
+
+## Security
+
+Pocket exposes most of its services on the host to the outside network. It should only be run in a protected environment!
+
+Pocket is compatible with Linux, MacOS (intel based), and Windows (through WSL2), although the later hasnt been tested in a while.
+
 ## Cluster Set up
 
 Clone this git repository to a location of your choice.
 
 For a cluster with all built-in services enabled:
 ```bash
-make setup.local # This will only give you namespaces
-# OR
-# SERVICES=opmon make setup.local
+SERVICES=<services> make setup.local
+```
+
+The services availables are:
+- opmon,
+- ers,
+- dqm,
+- cvmfs,
+- daqconfig,
+- runserv.
+
+You can provide a list as such:
+```bash
+SERVICES=opmon,ers,daqconfig make setup.local
 ```
 
 This will setup your local (one-node) cluster, and print out available default services and their access credentials.
+
+Most of the services started by make should be accessible from your machine. The list of port is in `local/kind.config.yml` ("host port" entries).
 
 ![](print-access-creds.png)
 
@@ -69,12 +88,12 @@ eval $(make env)
 
 To destroy after you finished, run
 ```bash
-$ make destroy.openstack
+$ make destroy.local
 ```
 
-## Quick Start: Error Reporting System
+This will delete the kind container running in docker.
 
-This section covers how to install the Error Reporting System, and the 2.8 Grafana dashboard.
+## Quick Start: Error Reporting System
 
 Clone this repository to your location. Keep in mind that access to the Internet is required.
 
@@ -89,8 +108,9 @@ SERVICES=opmon,ers make setup.local
 ```bash
 Grafana
 	URL (in-cluster): http://grafana.monitoring:3000
-	URL (out-cluster): http://<your IP>:31003
-	User: admin	Password: passssssssworddddd
+	URL (out-cluster): http://localhost:31003
+	User: admin
+	Password: passssssssworddddd
 ```
 
 Navigate to Grafana and log in with the provided credentials.
@@ -102,26 +122,30 @@ To use the ERS in pocket, the DAQ must send error messages to the Kafka instance
 ```
 Kafka
 	address (in-cluster): kafka-svc.kafka-kraft:9092
-	address (out-cluster): <server's external IP>:30092
+	address (out-cluster): localhost:30092
 ```
 
-To configure the DAQ application to report to the Pocket ERS, set the environment variables below to the Kafka address. If you are running the DAQ application outside of pocket, use the out-cluster address. For example: 
+To configure the DAQ applications to report to the Pocket ERS/Opmon, set the variables in the boot section of your configuration to the Kafka address.
 
-```bash
-export KAFKA=<your Kafka address>
+Note that this is the file you provide to `daqconf`!
 
-export DUNEDAQ_ERS_STREAM_LIBS=erskafka
-export DUNEDAQ_PARTITION=ChooseYourPartitionName
-export DUNEDAQ_ERS_INFO="erstrace,throttle(30,100),lstdout,erskafka($KAFKA:30092)"
-export DUNEDAQ_ERS_WARNING="erstrace,throttle(30,100),lstderr,erskafka($KAFKA:30092)"
-export DUNEDAQ_ERS_ERROR="erstrace,throttle(30,100),lstderr,erskafka($KAFKA:30092)"
-export DUNEDAQ_ERS_FATAL="erstrace,lstderr,erskafka($KAFKA:30092)"
+```json
+{
+    "boot": {
+        "ers_impl": "pocket",
+        "opmon_impl": "pocket",
+		"pocket_url": "<the-name-or-ip-of-the-host-where-pocket-is-running>",
+		...
+	},
+	...
+}
 ```
 
 ## Accessing services
 
-Built-in services will be exposed via static port bindings to `localhost`.  
-These are printed out after a successful setup or by running `make print-access-creds`.
+Built-in services will be exposed via static port bindings to `localhost` (again, the list of what is exposed is in `local/kind.config.yml`).
+
+These are printed out after a successful setup or by running `make print-access-creds` (that doesn't work on MacOS...).
 
 |Service|Port|
 |-|-|
@@ -150,15 +174,15 @@ $ # when using OpenStack
 $ curl --socks5 https://mycernusername-pocketdune.cern.ch:31000 --socks5-hostname https://mycernusername-pocketdune.cern.ch:31000 http://example-server
 ```
 
-or a webbrowser using foxyproxy  
+or a webbrowser using foxyproxy
 ![](foxyproxy.png)
 
 ![](grafana.png)
 
-## supported setups
+## Supported setups
 
-### locally on your own machine
-This will create a single node cluster.  
+### Locally
+This will create a single node cluster.
 The only requirement is a working installation of `docker`, other binaries required for setup are downloaded automatically and require no sudo privileges.
 ```bash
 $ make setup.local
@@ -174,7 +198,7 @@ To destroy after you finished, run
 $ make destroy.local
 ```
 
-### CERN OpenStack
+### CERN OpenStack (untested since 2020)
 This will create a two-node cluster (by default). You will need Python3.8 or higher and ssh client on your local machine. Other binaries required for setup are downloaded automatically and require no sudo privileges.
 
 You will need to authenticate with CERN OpenStack, the makefile will help you do that if you don't know how.
