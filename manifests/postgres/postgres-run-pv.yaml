@@ -17,4 +17,3 @@ spec:
   claimRef:
     name: "postgresql-run-pv-claim"
     namespace: microservices
----

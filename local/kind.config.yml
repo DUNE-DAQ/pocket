@@ -76,5 +76,8 @@ nodes:
     containerPort: 30005
     hostPort: 30005
   - # run number
-    containerPort: 30050
-    hostPort: 30050
+    containerPort: 30006
+    hostPort: 30006
+  - # run postgres
+    containerPort: 30007
+    hostPort: 30007

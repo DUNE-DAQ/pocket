@@ -19,23 +19,22 @@ spec:
       - name: run-postgresql
         image: postgres:12.8
         ports:
-        - containerPort: 30005
+        - containerPort: 5432
           name: postgres
           protocol: TCP
-        env:
-        - name: RUNSERVICES
-          value: runservices
         envFrom:
         - secretRef:
             name: postgres-secrets
         volumeMounts:
           - mountPath: /docker-entrypoint-initdb.d/
             name: run-sql
+          - mountPath: /pgdata/
+            name: data
       volumes:
         - name: run-sql
           configMap:
             name: run-sql
-        - name: "postgresql-run-pv-volume"
+        - name: data
           persistentVolumeClaim:
             claimName: "postgresql-run-pv-claim"
 
