@@ -6,11 +6,12 @@ metadata:
   namespace: microservices
   labels:
     type: local
+    app: run-postgres
 spec:
   storageClassName: manual
   accessModes: ["ReadWriteOnce"]
   capacity:
-    storage: 2Gi
+    storage: 10Gi
   hostPath:
     path: '/scratch/kube/run-postgres'
   claimRef:

@@ -8,23 +8,23 @@ metadata:
 spec:
   selector:
     matchLabels:
-      app: run-postgresql
+      app: run-postgres
   template:
     metadata:
       labels:
-        app: run-postgresql
+        app: run-postgres
     spec:
       storageClassName:
       containers:
       - name: run-postgresql
         image: postgres:12.8
         ports:
-        - containerPort: 5432
+        - containerPort: 30005
           name: postgres
           protocol: TCP
         env:
-        - name: RUN_POSTGRES_DB
-          value: pgschema
+        - name: RUNSERVICES
+          value: runservices
         envFrom:
         - secretRef:
             name: postgres-secrets

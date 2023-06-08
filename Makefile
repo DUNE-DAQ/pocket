@@ -63,10 +63,10 @@ runpostgres.local:
 	$(KUBECTL) apply -f manifests/postgres/postgres-run-pvc.yaml ||:
 	$(KUBECTL) apply -f manifests/postgres/run-postgres.yaml ||:
 	$(KUBECTL) apply -f manifests/postgres/run-postgres-svc.yaml ||:
-	$(KUBECTL) apply -f manifests/postgres/postgres-run-backup-pv.yaml ||:
-	$(KUBECTL) apply -f manifests/postgres/postgres-run-backup-pvc.yaml ||:
-	$(KUBECTL) apply -f manifests/postgres/run-postgresbackup-depl.yaml ||:
-	$(KUBECTL) apply -f manifests/postgres/run-postgresbackupjob.yaml ||:
+	#$(KUBECTL) apply -f manifests/postgres/postgres-run-backup-pv.yaml ||:
+	#$(KUBECTL) apply -f manifests/postgres/postgres-run-backup-pvc.yaml ||:
+	#$(KUBECTL) apply -f manifests/postgres/run-postgresbackup-depl.yaml ||:
+	#$(KUBECTL) apply -f manifests/postgres/run-postgresbackupjob.yaml ||:
 
 .PHONY: runregistry.local
 runregistry.local: runpostgres.local
@@ -77,8 +77,8 @@ runregistry.local: runpostgres.local
 	--from-literal=RGUSER=admin \
 	--from-literal=RGPASS=$(PGPASS) \
 	--from-literal=RGDB=postgres \
-	--from-literal=RGPORT='5432' ||:
-	$(KUBECTL) apply -f manifests/microservices/runregistry-rest.yaml
+	--from-literal=RGPORT="5005" ||:
+	#$(KUBECTL) apply -f manifests/microservices/runregistry-rest.yaml
 
 .PHONY: runnumber.local
 runnumber.local: runpostgres.local
@@ -89,8 +89,8 @@ runnumber.local: runpostgres.local
 	--from-literal=RNUSER=admin \
 	--from-literal=RNPASS=$(PGPASS)\
        	--from-literal=RNDB=postgres \
-	--from-literal=RNPORT='5432' ||:
-	$(KUBECTL) apply -f manifests/microservices/runnumber-rest.yaml
+	--from-literal=RNPORT="5005" ||:
+	#$(KUBECTL) apply -f manifests/microservices/runnumber-rest.yaml
 
 .PHONY: runservices.local
 runservices.local: runpostgres.local runregistry.local runnumber.local

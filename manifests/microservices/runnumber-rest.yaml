@@ -7,16 +7,15 @@ spec:
   selector:
     matchLabels:
       app: runnumber-rest
-  minReadySeconds: 5
   template:
     metadata:
       labels:
         app: runnumber-rest
     spec:
-      initContainers:
-      - name: wait-for-run-postgres
-        image: busybox:1.28
-        command: ['sh','-c', 'until nslookup postgres-run-svc.microservices.svc.cluster.local; do echo waiting for run-postgres to run; sleep 1; done']            
+      #      initContainers:
+      #      - name: wait-for-run-postgres
+      #        image: busybox:1.28
+      #        command: ['sh','-c', 'until nslookup postgres-run-svc.microservices.svc.cluster.local; do echo waiting for run-postgres to run; sleep 1; done']            
       containers:
       - image: ghcr.io/dune-daq/pocket-runnumber-rest:0.8
         name: runnumber-rest
@@ -24,43 +23,43 @@ spec:
         - secretRef:
             name: runnumber-rest-secrets
         ports:
-        - containerPort: 5000
+        - containerPort: 5005
           protocol: TCP
         resources: {}
         terminationMessagePath: /dev/termination-log
         terminationMessagePolicy: File
 ---
-apiVersion: v1
-kind: Service
-metadata:
-  name: runnumber-rest-svc
-  labels:
-    app: runnumber-rest
-  namespace: microservices
-spec:
-  type: ClusterIP
-  ports:
-  - port: 5000
-    protocol: TCP
-    targetPort: 5000
-  selector:
-    app: runnumber-rest
-
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: runnumber-rest-svc-ext
-  labels:
-    app: runnumber-rest
-  namespace: microservices
-spec:
-  type: NodePort
-  ports:
-  - port: 5000
-    protocol: TCP
-    targetPort: 5000
-    nodePort: 30050
-  selector:
-    app: runnumber-rest
-
+#apiVersion: v1
+#kind: Service
+#metadata:
+#  name: runnumber-rest-svc
+#  labels:
+#    app: runnumber-rest
+#  namespace: microservices
+#spec:
+#  type: ClusterIP
+#  ports:
+#  - port: 5050
+#    protocol: TCP
+#    targetPort: 5050
+#  selector:
+#    app: runnumber-rest
+#
+#---
+#apiVersion: v1
+#kind: Service
+#metadata:
+#  name: runnumber-rest-svc-ext
+#  labels:
+#    app: runnumber-rest
+#  namespace: microservices
+#spec:
+#  type: NodePort
+#  ports:
+#  - port: 5050
+#    protocol: TCP
+#    targetPort: 5050
+#    nodePort: 30050
+#  selector:
+#    app: runnumber-rest
+#
