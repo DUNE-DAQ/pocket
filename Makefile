@@ -56,9 +56,12 @@ runpostgres.local:
 
 	$(KUBECTL) -n microservices create secret generic postgres-secrets \
 	--from-literal=POSTGRES_USER="admin" \
-	--from-literal=POSTGRES_PASSWORD="$(PGPASS)" ||:
+	--from-literal=POSTGRES_PASSWORD="$(PGPASS)" \
+	--from-literal=POSTGRES_DB='admin' \
+	--from-literal=PGDATA=/pgdata ||:
 
-	@>/dev/null 2>&1 $(KUBECTL) -n microservices create configmap run-sql --from-file manifests/postgres/sql/runservices.sql ||:
+	@>/dev/null 2>&1 $(KUBECTL) -n microservices create configmap run-sql --from-file manifests/postgres/sql/create-run-databases.sh ||:
+
 	$(KUBECTL) apply -f manifests/postgres/postgres-run-pv.yaml ||:
 	$(KUBECTL) apply -f manifests/postgres/postgres-run-pvc.yaml ||:
 	$(KUBECTL) apply -f manifests/postgres/run-postgres.yaml ||:
@@ -76,9 +79,10 @@ runregistry.local: runpostgres.local
 	--from-literal=RGURI=postgres-run-svc.microservices \
 	--from-literal=RGUSER=admin \
 	--from-literal=RGPASS=$(PGPASS) \
-	--from-literal=RGDB=postgres \
-	--from-literal=RGPORT="5005" ||:
-	#$(KUBECTL) apply -f manifests/microservices/runregistry-rest.yaml
+	--from-literal=RGDB="postgres" \
+	--from-literal=RGDBNAME="run_database" \
+	--from-literal=RGPORT="5432" ||:
+	$(KUBECTL) apply -f manifests/microservices/runregistry-rest.yaml
 
 .PHONY: runnumber.local
 runnumber.local: runpostgres.local
@@ -88,12 +92,12 @@ runnumber.local: runpostgres.local
 	--from-literal=RNURI=postgres-run-svc.microservices \
 	--from-literal=RNUSER=admin \
 	--from-literal=RNPASS=$(PGPASS)\
-       	--from-literal=RNDB=postgres \
-	--from-literal=RNPORT="5005" ||:
+    --from-literal=RNDB=postgres \
+	--from-literal=RNPORT="5432" ||:
 	#$(KUBECTL) apply -f manifests/microservices/runnumber-rest.yaml
 
 .PHONY: runservices.local
-runservices.local: runpostgres.local runregistry.local runnumber.local
+runservices.local: runpostgres.local#runregistry.local# runnumber.local
 	@echo "setting up all runservices"
 
 .PHONY: kafka2influx.local
@@ -119,7 +123,7 @@ kafka.local: dependency.docker kind kubectl external-manifests namespaces.local
 
 
 .PHONY: erspostgres.local
-erspostgres.local: kind kubectl external-manifests namespaces.local 
+erspostgres.local: kind kubectl external-manifests namespaces.local
 	@echo "installing postgres"
 
 	$(KUBECTL) -n ers create secret generic postgres-secrets \
@@ -185,7 +189,7 @@ daqconfig-mongo.local: kind kubectl external-manifests namespaces.local
 
 
 .PHONY: grafana.local
-grafana.local: dependency.docker kind kubectl external-manifests namespaces.local 
+grafana.local: dependency.docker kind kubectl external-manifests namespaces.local
 	@echo "installing grafana"
 
 	$(KUBECTL) -n monitoring create secret generic grafana-secrets \
@@ -212,7 +216,7 @@ grafana.local: dependency.docker kind kubectl external-manifests namespaces.loca
 
 
 .PHONY: influx.local
-influx.local: dependency.docker kind kubectl 
+influx.local: dependency.docker kind kubectl
 	@echo "installing influx"
 
 	@>/dev/null 2>&1 $(KUBECTL) -n monitoring create secret generic influxdb-secrets \
@@ -419,7 +423,7 @@ endif
 #	@echo "downloading helm $(HELM_VERSION)"
 #endif
 #	@mkdir ${EXTERNALS_BIN_FOLDER}/helm_temp
-#	@curl -Lo ${EXTERNALS_BIN_FOLDER}/helm_temp/helm-v${HELM_VERSION}-linux-amd64.tar.gz https://get.helm.sh/helm-v${HELM_VERSION}-linux-amd64.tar.gz 
+#	@curl -Lo ${EXTERNALS_BIN_FOLDER}/helm_temp/helm-v${HELM_VERSION}-linux-amd64.tar.gz https://get.helm.sh/helm-v${HELM_VERSION}-linux-amd64.tar.gz
 #	@tar xf ${EXTERNALS_BIN_FOLDER}/helm_temp/helm-v${HELM_VERSION}-linux-amd64.tar.gz -C ${EXTERNALS_BIN_FOLDER}/helm_temp
 #	@mv ${EXTERNALS_BIN_FOLDER}/helm_temp/linux-amd64/helm ${HELM}
 
