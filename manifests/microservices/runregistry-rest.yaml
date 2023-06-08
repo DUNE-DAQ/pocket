@@ -1,3 +1,4 @@
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -17,49 +18,32 @@ spec:
       #      - name: wait-for-run-postgres
       #        image: busybox:1.28
       #        command: ['sh','-c', 'until nslookup postgres-run-svc.microservices.svc.cluster.local; do echo waiting for run-postgres to run; sleep 1; done']
+      storageClassName:
       containers:
-      - image: ghcr.io/dune-daq/pocket-runregistry-rest:v0.0.3
-        name: runregistry-rest
+      - name: runregistry-rest
+        image: ghcr.io/dune-daq/pocket-runregistry-rest:v0.0.7
         envFrom:
         - secretRef:
             name: runregistry-rest-secrets
         ports:
         - containerPort: 5005
-          protocol: TCP
-        resources: {}
-        terminationMessagePath: /dev/termination-log
-        terminationMessagePolicy: File
-          #---
-          #apiVersion: v1
-          #kind: Service
-          #metadata:
-          #  name: runregistry-rest-svc
-          #  labels:
-          #    app: runregistry-rest
-          #  namespace: microservices
-          #spec:
-          #  type: ClusterIP
-          #  ports:
-          #  - port: 5005
-          #    protocol: TCP
-          #    targetPort: 5005
-          #  selector:
-          #    app: runregistry-rest
-          #
-          #---
-          #apiVersion: v1
-          #kind: Service
-          #metadata:
-          #  name: runregistry-rest-svc-ext
-          #  labels:
-          #    app: runregistry-rest
-          #  namespace: microservices
-          #spec:
-          #  type: NodePort
-          #  ports:
-          #  - port: 5005
-          #    protocol: TCP
-          #    targetPort: 5005
-          #    nodePort: 30005
-          #  selector:
-          #    app: runregistry-rest
+        #   protocol: TCP
+        # terminationMessagePath: /dev/termination-log
+        # terminationMessagePolicy: File
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: runregistry-rest-svc-ext
+  labels:
+    app: runregistry-rest
+  namespace: microservices
+spec:
+  type: NodePort
+  ports:
+  - port: 30005
+    protocol: TCP
+    targetPort: 5005
+    nodePort: 30005
+  selector:
+    app: runregistry-rest
