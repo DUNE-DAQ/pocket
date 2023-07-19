@@ -92,12 +92,13 @@ runnumber.local: runpostgres.local
 	--from-literal=RNURI=postgres-run-svc.microservices \
 	--from-literal=RNUSER=admin \
 	--from-literal=RNPASS=$(PGPASS)\
-    --from-literal=RNDB=postgres \
+    --from-literal=RNDB="postgres" \
+	--from-literal=RNDBNAME="run_database" \
 	--from-literal=RNPORT="5432" ||:
-	#$(KUBECTL) apply -f manifests/microservices/runnumber-rest.yaml
+	$(KUBECTL) apply -f manifests/microservices/runnumber-rest.yaml
 
 .PHONY: runservices.local
-runservices.local: runpostgres.local#runregistry.local# runnumber.local
+runservices.local: setup.local runpostgres.local runregistry.local runnumber.local
 	@echo "setting up all runservices"
 
 .PHONY: kafka2influx.local

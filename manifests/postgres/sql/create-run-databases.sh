@@ -27,6 +27,15 @@ CREATE TABLE run_schema.run_registry_configs(
        REFERENCES run_schema.run_registry_meta(run_number)
 );
 
+CREATE TABLE run_schema.run_number(
+  rn INT PRIMARY KEY NOT NULL,
+  start_time TIMESTAMP (6) NOT NULL,
+  flag BOOLEAN NOT NULL,
+  stop_time TIMESTAMP (6)
+);
+
+INSERT INTO run_schema.run_number(rn, start_time, flag, stop_time) VALUES (1000000, CURRENT_TIMESTAMP, true, CURRENT_TIMESTAMP);
+
 \dt+ run_schema.*
 
 EOSQL
