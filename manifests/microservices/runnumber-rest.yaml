@@ -12,12 +12,12 @@ spec:
       labels:
         app: runnumber-rest
     spec:
-      #      initContainers:
-      #      - name: wait-for-run-postgres
-      #        image: busybox:1.28
-      #        command: ['sh','-c', 'until nslookup postgres-run-svc.microservices.svc.cluster.local; do echo waiting for run-postgres to run; sleep 1; done']            
+      initContainers:
+      - name: wait-for-run-postgres
+        image: busybox:1.28
+        command: ['sh','-c', 'until nslookup postgres-run-svc-ext.microservices.svc.cluster.local; do echo waiting for run-postgres to run; sleep 1; done']            
       containers:
-      - image: ghcr.io/dune-daq/pocket-runnumber-rest:0.15
+      - image: ghcr.io/dune-daq/pocket-runnumber-rest:1.0
         name: runnumber-rest
         envFrom:
         - secretRef:
