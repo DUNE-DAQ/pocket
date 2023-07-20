@@ -13,7 +13,7 @@ Here is a list of the facilities that are included in pocket:
 - CVMFS (untested),
 - DQM (this hasn't been tested in a while),
 - MongoDB configuration,
-- Run services (not available yet).
+- Run services.
 
 
 ## Installation

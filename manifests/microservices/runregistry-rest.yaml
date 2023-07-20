@@ -17,7 +17,7 @@ spec:
       initContainers:
       - name: wait-for-run-postgres
         image: busybox:1.28
-        command: ['sh','-c', 'until nslookup postgres-run-svc-ext.microservices.svc.cluster.local; do echo waiting for run-postgres to run; sleep 1; done']
+        command: ['sh','-c', 'until nslookup runregistry-rest-svc-ext.microservices.svc.cluster.local; do echo waiting for run-postgres to run; sleep 1; done']
       storageClassName:
       containers:
       - name: runregistry-rest
