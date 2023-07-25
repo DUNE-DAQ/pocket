@@ -60,7 +60,7 @@ runpostgres.local:
 	--from-literal=POSTGRES_DB='admin' \
 	--from-literal=PGDATA=/pgdata ||:
 
-	@>/dev/null 2>&1 $(KUBECTL) -n microservices create configmap run-sql --from-file manifests/postgres/sql/create-run-databases.sh ||:
+	@>/dev/null 2>&1 $(KUBECTL) -n microservices create configmap run-sql --from-file manifests/postgres/sql/runservices.sql ||:
 
 	$(KUBECTL) apply -f manifests/postgres/postgres-run-pv.yaml ||:
 	$(KUBECTL) apply -f manifests/postgres/postgres-run-pvc.yaml ||:
@@ -98,7 +98,7 @@ runnumber.local: runpostgres.local
 	$(KUBECTL) apply -f manifests/microservices/runnumber-rest.yaml
 
 .PHONY: runservices.local
-runservices.local: setup.local runpostgres.local runregistry.local runnumber.local
+runservices.local: runpostgres.local runregistry.local runnumber.local #setup.local
 	@echo "setting up all runservices"
 
 .PHONY: kafka2influx.local
