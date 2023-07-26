@@ -6,7 +6,6 @@ metadata:
   namespace: microservices
   labels:
     type: local
-    app: run-postgres
 spec:
   storageClassName: ""
   accessModes:
