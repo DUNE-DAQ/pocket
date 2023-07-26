@@ -114,3 +114,4 @@ ALTER TABLE ONLY run_schema.run_registry_configs
 -- PostgreSQL database dump complete
 --
 
+INSERT INTO run_schema.run_number(rn, start_time, flag, stop_time) VALUES (1000000, CURRENT_TIMESTAMP, true, CURRENT_TIMESTAMP);
