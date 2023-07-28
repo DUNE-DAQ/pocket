@@ -14,18 +14,18 @@ spec:
           - name: postgres-backup
             image: postgres:12
             command: ["/bin/sh"]
-            args: ["-c", 'echo $POSTGRES_PASSWORD; export PGPASSWORD=$POSTGRES_PASSWORD; pg_dump -U admin -w -h postgres-svc.ers ApplicationDbErrorReporting > /var/backups/backup-$(date +"%m-%d-%Y-%H-%M").sql']
+            args: ["-c", 'echo $POSTGRES_PASSWORD; export PGPASSWORD=$POSTGRES_PASSWORD; pg_dump -U admin -w -h postgres-svc.ers ApplicationDbErrorReporting > /var/backups/ers/ers-backup-$(date +"%m-%d-%Y-%H-%M").sql']
             envFrom:
             - secretRef:
                 name: postgres-secrets
             volumeMounts:
-            - mountPath: /var/backups
+            - mountPath: /var/backups/ers
               name: postgres-storage
           restartPolicy: Never
           volumes:
           - name: postgres-storage
             hostPath:
             # Ensure the file directory is created.
-              path: /scratch/kube/postgres-backups
+              path: /scratch/kube/postgres-backups/ers
               type: DirectoryOrCreate
 

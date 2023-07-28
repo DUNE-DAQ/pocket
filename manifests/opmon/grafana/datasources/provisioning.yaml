@@ -36,3 +36,18 @@ datasources:
     editable: "true"
     version: 1
 
+  - name: 'RunReg'
+    type: 'postgres'
+    access: proxy
+    orgId: 1
+    uid: 'RunReg'
+    url:  "postgres-run-svc.microservices"
+    database: "runservices"
+    user: "admin"
+    secureJsonData:
+      password: "${POSTGRES_PASSWORD}"
+    jsonData:
+      sslmode: 'disable'
+    version: 1
+
+

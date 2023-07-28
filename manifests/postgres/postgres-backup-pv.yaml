@@ -1,0 +1,19 @@
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: "postgresql-pv-backup"
+  namespace: ers
+  labels:
+    type: local
+spec:
+  storageClassName: manual
+  accessModes: ["ReadWriteOnce"]
+  capacity:
+    storage: 2Gi
+  hostPath:
+    path: '/scratch/kube/postgres-backups/ers'
+  claimRef:
+    name: "postgresql-pv-backup-claim"
+    namespace: ers
+

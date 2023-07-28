@@ -50,21 +50,56 @@ namespaces.local: kind kubectl external-manifests
 	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/daqconfig/ns-daqconfig.yaml ||:
 	@>/dev/null 2>&1 $(KUBECTL) apply -f manifests/microservices/ns-microservices.yaml ||:
 
+.PHONY: runpostgres.local
+runpostgres.local:
+	@echo "setting up runservices postgres"
+
+	$(KUBECTL) -n microservices create secret generic postgres-secrets \
+	--from-literal=POSTGRES_USER="admin" \
+	--from-literal=POSTGRES_PASSWORD="$(PGPASS)" \
+	--from-literal=POSTGRES_DB='admin' \
+	--from-literal=PGDATA=/pgdata ||:
+
+	@>/dev/null 2>&1 $(KUBECTL) -n microservices create configmap run-sql --from-file manifests/postgres/sql/runservices.sql ||:
+
+	$(KUBECTL) apply -f manifests/postgres/postgres-run-pv.yaml ||:
+	$(KUBECTL) apply -f manifests/postgres/postgres-run-pvc.yaml ||:
+	$(KUBECTL) apply -f manifests/postgres/run-postgres.yaml ||:
+	$(KUBECTL) apply -f manifests/postgres/run-postgres-svc.yaml ||:
+	#$(KUBECTL) apply -f manifests/postgres/postgres-run-backup-pv.yaml ||:
+	#$(KUBECTL) apply -f manifests/postgres/postgres-run-backup-pvc.yaml ||:
+	#$(KUBECTL) apply -f manifests/postgres/run-postgresbackup-depl.yaml ||:
+	#$(KUBECTL) apply -f manifests/postgres/run-postgresbackupjob.yaml ||:
+
 .PHONY: runregistry.local
-runregistry.local: 
+runregistry.local: runpostgres.local
 	@echo "setting up run-registry"
+
 	$(KUBECTL) -n microservices create secret generic runregistry-rest-secrets \
-	--from-literal=RGURI=postgres-svc.ers --from-literal=RGUSER=admin \
-	--from-literal=RGPASS=$(PGPASS) --from-literal=RGDB=postgres --from-literal=RGPORT='5432' ||:
+	--from-literal=RGURI=postgres-run-svc.microservices \
+	--from-literal=RGUSER=admin \
+	--from-literal=RGPASS=$(PGPASS) \
+	--from-literal=RGDB="postgres" \
+	--from-literal=RGDBNAME="run_database" \
+	--from-literal=RGPORT="5432" ||:
 	$(KUBECTL) apply -f manifests/microservices/runregistry-rest.yaml
 
 .PHONY: runnumber.local
-runnumber.local: 
+runnumber.local: runpostgres.local
 	@echo "setting up run-number"
+
 	$(KUBECTL) -n microservices create secret generic runnumber-rest-secrets \
-	--from-literal=RNURI=postgres-svc.ers --from-literal=RNUSER=admin \
-	--from-literal=RNPASS=$(PGPASS) --from-literal=RNDB=postgres --from-literal=RNPORT='5432' ||:
+	--from-literal=RNURI=postgres-run-svc.microservices \
+	--from-literal=RNUSER=admin \
+	--from-literal=RNPASS=$(PGPASS)\
+    --from-literal=RNDB="postgres" \
+	--from-literal=RNDBNAME="run_database" \
+	--from-literal=RNPORT="5432" ||:
 	$(KUBECTL) apply -f manifests/microservices/runnumber-rest.yaml
+
+.PHONY: runservices.local
+runservices.local: runpostgres.local runregistry.local runnumber.local #setup.local
+	@echo "setting up all runservices"
 
 .PHONY: kafka2influx.local
 kafka2influx.local: kafka.local influx.local
@@ -101,7 +136,10 @@ erspostgres.local: kind kubectl external-manifests namespaces.local
 	$(KUBECTL) apply -f manifests/postgres/postgres-pvc.yaml ||:
 	$(KUBECTL) apply -f manifests/postgres/ers-postgres.yaml ||:
 	$(KUBECTL) apply -f manifests/postgres/ers-postgres-svc.yaml ||:
-
+	$(KUBECTL) apply -f manifests/postgres/postgres-backup-pv.yaml ||:
+	$(KUBECTL) apply -f manifests/postgres/postgres-backup-pvc.yaml ||:
+	$(KUBECTL) apply -f manifests/postgres/ers-postgresbackup-depl.yaml ||:
+	$(KUBECTL) apply -f manifests/postgres/ers-postgresbackupjob.yaml ||:
 
 .PHONY: ers.local
 ers.local: kafka.local erspostgres.local #grafana.local
@@ -152,7 +190,7 @@ daqconfig-mongo.local: kind kubectl external-manifests namespaces.local
 
 
 .PHONY: grafana.local
-grafana.local: dependency.docker kind kubectl external-manifests namespaces.local 
+grafana.local: dependency.docker kind kubectl external-manifests namespaces.local
 	@echo "installing grafana"
 
 	$(KUBECTL) -n monitoring create secret generic grafana-secrets \
@@ -179,7 +217,7 @@ grafana.local: dependency.docker kind kubectl external-manifests namespaces.loca
 
 
 .PHONY: influx.local
-influx.local: dependency.docker kind kubectl 
+influx.local: dependency.docker kind kubectl
 	@echo "installing influx"
 
 	@>/dev/null 2>&1 $(KUBECTL) -n monitoring create secret generic influxdb-secrets \
@@ -207,6 +245,11 @@ kubectl-apply: kubectl external-manifests namespaces.local ## apply files in `ma
 	@echo "installing basic services"
 	@>/dev/null $(KUBECTL) apply -f manifests
 
+ifeq ($(RUNSERV_ENABLED),0)
+	@echo -e "\e[33mskipping installation of run-services\e[0m"
+else
+	@$(MAKE) --no-print-directory runservices.local
+endif
 
 ifeq ($(ERS_ENABLED),0)
 	@echo -e "\e[33mskipping installation of Kafka-ERS\e[0m"
@@ -381,7 +424,7 @@ endif
 #	@echo "downloading helm $(HELM_VERSION)"
 #endif
 #	@mkdir ${EXTERNALS_BIN_FOLDER}/helm_temp
-#	@curl -Lo ${EXTERNALS_BIN_FOLDER}/helm_temp/helm-v${HELM_VERSION}-linux-amd64.tar.gz https://get.helm.sh/helm-v${HELM_VERSION}-linux-amd64.tar.gz 
+#	@curl -Lo ${EXTERNALS_BIN_FOLDER}/helm_temp/helm-v${HELM_VERSION}-linux-amd64.tar.gz https://get.helm.sh/helm-v${HELM_VERSION}-linux-amd64.tar.gz
 #	@tar xf ${EXTERNALS_BIN_FOLDER}/helm_temp/helm-v${HELM_VERSION}-linux-amd64.tar.gz -C ${EXTERNALS_BIN_FOLDER}/helm_temp
 #	@mv ${EXTERNALS_BIN_FOLDER}/helm_temp/linux-amd64/helm ${HELM}
 
