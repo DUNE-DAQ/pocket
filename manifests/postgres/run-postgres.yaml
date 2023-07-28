@@ -28,7 +28,7 @@ spec:
         volumeMounts:
           - mountPath: /docker-entrypoint-initdb.d/
             name: run-sql
-          - mountPath: /pgdata/
+          - mountPath: /share/run-postgres/
             name: data
       volumes:
         - name: run-sql

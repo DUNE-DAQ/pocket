@@ -15,7 +15,7 @@ spec:
       initContainers:
       - name: wait-for-run-postgres
         image: busybox:1.28
-        command: ['sh','-c', 'until nslookup postgres-run-svc-ext.microservices.svc.cluster.local; do echo waiting for run-postgres to run; sleep 5; done']
+        command: ['sh','-c', 'until nslookup postgres-run-svc-ext.microservices.svc.cluster.local; do echo waiting for run-postgres to run; sleep 15; done']
       containers:
       - image: ghcr.io/dune-daq/pocket-runnumber-rest:1.0
         name: runnumber-rest
