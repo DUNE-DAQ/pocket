@@ -19,14 +19,14 @@ Here is a list of the facilities that are included in pocket:
 ## Installation
 
 ### Requirements
-- a functional docker installation
+- a functional docker installation (typically docker-ce)
 - access to external network/Internet for git and dockerhub downloads
 
 If your environment does not already provide a working Docker configuration, install Docker and run the daemon.
 
 More information about installing Docker is [here](https://docs.docker.com/engine/install/).
 
-On CentOS/SL, as root:
+On CentOS/SL/Alma9, as root:
 ```
  $ [yum|dnf] -y install docker
  $ systemctl enable docker
