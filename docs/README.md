@@ -58,3 +58,7 @@ If you recieve:
 ```
 
 You should first `cd daq-kube`.
+
+### local storage
+
+This setup will use `./local` to store your persistant disks. You can replace this directory with a symbolic link to another location.
