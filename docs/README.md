@@ -38,6 +38,11 @@ git clone https://github.com/DUNE-DAQ/pocket.git
 cd pocket
 make help
 ```
+## create pocketdune cluster
+
+```bash
+make create-pocketdune-cluster
+```
 
 Select the workflow you desire from the output of `make help`.
 
