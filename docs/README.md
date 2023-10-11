@@ -39,7 +39,7 @@ cd pocket
 make help
 ```
 
-Select the workflow you desire from the output of `make help`.
+Select the workflow you desire from the output of `make help`.  Odds are it is `make recreate-pocketdune-cluster`.
 
 The utilities this workflow installs can be added to your `$PATH` via `eval $(make env)`.
 
