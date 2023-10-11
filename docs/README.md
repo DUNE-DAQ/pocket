@@ -1,31 +1,29 @@
-# Pocket
+# pocket
 
-## Introduction
+The goal of this project is to setup a minimal kubernetes environment for deploying DAQ workflows.
 
-Pocket is a way to package CCM-related facilities in a docker container, so that they can be available for developpers who are not at CERN on the neutrino platform.
-It also enables user to test workflows in kubernetes, as the container that is started holds a full kubernetes cluster on a single node.
-
-Pocket is based on [(Linux) containers](docker.io), [Kubernetes](kubernetes.io) and [KIND](https://kind.sigs.k8s.io).
-
-Here is a list of the facilities that are included in pocket:
-- Opmon,
-- ERS,
-- CVMFS (untested),
-- DQM (this hasn't been tested in a while),
-- MongoDB configuration,
-- Run services.
-
+Pocket is based on [(Linux) containers](https://docker.io), [Kubernetes](https://kubernetes.io) and [KIND](https://kind.sigs.k8s.io).
 
 ## Installation
 
 ### Requirements
+
+=======
 - a functional docker installation (typically docker-ce)
 - access to external network/Internet for git and dockerhub downloads
 
-If your environment does not already provide a working Docker configuration, install Docker and run the daemon.
+Utilities:
 
-More information about installing Docker is [here](https://docs.docker.com/engine/install/).
+- `make`
+- `base64`
+- `find`
+- `git`
+- `grep`
+- `jq`
+- `sed`
 
+You must also have a functional [`docker` installation](https://docs.docker.com/engine/install/) that can download container images from the internet.
+=======
 On CentOS/SL/Alma9, as root:
 ```
  $ [yum|dnf] -y install docker
@@ -33,188 +31,32 @@ On CentOS/SL/Alma9, as root:
  $ systemctl start docker
 ```
 
-On Fedora you may need to set the kernel commandline parameter:
-```systemd.unified_cgroup_hierarchy=0```
+## Setup
 
-### Cloning the repo
+To use this project you need to clone the git repo and run one of the Makefile workflows:
 
-If you want to clone this repo :
 ```bash
-git clone --recurse-submodules git@github.com:DUNE-DAQ/pocket.git
+git clone https://github.com/DUNE-DAQ/pocket.git
 cd pocket
-#should you want the latest and greatest grafana dashboards:
-cd manifests/opmon/grafana/grafana-dashboards/
-git checkout develop
+make help
 ```
 
-## Security
+Select the workflow you desire from the output of `make help`.
 
-Pocket exposes most of its services on the host to the outside network. It should only be run in a protected environment!
+The utilities this workflow installs can be added to your `$PATH` via `eval $(make env)`.
 
-Pocket is compatible with Linux, MacOS (intel based), and Windows (through WSL2), although the later hasnt been tested in a while.
+### Security
 
-## Cluster Set up
+Pocket exposes most of its services on the host to the outside network. It should only be run in a protected environment where it is safe to expose these services!
 
-Clone this git repository to a location of your choice.
+## Deployment
 
-For a cluster with all built-in services enabled:
-```bash
-SERVICES=<services> make setup.local
-```
+Once you have created the kind cluster via this project, you should be able to select your deployment target from `daq-kube`. See that repo for instructions
 
-The services availables are:
-- opmon,
-- ers,
-- dqm,
-- cvmfs,
-- daqconfig,
-- runserv.
-
-You can provide a list as such:
-```bash
-SERVICES=opmon,ers,daqconfig make setup.local
-```
-
-This will setup your local (one-node) cluster, and print out available default services and their access credentials.
-
-Most of the services started by make should be accessible from your machine. The list of port is in `local/kind.config.yml` ("host port" entries).
-
-![](print-access-creds.png)
-
-Optionally, to make your shell use binaries (`kubectl`, ...) that pocket ships with
-```bash
-eval $(make env)
-```
-
-To destroy after you finished, run
-```bash
-$ make destroy.local
-```
-
-This will delete the kind container running in docker.
-
-## Quick Start: Error Reporting System
-
-Clone this repository to your location. Keep in mind that access to the Internet is required.
-
-Set the SERVICES variables and run `make`:
-
-```bash
-SERVICES=opmon,ers make setup.local
-```
-
-### Access Grafana
-
-```bash
-Grafana
-	URL (in-cluster): http://grafana.monitoring:3000
-	URL (out-cluster): http://localhost:31003
-	User: admin
-	Password: passssssssworddddd
-```
-
-Navigate to Grafana and log in with the provided credentials.
-
-### Configure the DAQ application
-
-To use the ERS in pocket, the DAQ must send error messages to the Kafka instance running in Pocket. External and internal addresses are printed after setup:
+If you recieve:
 
 ```
-Kafka
-	address (in-cluster): kafka-svc.kafka-kraft:9092
-	address (out-cluster): localhost:30092
+✗ target pocket not existent in kluctl project config
 ```
 
-To configure the DAQ applications to report to the Pocket ERS/Opmon, set the variables in the boot section of your configuration to the Kafka address.
-
-Note that this is the file you provide to `daqconf`!
-
-```json
-{
-    "boot": {
-        "ers_impl": "pocket",
-        "opmon_impl": "pocket",
-		"pocket_url": "<the-name-or-ip-of-the-host-where-pocket-is-running>",
-		...
-	},
-	...
-}
-```
-
-## Accessing services
-
-Built-in services will be exposed via static port bindings to `localhost` (again, the list of what is exposed is in `local/kind.config.yml`).
-
-These are printed out after a successful setup or by running `make print-access-creds` (that doesn't work on MacOS...).
-
-|Service|Port|
-|-|-|
-|Proxy server|31000|
-|K8S Dashboard|31001|
-|InfluxDB|31002|
-|Grafana|31003|
-|ElasticSearch|31004|
-|Kibana|31005|
-|Opmonlib Proxy|31006|
-|Kafka External|30092|
-|Kafka monitoring|30075|
-|Error Reporting System|30080|
-|DQM Platform|30081|
-
-
-
-For the in-cluster experience with DNS, and to access your own (non-built-in) defined services,
-the cluster will have a http proxy running for you to access any services internal to the cluster.
-
-This proxy runs on port `31000` and is usable using curl
-```bash
-$ # when using local deployment
-$ curl --socks5 localhost:31000 --socks5-hostname localhost:31000 http://example-server
-$ # when using OpenStack
-$ curl --socks5 https://mycernusername-pocketdune.cern.ch:31000 --socks5-hostname https://mycernusername-pocketdune.cern.ch:31000 http://example-server
-```
-
-or a webbrowser using foxyproxy
-![](foxyproxy.png)
-
-![](grafana.png)
-
-## Supported setups
-
-### Locally
-This will create a single node cluster.
-The only requirement is a working installation of `docker`, other binaries required for setup are downloaded automatically and require no sudo privileges.
-```bash
-$ make setup.local
-```
-
-Optionally, to make your shell use binaries (`kubectl`, ...) that pocket ships with
-```bash
-eval $(make env)
-```
-
-To destroy after you finished, run
-```bash
-$ make destroy.local
-```
-
-### CERN OpenStack (untested since 2020)
-This will create a two-node cluster (by default). You will need Python3.8 or higher and ssh client on your local machine. Other binaries required for setup are downloaded automatically and require no sudo privileges.
-
-You will need to authenticate with CERN OpenStack, the makefile will help you do that if you don't know how.
-```bash
-$ make setup.openstack
-```
-
-This will create a `terraform.tfstate` file in `./openstack/terraform`. Keep this file, and keep it secret, for as long as you wish to have your cluster.
-It contains your SSH key, there is no other place where you can retrieve this.
-
-If you are not on the CERN network, open a proxy using `ssh -D 12345 lxplus.cern.ch`.
-You can then execute `HTTP_PROXY=https://localhost:12345 make setup.openstack`.
-
-To destroy after you finished, run
-```bash
-$ make destroy.openstack
-```
-
-You can change the number and flavor of machines to use by editing [terraform/wanted.tf](terraform/wanted.tf)
+You should first `cd daq-kube`.
