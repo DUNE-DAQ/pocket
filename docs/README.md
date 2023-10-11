@@ -43,6 +43,12 @@ Select the workflow you desire from the output of `make help`.
 
 The utilities this workflow installs can be added to your `$PATH` via `eval $(make env)`.
 
+## Create cluster
+
+```bash
+make create-pocketdune-cluster
+```
+
 ### Security
 
 Pocket exposes most of its services on the host to the outside network. It should only be run in a protected environment where it is safe to expose these services!
