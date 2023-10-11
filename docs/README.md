@@ -8,7 +8,6 @@ Pocket is based on [(Linux) containers](https://docker.io), [Kubernetes](https:/
 
 ### Requirements
 
-- a functional docker installation (typically docker-ce)
 - access to external network/Internet for git and dockerhub downloads
 
 Utilities:
@@ -25,7 +24,7 @@ You must also have a functional [`docker` installation](https://docs.docker.com/
 
 On CentOS/SL/Alma9, as root:
 ```
- $ [yum|dnf] -y install docker
+ $ [yum|dnf] -y install docker-ce
  $ systemctl enable docker
  $ systemctl start docker
 ```
