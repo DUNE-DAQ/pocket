@@ -44,6 +44,12 @@ make help
 make create-pocketdune-cluster
 ```
 
+## setup your path
+
+```
+eval $(make env)
+```
+
 Select the workflow you desire from the output of `make help`.  Odds are it is `make recreate-pocketdune-cluster`.
 
 The utilities this workflow installs can be added to your `$PATH` via `eval $(make env)`.
