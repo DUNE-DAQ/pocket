@@ -64,7 +64,7 @@ ${MY_KIND_CLUSTER_CONFIG}: remove-kind-config get-kube-daq
 	@echo "        node-labels: "ingress-ready=true"" >> ${MY_KIND_CLUSTER_CONFIG}
 	@echo "" >> ${MY_KIND_CLUSTER_CONFIG}
 	@echo "  extraPortMappings:" >> ${MY_KIND_CLUSTER_CONFIG}
-	@for port in $$(cd ${MAKEFILE_DIR}/daq-kube/dune_daq_services/node-ports && grep nodePort * | cut -d':' -f3 | sort -n | grep -v nodePort); do echo "  - containerPort: $$port" >> ${MY_KIND_CLUSTER_CONFIG}; echo "    hostPort: $$port" >> ${MY_KIND_CLUSTER_CONFIG}; done
+	@for port in $$(cd ${MAKEFILE_DIR}/daq-kube/node-ports && grep nodePort * | cut -d':' -f3 | sort -n | grep -v nodePort); do echo "  - containerPort: $$port" >> ${MY_KIND_CLUSTER_CONFIG}; echo "    hostPort: $$port" >> ${MY_KIND_CLUSTER_CONFIG}; done
 	@echo "" >> ${MY_KIND_CLUSTER_CONFIG}
 	@echo "- role: worker" >> ${MY_KIND_CLUSTER_CONFIG}
 	@echo "  image: ${KIND_NODE_VERSION}" >> ${MY_KIND_CLUSTER_CONFIG}
