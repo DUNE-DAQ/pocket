@@ -64,6 +64,9 @@ create-${KIND_CLUSTER_NAME}-cluster: test-shell-utils test-docker-is-working get
 	@echo ""
 	@kind create cluster --wait 10s --config ${MY_KIND_CLUSTER_CONFIG}
 	@echo ""
+	@echo "Setting role on worker(s)..."
+	@for node in $$(kubectl get nodes -o 'jsonpath={.items[*].metadata.name}'); do echo $${node} | grep -q worker; if [[ $$? -eq 0 ]]; then kubectl label node $${node} node-role.kubernetes.io/worker=worker; fi; done
+	@echo ""
 	@echo "Cleaning up unnecessary resources, please wait..."
 	kubectl delete storageclass standard --now=true --wait=true
 	kubectl delete namespace local-path-storage --now=true --wait=true
