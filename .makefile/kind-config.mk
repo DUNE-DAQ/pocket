@@ -71,3 +71,5 @@ ${MY_KIND_CLUSTER_CONFIG}: remove-kind-config get-kube-daq
 	@echo "  extraMounts:" >> ${MY_KIND_CLUSTER_CONFIG}
 	@echo "  - hostPath: ${MY_PERSISTENT_STORAGE}" >> ${MY_KIND_CLUSTER_CONFIG}
 	@echo "    containerPath: /var/local-path-provisioner" >> ${MY_KIND_CLUSTER_CONFIG}
+	@echo "    labels:" >> ${MY_KIND_CLUSTER_CONFIG}
+	@echo "      node-role.kubernetes.io/worker: worker" >> ${MY_KIND_CLUSTER_CONFIG}
