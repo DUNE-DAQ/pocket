@@ -75,6 +75,25 @@ As a part of the create process a handful of utilities will be downloaded.  You'
 eval $(make env)
 ```
 
+## Deployment
+
+Once you have created the kind cluster via this project, you should be able to select your deployment target from `daq-kube`. See that [repo](https://github.com/DUNE-DAQ/daq-kube) for instructions.
+
+Odds are you want to run:
+
+```bash
+cd daq-kube
+kluctl deploy -t pocket
+```
+
+If you recieve:
+
+```shell
+✗ target pocket not existent in kluctl project config
+```
+
+You skipped running `cd daq-kube`.
+
 ## Cleanup pocketdune cluster
 
 Once you are done with the cluster, you can remove it with:
@@ -82,15 +101,3 @@ Once you are done with the cluster, you can remove it with:
 ```bash
 make remove-pocketdune-cluster
 ```
-
-## Deployment
-
-Once you have created the kind cluster via this project, you should be able to select your deployment target from `daq-kube`. See that [repo](https://github.com/DUNE-DAQ/daq-kube) for instructions.
-
-If you recieve:
-
-```
-✗ target pocket not existent in kluctl project config
-```
-
-You should first `cd daq-kube`.
