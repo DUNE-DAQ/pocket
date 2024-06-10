@@ -3,7 +3,9 @@ images/daq_application/cvmfs_import/image/
 share/
 env
 daq-kube/
+daq-kube
 bin/
 config/
 local/
+local
 *~

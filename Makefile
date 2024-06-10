@@ -6,9 +6,9 @@ KIND_CLUSTER_NAME := pocketdune
 # BEGIN FRUSTRATING MANUAL MAINTANCE
 # keep these in sync by hand :(
 # RHEL7 doesn't support kind 0.20.0
-KUBERNETES_VERSION := v1.27.1
-KIND_VERSION := v0.19.0
-KIND_NODE_VERSION := docker.io/kindest/node:v1.27.1@sha256:b7d12ed662b873bd8510879c1846e87c7e676a79fefc93e17b2a52989d3ff42b
+KUBERNETES_VERSION := v1.27.13
+KIND_VERSION := v0.23.0
+KIND_NODE_VERSION := docker.io/kindest/node:v1.27.13@sha256:17439fa5b32290e3ead39ead1250dca1d822d94a10d26f1981756cd51b24b9d8
 # END FRUSTRATING MANUAL MAINTANCE
 
 MAKEFILE_DIR := $(dir $(realpath $(lastword $(MAKEFILE_LIST))))
