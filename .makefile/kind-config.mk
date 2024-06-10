@@ -40,6 +40,7 @@ ${MY_KIND_CLUSTER_CONFIG}: remove-kind-config get-kube-daq
 	@echo "  serverTLSBootstrap: true" >> ${MY_KIND_CLUSTER_CONFIG}
 	@echo "  rotateCertificates: true" >> ${MY_KIND_CLUSTER_CONFIG}
 	@echo "  failSwapOn: false" >> ${MY_KIND_CLUSTER_CONFIG}
+	@echo "  localStorageCapacityIsolation: true" >> ${MY_KIND_CLUSTER_CONFIG}
 	@echo "" >> ${MY_KIND_CLUSTER_CONFIG}
 	@echo "- |-" >> ${MY_KIND_CLUSTER_CONFIG}
 	@echo "  apiVersion: kubeadm.k8s.io/v1beta3" >> ${MY_KIND_CLUSTER_CONFIG}
@@ -71,5 +72,3 @@ ${MY_KIND_CLUSTER_CONFIG}: remove-kind-config get-kube-daq
 	@echo "  extraMounts:" >> ${MY_KIND_CLUSTER_CONFIG}
 	@echo "  - hostPath: ${MY_PERSISTENT_STORAGE}" >> ${MY_KIND_CLUSTER_CONFIG}
 	@echo "    containerPath: /var/local-path-provisioner" >> ${MY_KIND_CLUSTER_CONFIG}
-#	@echo "  labels:" >> ${MY_KIND_CLUSTER_CONFIG}
-#	@echo "    node-role.kubernetes.io/worker: worker" >> ${MY_KIND_CLUSTER_CONFIG}
