@@ -129,12 +129,12 @@ test-shell-utils: test-base64-is-working test-find-is-working test-git-exists te
 
 .PHONY: test-base64-is-working
 test-base64-is-working: ## verify `base64` is working
-	@echo -e "Checking if \`\033[1mbase64\033[0m\` is installed and workingr"
+	@echo -e "Checking if \`\033[1mbase64\033[0m\` is installed and working"
 	@echo | base64 >/dev/null
 
 .PHONY: test-docker-is-working
 test-docker-is-working: ## verify `docker` can run images
-	@echo -e "Checking if \`\033[1mdocker\033[0m\` is installed and workingr"
+	@echo -e "Checking if \`\033[1mdocker\033[0m\` is installed and working"
 	docker run --rm docker.io/library/hello-world:latest >/dev/null
 
 .PHONY: test-find-is-working
