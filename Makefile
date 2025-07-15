@@ -62,18 +62,18 @@ create-${KIND_CLUSTER_NAME}-cluster: test-shell-utils test-docker-is-working get
 	@echo "Creating kind cluster..."
 	@echo -e "\033[1m**\033[0m The wait for control-plane=Ready \033[1mmay time out\033[0m, this is safe to ignore. \033[1m**\033[0m"
 	@echo ""
-	@kind create cluster --wait 10s --config ${MY_KIND_CLUSTER_CONFIG}
+	@${MY_BINDIR}/kind create cluster --wait 10s --config ${MY_KIND_CLUSTER_CONFIG}
 	@echo ""
 	@echo "Setting role on worker(s)..."
 	@for node in $$(kubectl get nodes -o 'jsonpath={.items[*].metadata.name}'); do echo $${node} | grep -q worker; if [[ $$? -eq 0 ]]; then kubectl label node $${node} node-role.kubernetes.io/worker=worker; fi; done
 	@echo ""
 	@echo "Cleaning up unnecessary resources, please wait..."
-	kubectl delete storageclass standard --now=true --wait=true
-	kubectl delete namespace local-path-storage --now=true --wait=true
+	${MY_BINDIR}/kubectl delete storageclass standard --now=true --wait=true
+	${MY_BINDIR}/kubectl delete namespace local-path-storage --now=true --wait=true
 	@echo ""
 	@echo "Setting up kubernetes client certificates..."
 	@sleep 5
-	@kubectl get csr --no-headers=true | grep -i pending | cut -d' ' -f1 | xargs -i kubectl certificate approve {} >/dev/null
+	@${MY_BINDIR}/kubectl get csr --no-headers=true | grep -i pending | cut -d' ' -f1 | xargs -i kubectl certificate approve {} >/dev/null
 	@echo ""
 	@echo -e "You can setup your \033[1m\$$PATH\033[0m with:"
 	@echo -e " \033[1m eval \$$(make env) \033[0m"
@@ -89,7 +89,7 @@ create-${KIND_CLUSTER_NAME}-cluster: test-shell-utils test-docker-is-working get
 .PHONY: remove-${KIND_CLUSTER_NAME}-cluster
 remove-${KIND_CLUSTER_NAME}-cluster: test-docker-is-working get-kind remove-kind-config ## Delete the KinD cluster
 	@echo ""
-	kind delete cluster --name ${KIND_CLUSTER_NAME}
+	${MY_BINDIR}/kind delete cluster --name ${KIND_CLUSTER_NAME}
 	@echo ""
 
 .PHONY: recreate-${KIND_CLUSTER_NAME}-cluster
