@@ -1,10 +1,25 @@
 ${MY_BINDIR}/kluctl: test-jq-is-working
 	@mkdir -p ${MY_BINDIR}
 	@echo ""
-	@echo -e "Finding latest version of \033[1mkluctl\033[0m..."
-	$(eval KLUCTL_VERSION=$(shell curl -Lfs https://api.github.com/repos/kluctl/kluctl/releases/latest | jq '.tag_name' | tr -d '"'))
-	@echo -e "Downloading \033[1mkluctl\033[0m..."
-	@curl -Lfs https://github.com/kluctl/kluctl/releases/download/${KLUCTL_VERSION}/kluctl_${KLUCTL_VERSION}_${OS}_${PLATFORM}.tar.gz -o ${MY_BINDIR}/kluctl-${KLUCTL_VERSION}.tar.gz
-	@cd ${MY_BINDIR} ; tar xf ${MY_BINDIR}/kluctl-${KLUCTL_VERSION}.tar.gz --transform "s,kluctl,kluctl-${KLUCTL_VERSION}," 2>/dev/null
-	@chmod +x ${MY_BINDIR}/kluctl-${KLUCTL_VERSION}
-	@ln -sf ${MY_BINDIR}/kluctl-${KLUCTL_VERSION} ${MY_BINDIR}/kluctl
+	@echo "Finding latest version of kluctl..."
+
+	@ARCH=$$(uname -m); \
+	if [ "$$ARCH" = "x86_64" ]; then \
+		KEY="darwin_amd64"; \
+	elif [ "$$ARCH" = "arm64" ]; then \
+		KEY="darwin_arm64"; \
+	else \
+		echo "Unsupported architecture: $$ARCH"; exit 1; \
+	fi; \
+	KLUCTL_URL=$$(curl -s https://api.github.com/repos/kluctl/kluctl/releases/latest | \
+		jq -r ".assets[] | select(.name | test(\"$$KEY\")) | .browser_download_url"); \
+	if [ -z "$$KLUCTL_URL" ]; then \
+		echo "Error: no matching release asset found for $$KEY"; exit 1; \
+	fi; \
+	echo "Downloading binary with key $$KEY from $$KLUCTL_URL..."; \
+	curl -L $$KLUCTL_URL -o ${MY_BINDIR}/kluctl; \
+	chmod +x ${MY_BINDIR}/kluctl
+
+test-jq-is-working:
+	@command -v jq >/dev/null 2>&1 || { echo >&2 "jq is required but not installed."; exit 1; }
+
