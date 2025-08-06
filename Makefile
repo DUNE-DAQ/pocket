@@ -80,16 +80,18 @@ create-${KIND_CLUSTER_NAME}-cluster: write-kind-config | test-shell-utils test-d
 	@echo "You should look at the cluster status with:"
 	@echo -e " \033[1m kubectl get pods -A \033[0m"
 	@echo "and install your cluster components with \`kluctl\`"
-	@echo -e "from the \033[1mdaq-kube\033[0m repo you have just checked out:"
+	@echo -e " from the \033[1mdaq-kube\033[0m repo you have just checked out:"
 	@echo -e " \033[1m cd ${MAKEFILE_DIR}/daq-kube \033[0m"
 	@echo "You should review the instructions in that repository"
-	@echo "to see the expected usage"
+	@echo " to see the expected usage:"
 	@echo -e " \033[1m kluctl list-targets --only-names \033[0m"
 	@echo "You probably want to run something like this:"
+	@echo -e " \033[1m kluctl deploy -t pocket-baseline -y \033[0m"
+	@echo "Or this:"
 	@echo -e " \033[1m kluctl deploy -t pocket -y \033[0m"
 
 .PHONY: remove-${KIND_CLUSTER_NAME}-cluster
-remove-${KIND_CLUSTER_NAME}-cluster: | test-docker-is-working get-kind remove-kind-config ## Delete the KinD cluster
+remove-${KIND_CLUSTER_NAME}-cluster: remove-kind-config | test-docker-is-working get-kind ## Delete the KinD cluster
 	@echo ""
 	${MY_BINDIR}/kind delete cluster --name ${KIND_CLUSTER_NAME}
 	@echo ""
