@@ -1,4 +1,4 @@
-${MY_BINDIR}/kluctl: test-jq-is-working
+${MY_BINDIR}/kluctl: | test-jq-is-working
 	@mkdir -p ${MY_BINDIR}
 	@echo ""
 	@echo -e "Finding latest version of \033[1mkluctl\033[0m..."
