@@ -57,7 +57,7 @@ remove-kind-config: ## Delete the generated KinD config
 	@rm -f ${MY_KIND_CLUSTER_CONFIG}
 
 .PHONY: create-${KIND_CLUSTER_NAME}-cluster
-create-${KIND_CLUSTER_NAME}-cluster: test-shell-utils test-docker-is-working get-kubectl get-kind write-kind-config get-kluctl ## Create the KinD cluster
+create-${KIND_CLUSTER_NAME}-cluster: write-kind-config | test-shell-utils test-docker-is-working get-kubectl get-kind get-kluctl ## Create the KinD cluster
 	@echo ""
 	@echo "Creating kind cluster..."
 	@echo -e "\033[1m**\033[0m The wait for control-plane=Ready \033[1mmay time out\033[0m, this is safe to ignore. \033[1m**\033[0m"
@@ -83,11 +83,13 @@ create-${KIND_CLUSTER_NAME}-cluster: test-shell-utils test-docker-is-working get
 	@echo -e "from the \033[1mdaq-kube\033[0m repo you have just checked out:"
 	@echo -e " \033[1m cd ${MAKEFILE_DIR}/daq-kube \033[0m"
 	@echo "You should review the instructions in that repository"
-	@echo "to run something like this:"
+	@echo "to see the expected usage"
+	@echo -e " \033[1m kluctl list-targets --only-names \033[0m"
+	@echo "You probably want to run something like this:"
 	@echo -e " \033[1m kluctl deploy -t pocket -y \033[0m"
 
 .PHONY: remove-${KIND_CLUSTER_NAME}-cluster
-remove-${KIND_CLUSTER_NAME}-cluster: test-docker-is-working get-kind remove-kind-config ## Delete the KinD cluster
+remove-${KIND_CLUSTER_NAME}-cluster: | test-docker-is-working get-kind remove-kind-config ## Delete the KinD cluster
 	@echo ""
 	${MY_BINDIR}/kind delete cluster --name ${KIND_CLUSTER_NAME}
 	@echo ""
@@ -125,7 +127,7 @@ get-kube-daq: ${MAKEFILE_DIR}/daq-kube/.kluctl.yaml ## Checkout kube-daq reposit
 ### System tests
 ##
 .PHONY: test-shell-utils
-test-shell-utils: test-base64-is-working test-find-is-working test-git-exists test-grep-is-working test-jq-is-working test-sed-is-working  ## verify expected shell utils are installed
+test-shell-utils: | test-base64-is-working test-find-is-working test-git-exists test-grep-is-working test-jq-is-working test-sed-is-working  ## verify expected shell utils are installed
 
 .PHONY: test-base64-is-working
 test-base64-is-working: ## verify `base64` is working
