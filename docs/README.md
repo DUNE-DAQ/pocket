@@ -33,6 +33,8 @@ sudo systemctl enable docker
 sudo systemctl start docker
 ```
 
+**NOTE**: the CVMFS-CSI is incompatible with rootless containers.
+
 ## Setup
 
 To use this project you need to clone the git repo and run one of the Makefile workflows:
