@@ -129,12 +129,17 @@ get-kube-daq: ${MAKEFILE_DIR}/daq-kube/.kluctl.yaml ## Checkout kube-daq reposit
 ### System tests
 ##
 .PHONY: test-shell-utils
-test-shell-utils: | test-base64-is-working test-find-is-working test-git-exists test-grep-is-working test-jq-is-working test-sed-is-working  ## verify expected shell utils are installed
+test-shell-utils: | test-base64-is-working test-curl-is-working test-find-is-working test-git-exists test-grep-is-working test-jq-is-working test-sed-is-working  ## verify expected shell utils are installed
 
 .PHONY: test-base64-is-working
 test-base64-is-working: ## verify `base64` is working
 	@echo -e "Checking if \`\033[1mbase64\033[0m\` is installed and working"
 	@echo | base64 >/dev/null
+
+.PHONY: test-curl-is-working
+test-curl-is-working: ## verify `curl` is working
+        @echo -e "Checking if \`\033[1mcurl\033[0m\` is installed and working"
+        @echo | curl -s https://github.com >/dev/null
 
 .PHONY: test-docker-is-working
 test-docker-is-working: ## verify `docker` can run images
