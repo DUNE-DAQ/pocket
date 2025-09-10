@@ -6,9 +6,9 @@ KIND_CLUSTER_NAME := pocketdune
 # BEGIN FRUSTRATING MANUAL MAINTANCE
 # keep these in sync by hand :(
 # RHEL7 doesn't support kind 0.20.0 or later
-KUBERNETES_VERSION := v1.33.1
-KIND_VERSION := v0.29.0
-KIND_NODE_VERSION := docker.io/kindest/node:v1.33.1@sha256:050072256b9a903bd914c0b2866828150cb229cea0efe5892e2b644d5dd3b34f
+KUBERNETES_VERSION := v1.34.0
+KIND_VERSION := v0.30.0
+KIND_NODE_VERSION := docker.io/kindest/node:v1.34.0@sha256:7416a61b42b1662ca6ca89f02028ac133a309a2a30ba309614e8ec94d976dc5a
 # END FRUSTRATING MANUAL MAINTANCE
 
 MAKEFILE_DIR := $(dir $(realpath $(lastword $(MAKEFILE_LIST))))
@@ -21,7 +21,7 @@ MY_KIND_CLUSTER_CONFIG := ${MY_CONFIGDIR}/${KIND_CLUSTER_NAME}.kind.cluster.conf
 OS := $(shell uname -s | tr '[:upper:]' '[:lower:]')
 PLATFORM := $(shell uname -m | tr '[:upper:]' '[:lower:]' | sed -e 's/x86_64/amd64/')
 
-# try to break out targets into something more manageable 
+# try to break out targets into something more manageable
 include .makefile/kubectl.mk
 include .makefile/kind.mk
 include .makefile/kind-config.mk
