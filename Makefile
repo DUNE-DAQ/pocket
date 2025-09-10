@@ -138,8 +138,8 @@ test-base64-is-working: ## verify `base64` is working
 
 .PHONY: test-curl-is-working
 test-curl-is-working: ## verify `curl` is working
-        @echo -e "Checking if \`\033[1mcurl\033[0m\` is installed and working"
-        @echo | curl -s https://github.com >/dev/null
+	@echo -e "Checking if \`\033[1mcurl\033[0m\` is installed and working"
+	@echo | curl -s https://github.com >/dev/null
 
 .PHONY: test-docker-is-working
 test-docker-is-working: ## verify `docker` can run images
