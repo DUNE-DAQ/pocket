@@ -43,29 +43,27 @@ ${MY_KIND_CLUSTER_CONFIG}: remove-kind-config get-kube-daq
 	@echo "  localStorageCapacityIsolation: true" >> ${MY_KIND_CLUSTER_CONFIG}
 	@echo "" >> ${MY_KIND_CLUSTER_CONFIG}
 	@echo "- |-" >> ${MY_KIND_CLUSTER_CONFIG}
-	@echo "  apiVersion: kubeadm.k8s.io/v1beta3" >> ${MY_KIND_CLUSTER_CONFIG}
+	@echo "  apiVersion: kubeadm.k8s.io/v1beta4" >> ${MY_KIND_CLUSTER_CONFIG}
 	@echo "  kind: ClusterConfiguration" >> ${MY_KIND_CLUSTER_CONFIG}
 	@echo "  clusterName: ${KIND_CLUSTER_NAME}" >> ${MY_KIND_CLUSTER_CONFIG}
 	@echo "  apiServer:" >> ${MY_KIND_CLUSTER_CONFIG}
 	@echo "    extraArgs:" >> ${MY_KIND_CLUSTER_CONFIG}
-	@echo "      enable-aggregator-routing: \"true\"" >> ${MY_KIND_CLUSTER_CONFIG}
-	@echo "      enable-bootstrap-token-auth: \"true\"" >> ${MY_KIND_CLUSTER_CONFIG}
-	@echo "      authorization-mode: \"Node,RBAC\"" >> ${MY_KIND_CLUSTER_CONFIG}
-	@echo "      profiling: \"true\"" >> ${MY_KIND_CLUSTER_CONFIG}
+	@echo "    - name: enable-aggregator-routing" >> ${MY_KIND_CLUSTER_CONFIG}
+	@echo "      value: \"true\"" >> ${MY_KIND_CLUSTER_CONFIG}
+	@echo "    - name: enable-bootstrap-token-auth" >> ${MY_KIND_CLUSTER_CONFIG}
+	@echo "      value: \"true\"" >> ${MY_KIND_CLUSTER_CONFIG}
+	@echo "    - name: authorization-mode" >> ${MY_KIND_CLUSTER_CONFIG}
+	@echo "      value: \"Node,RBAC\"" >> ${MY_KIND_CLUSTER_CONFIG}
+	@echo "    - name: profiling" >> ${MY_KIND_CLUSTER_CONFIG}
+	@echo "      value: \"true\"" >> ${MY_KIND_CLUSTER_CONFIG}
 	@echo "" >> ${MY_KIND_CLUSTER_CONFIG}
 	@echo "nodes:" >> ${MY_KIND_CLUSTER_CONFIG}
 	@echo "- role: control-plane" >> ${MY_KIND_CLUSTER_CONFIG}
 	@echo "  image: ${KIND_NODE_VERSION}" >> ${MY_KIND_CLUSTER_CONFIG}
-	@echo "  kubeadmConfigPatches:" >> ${MY_KIND_CLUSTER_CONFIG}
-	@echo "  - |-" >> ${MY_KIND_CLUSTER_CONFIG}
-	@echo "    apiVersion: kubeadm.k8s.io/v1beta3" >> ${MY_KIND_CLUSTER_CONFIG}
-	@echo "    kind: InitConfiguration" >> ${MY_KIND_CLUSTER_CONFIG}
-	@echo "    nodeRegistration:" >> ${MY_KIND_CLUSTER_CONFIG}
-	@echo "      kubeletExtraArgs:" >> ${MY_KIND_CLUSTER_CONFIG}
-	@echo "        node-labels: "ingress-ready=true"" >> ${MY_KIND_CLUSTER_CONFIG}
-	@echo "" >> ${MY_KIND_CLUSTER_CONFIG}
+	@echo "  labels:" >> ${MY_KIND_CLUSTER_CONFIG}
+	@echo "    ingress-ready: \"true\"" >> ${MY_KIND_CLUSTER_CONFIG}
 	@echo "  extraPortMappings:" >> ${MY_KIND_CLUSTER_CONFIG}
-	@for port in $$(cd ${MAKEFILE_DIR}/daq-kube/node-ports/static-ports/ && grep nodePort * | cut -d':' -f3 | sort -n | grep -v nodePort); do echo "  - containerPort: $$port" >> ${MY_KIND_CLUSTER_CONFIG}; echo "    hostPort: $$port" >> ${MY_KIND_CLUSTER_CONFIG}; done
+	@for port in $$(cd ${MAKEFILE_DIR}/daq-kube/node-ports/static-ports/ && grep nodePort * | cut -d':' -f3 | sort -n | grep -v nodePort); do echo "  - containerPort: $${port}" >> ${MY_KIND_CLUSTER_CONFIG}; echo "    hostPort: $${port}" >> ${MY_KIND_CLUSTER_CONFIG}; done
 	@echo "" >> ${MY_KIND_CLUSTER_CONFIG}
 	@echo "- role: worker" >> ${MY_KIND_CLUSTER_CONFIG}
 	@echo "  image: ${KIND_NODE_VERSION}" >> ${MY_KIND_CLUSTER_CONFIG}
