@@ -7,9 +7,9 @@ KIND_CLUSTER_NAME := pocketdune
 # keep these in sync by hand :(
 # RHEL7 doesn't support kind 0.20.0 or later
 # RHEL8 can enable cgroup v2 for kind 0.31.0 or later
-KUBERNETES_VERSION := v1.35.0
-KIND_VERSION := v0.31.0
-KIND_NODE_VERSION := docker.io/kindest/node:v1.35.0@sha256:452d707d4862f52530247495d180205e029056831160e22870e37e3f6c1ac31f
+KUBERNETES_VERSION := v1.36.1
+KIND_VERSION := v0.32.0
+KIND_NODE_VERSION := docker.io/kindest/node:v1.36.1@sha256:3489c7674813ba5d8b1a9977baea8a6e553784dab7b84759d1014dbd78f7ebd5
 # END FRUSTRATING MANUAL MAINTANCE
 
 MAKEFILE_DIR := $(dir $(realpath $(lastword $(MAKEFILE_LIST))))
