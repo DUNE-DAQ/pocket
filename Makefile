@@ -23,6 +23,7 @@ OS := $(shell uname -s | tr '[:upper:]' '[:lower:]')
 PLATFORM := $(shell uname -m | tr '[:upper:]' '[:lower:]' | sed -e 's/x86_64/amd64/')
 
 # try to break out targets into something more manageable
+include .makefile/helm.mk
 include .makefile/kubectl.mk
 include .makefile/kind.mk
 include .makefile/kind-config.mk
@@ -58,7 +59,7 @@ remove-kind-config: ## Delete the generated KinD config
 	@rm -f ${MY_KIND_CLUSTER_CONFIG}
 
 .PHONY: create-${KIND_CLUSTER_NAME}-cluster
-create-${KIND_CLUSTER_NAME}-cluster: write-kind-config | test-shell-utils test-docker-is-working get-kubectl get-kind get-kluctl ## Create the KinD cluster
+create-${KIND_CLUSTER_NAME}-cluster: write-kind-config | test-shell-utils test-docker-is-working get-kubectl get-kind get-helm get-kluctl ## Create the KinD cluster
 	@echo ""
 	@echo "Creating kind cluster..."
 	@echo -e "\033[1m**\033[0m The wait for control-plane=Ready \033[1mmay time out\033[0m, this is safe to ignore. \033[1m**\033[0m"
@@ -112,6 +113,10 @@ get-kind: ${MY_BINDIR}/kind ## fetch KinD binary
 get-kubectl: ${MAKEFILE_DIR}/bin/kubectl ## fetch kubectl binary
 	@true # fall through to ugly name
 
+
+.PHONY: get-helm
+get-helm: ${MY_BINDIR}/helm ## fetch helm binary
+	@true # fall through to ugly name
 
 .PHONY: get-kluctl
 get-kluctl: ${MY_BINDIR}/kluctl ## fetch kluctl binary
