@@ -1,8 +1,9 @@
 ${MY_BINDIR}/helm: | test-jq-is-working
 	@mkdir -p ${MY_BINDIR}
 	@echo ""
-	@echo -e "Finding latest version of \033[1mhelm\033[0m..."
-	$(eval HELM_VERSION=$(shell curl -Lfs https://api.github.com/repos/helm/helm/releases/latest | jq '.tag_name' | tr -d '"'))
+	@if [ "${HELM_VERSION}" = "latest" ]; then \
+		HELM_VERSION=$$(curl -Lfs https://api.github.com/repos/helm/helm/releases/latest | jq '.tag_name' | tr -d '"'); \
+	fi
 	@echo -e "Downloading \033[1mhelm\033[0m ${HELM_VERSION} for ${OS} ${PLATFORM}..."
 	@echo "  https://get.helm.sh/helm-${HELM_VERSION}-${OS}-${PLATFORM}.tar.gz"
 	@curl -Lf https://get.helm.sh/helm-${HELM_VERSION}-${OS}-${PLATFORM}.tar.gz -o ${MY_BINDIR}/helm-${HELM_VERSION}.tar.gz
