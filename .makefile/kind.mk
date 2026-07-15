@@ -1,4 +1,4 @@
-${MY_BINDIR}/kind-${KIND_VERSION}:
+${MY_BINDIR}/kind:
 	@mkdir -p ${MY_BINDIR}; \
 	KIND_VERSION="${KIND_VERSION}"; \
 	if [ "$${KIND_VERSION}" = "latest" ]; then \
