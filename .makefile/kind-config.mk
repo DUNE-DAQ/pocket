@@ -59,14 +59,14 @@ ${MY_KIND_CLUSTER_CONFIG}: remove-kind-config get-kube-daq
 	@echo "" >> ${MY_KIND_CLUSTER_CONFIG}
 	@echo "nodes:" >> ${MY_KIND_CLUSTER_CONFIG}
 	@echo "- role: control-plane" >> ${MY_KIND_CLUSTER_CONFIG}
-	@echo "  image: ${KIND_NODE_VERSION}" >> ${MY_KIND_CLUSTER_CONFIG}
+	@if [ "${KIND_NODE_VERSION}" != "default" ]; then echo "  image: ${KIND_NODE_VERSION}" >> ${MY_KIND_CLUSTER_CONFIG}; fi
 	@echo "  labels:" >> ${MY_KIND_CLUSTER_CONFIG}
 	@echo "    ingress-ready: \"true\"" >> ${MY_KIND_CLUSTER_CONFIG}
 	@echo "  extraPortMappings:" >> ${MY_KIND_CLUSTER_CONFIG}
 	@for port in $$(cd ${MAKEFILE_DIR}/daq-kube/node-ports/static-ports/ && grep nodePort * | cut -d':' -f3 | sort -n | grep -v nodePort); do echo "  - containerPort: $${port}" >> ${MY_KIND_CLUSTER_CONFIG}; echo "    hostPort: $${port}" >> ${MY_KIND_CLUSTER_CONFIG}; done
 	@echo "" >> ${MY_KIND_CLUSTER_CONFIG}
 	@echo "- role: worker" >> ${MY_KIND_CLUSTER_CONFIG}
-	@echo "  image: ${KIND_NODE_VERSION}" >> ${MY_KIND_CLUSTER_CONFIG}
+	@if [ "${KIND_NODE_VERSION}" != "default" ]; then echo "  image: ${KIND_NODE_VERSION}" >> ${MY_KIND_CLUSTER_CONFIG}; fi
 	@echo "  extraMounts:" >> ${MY_KIND_CLUSTER_CONFIG}
 	@echo "  - hostPath: ${MY_PERSISTENT_STORAGE}" >> ${MY_KIND_CLUSTER_CONFIG}
 	@echo "    containerPath: /var/local-path-provisioner" >> ${MY_KIND_CLUSTER_CONFIG}

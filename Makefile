@@ -9,7 +9,7 @@ KIND_CLUSTER_NAME := pocketdune
 # RHEL8 can enable cgroup v2 for kind 0.31.0 or later
 KUBERNETES_VERSION := v1.36.1
 KIND_VERSION := v0.32.0
-KIND_NODE_VERSION := docker.io/kindest/node:v1.36.1@sha256:3489c7674813ba5d8b1a9977baea8a6e553784dab7b84759d1014dbd78f7ebd5
+KIND_NODE_VERSION := default
 
 HELM_VERSION ?= latest
 KLUCTL_VERSION ?= v2.27.0
